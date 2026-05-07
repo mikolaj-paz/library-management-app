@@ -127,6 +127,9 @@ cd library-management-app
 
 ## Running the App
 
+> [!WARNING]
+> If you encounter an error with missing **library-application** and **library-infrastructure** dependency, try running `./mvnw install` first.
+
 ```bash
 # Run via Spring Boot plugin
 ./mvnw -pl library-api spring-boot:run --no-transfer-progress
@@ -135,6 +138,8 @@ cd library-management-app
 ./mvnw -pl library-api package --no-transfer-progress
 java -jar library-api/target/library-api-*.jar
 ```
+
+If everything is set up correctly, there should be a running static page at `http://localhost:8080/`.
 
 ---
 
