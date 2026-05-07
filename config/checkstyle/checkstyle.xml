@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<!--
+  Checkstyle configuration.
+
+  Naming conventions, import hygiene, and basic code quality.
+  Formatting (indentation, line length, braces style) is intentionally
+  delegated to Spotless / Google Java Format.
+-->
+<module name="Checker">
+    <property name="severity" value="error"/>
+    <property name="fileExtensions" value="java"/>
+
+    <module name="NewlineAtEndOfFile"/>
+
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+    </module>
+
+    <module name="TreeWalker">
+
+        <module name="PackageName">
+            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+        </module>
+
+        <!-- Classes and interfaces: UpperCamelCase -->
+        <module name="TypeName"/>
+
+        <!-- Methods: lowerCamelCase -->
+        <module name="MethodName"/>
+
+        <!-- Parameters: lowerCamelCase -->
+        <module name="ParameterName"/>
+
+        <!-- Local variables: lowerCamelCase -->
+        <module name="LocalVariableName"/>
+
+        <!-- Instance fields: lowerCamelCase -->
+        <module name="MemberName"/>
+
+        <!-- Static non-final fields: lowerCamelCase -->
+        <module name="StaticVariableName"/>
+
+        <!-- Constants (static final): UPPER_SNAKE_CASE -->
+        <module name="ConstantName"/>
+
+        <!-- Generic type parameters: single uppercase letter or UpperCamelCase -->
+        <module name="ClassTypeParameterName">
+            <property name="format" value="^[A-Z][A-Z0-9]*$|^[A-Z][a-zA-Z0-9]*$"/>
+        </module>
+        <module name="InterfaceTypeParameterName">
+            <property name="format" value="^[A-Z][A-Z0-9]*$|^[A-Z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <!-- No wildcard imports (e.g. import java.util.*) -->
+        <module name="AvoidStarImport"/>
+
+        <!-- No unused imports (Spotless removeUnusedImports also handles this) -->
+        <module name="UnusedImports"/>
+
+        <!-- No imports from sun.* packages -->
+        <module name="IllegalImport"/>
+
+        <!-- Only one top-level type per file -->
+        <module name="OneTopLevelClass"/>
+
+        <!-- File name must match the public type name -->
+        <module name="OuterTypeFilename"/>
+
+        <!-- Never use == or != to compare Strings -->
+        <module name="StringLiteralEquality"/>
+
+        <!-- If equals() is overridden, hashCode() must be too -->
+        <module name="EqualsHashCode"/>
+
+        <!-- Simplify redundant boolean expressions, e.g. b == true → b -->
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+
+        <!-- Do not assign variables inside expressions, e.g. if ((x = foo()) != null) -->
+        <module name="InnerAssignment"/>
+
+        <!-- Empty catch blocks must have a comment explaining why -->
+        <module name="EmptyCatchBlock">
+            <property name="exceptionVariableName" value="expected|ignore|ignored"/>
+        </module>
+
+        <!-- Detect empty statements (lone semicolons) -->
+        <module name="EmptyStatement"/>
+
+        <!-- Modifiers in the canonical JLS order: public protected private ... -->
+        <module name="ModifierOrder"/>
+
+        <!-- Remove modifiers that are implicit: e.g. public on interface methods -->
+        <module name="RedundantModifier"/>
+
+    </module>
+</module>

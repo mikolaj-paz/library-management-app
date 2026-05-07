@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.example</groupId>
+        <artifactId>library-app</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>library-infrastructure</artifactId>
+    <name>Library :: Infrastructure</name>
+    <description>
+        Driven adapters - implements domain out-ports.
+        Contains: JPA persistence, repository implementations, mappers,
+        messaging adapters, and Spring configuration beans.
+        Depends on library-domain (implements its ports) and library-application
+        (for event publishing hooks if needed).
+    </description>
+
+    <dependencies>
+        <!-- Domain ports to implement -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>library-domain</artifactId>
+        </dependency>
+
+        <!-- Application layer (for ApplicationEventPublisher wiring if needed) -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>library-application</artifactId>
+        </dependency>
+
+        <!-- Spring Data JPA + Hibernate -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- MapStruct — JPA entity ↔ domain model mappers -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+
+        <!-- Test dependencies — integration tests with real DB via Testcontainers -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

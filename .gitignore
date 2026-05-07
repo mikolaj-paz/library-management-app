@@ -1,14 +1,16 @@
-# Compiled class file
+# Maven build output
+target/
 *.class
 
-# Log file
-*.log
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
 
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# VS Code
+.vscode/
 
 # Package Files #
 *.jar
@@ -18,7 +20,13 @@
 *.zip
 *.tar.gz
 *.rar
+!**/src/main/**
+!**/src/test/**
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# Logs
+*.log
+logs/
+
+# JVM crash logs
 hs_err_pid*
 replay_pid*

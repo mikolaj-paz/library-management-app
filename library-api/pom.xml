@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.example</groupId>
+        <artifactId>library-app</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>library-api</artifactId>
+    <name>Library :: API</name>
+    <description>
+        Driving adapter - REST entry point. Controllers are thin adapters that
+        translate HTTP requests into Commands/Queries and delegate to application services.
+        This module wires all layers together and hosts the @SpringBootApplication class.
+        Depends on library-application (use cases) and library-infrastructure (for DI wiring).
+    </description>
+
+    <dependencies>
+        <!-- Application use-case interfaces (what controllers call) -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>library-application</artifactId>
+        </dependency>
+
+        <!-- Infrastructure pulled in for Spring DI wiring — no direct calls to infra from controllers -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>library-infrastructure</artifactId>
+        </dependency>
+
+        <!-- Spring Web MVC -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- MapStruct — DTO ↔ Command/Query mappers -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+
+        <!-- Test dependencies — @WebMvcTest slice tests -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+              spring-boot-maven-plugin: packages the fat JAR / runs the app.
+              Add the main class to configuration once @SpringBootApplication is created:
+                <configuration>
+                    <mainClass>com.example.library.api.LibraryApplication</mainClass>
+                </configuration>
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <configuration>
+                    <!-- Skip repackage until the main application class is created -->
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
