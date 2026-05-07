@@ -27,6 +27,10 @@ out/
 *.log
 logs/
 
+# Local SQLite database files
+*.db
+*.db-journal
+
 # JVM crash logs
 hs_err_pid*
 replay_pid*

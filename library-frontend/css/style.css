@@ -1,0 +1,66 @@
+:root {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --text: #223047;
+  --muted: #66738a;
+  --primary: #0f766e;
+  --primary-strong: #115e59;
+  --border: #d8e1ea;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at top right, #d5f5ef, var(--bg) 55%);
+  min-height: 100vh;
+}
+
+.topbar {
+  padding: 2rem 1.5rem 1rem;
+  text-align: center;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 2.5vw, 2.4rem);
+}
+
+.topbar p {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+}
+
+.container {
+  width: min(860px, 92vw);
+  margin: 1rem auto 2rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 8px 28px rgba(34, 48, 71, 0.08);
+}
+
+button {
+  border: none;
+  background: var(--primary);
+  color: #ffffff;
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:hover {
+  background: var(--primary-strong);
+}
