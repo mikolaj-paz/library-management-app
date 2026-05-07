@@ -1,102 +1,193 @@
 # Library Management App
 
-Modular Java 21 project for a library management system, organized with DDD-style layers.
+A modular Java 21 library management system built with **Domain-Driven Design** and **Hexagonal Architecture**. The project is structured as a Maven multi-module build with strict layer isolation enforced at the module level.
 
 > [!CAUTION]
-> Runtime bootstrap class (`@SpringBootApplication`) is not yet present, so the app is currently in build-first mode.
+> The runtime bootstrap class (`@SpringBootApplication`) is not yet present. The project is currently in **build-first / skeleton mode** — domain implementation begins once the Strategist and Tactician deliver their design documents.
+
+---
 
 ## Tech Stack
 
-- Java 21
-- Maven (multi-module build)
-- Spring Boot (API module wiring)
-- Spotless + Google Java Format
-- Checkstyle
+| Technology | Version | Purpose |
+|---|---|---|
+| Java | 21 | Language |
+| Spring Boot | 3.3.5 | Application framework (API module only) |
+| Maven | 3.9.15 (via wrapper) | Build & dependency management |
+| Spotless + Google Java Format | 1.22.0 | Code formatting |
+| Checkstyle | — | Lint / style enforcement |
+| ArchUnit | 1.3.0 | Architecture fitness functions |
+| MapStruct | 1.5.5.Final | DTO ↔ domain mapping |
+| Testcontainers | 1.19.8 | Integration test infrastructure |
+| JUnit 5 + AssertJ + Mockito | (via Spring Boot BOM) | Testing |
+
+---
+
+## Architecture
+
+The project follows Hexagonal Architecture. The domain model has zero framework dependencies and is tested in isolation.
+
+```
+┌──────────────────────────────────────┐
+│           DRIVING SIDE               │
+│     REST API · Scheduled Jobs        │
+└────────────────┬─────────────────────┘
+                 │ uses
+       ┌─────────▼──────────┐
+       │  Application Layer  │  ← Use Cases / CQRS
+       └─────────┬──────────┘
+                 │ uses
+       ┌─────────▼──────────┐
+       │    Domain Layer     │  ← Aggregates, Entities,
+       │  (Pure Java, no FW) │    Value Objects, Domain
+       │                     │    Services, Domain Events
+       └─────────┬──────────┘
+                 │ defines ports (interfaces)
+       ┌─────────▼──────────┐
+       │  Infrastructure     │  ← JPA, Messaging, Adapters
+       └─────────────────────┘
+```
+
+### Module Dependency Rules
+
+```
+library-shared-kernel   →  (no library-* deps)
+library-domain          →  (no library-* deps)
+library-application     →  library-domain
+library-infrastructure  →  library-domain, library-application
+library-api             →  library-application, library-infrastructure
+```
+
+---
+
+## Module Structure
+
+| Module | Responsibility |
+|---|---|
+| `library-shared-kernel` | Shared value objects and cross-cutting primitives |
+| `library-domain` | Aggregates, entities, value objects, domain services, domain events, exceptions, and inbound/outbound ports |
+| `library-application` | Use-case orchestration — commands, queries, application services |
+| `library-infrastructure` | Persistence (JPA), messaging adapters, Spring configuration |
+| `library-api` | REST controllers, DTOs, MapStruct mappers, Spring Boot wiring |
+
+<details>
+<summary>Detailed package layout</summary>
+
+```
+library-domain/src/main/java/.../domain/
+├── model/          # Aggregates, Entities, Value Objects
+├── event/          # Domain Events
+├── exception/      # Domain Exceptions
+├── port/
+│   ├── in/         # Driving ports (use-case interfaces)
+│   └── out/        # Driven ports (repository / service interfaces)
+└── service/        # Domain Services
+
+library-application/src/main/java/.../application/
+├── command/        # Write-side commands
+├── query/          # Read-side queries
+└── service/        # Application Services (implement in-ports)
+
+library-infrastructure/src/main/java/.../infrastructure/
+├── persistence/    # JPA entities, repositories, mappers
+├── messaging/      # Domain event publishing
+└── config/         # Spring beans, DB config
+
+library-api/src/main/java/.../api/
+├── rest/
+│   ├── controller/ # Spring MVC controllers (thin adapters)
+│   ├── dto/        # Request / Response DTOs
+│   └── mapper/     # DTO ↔ Command/Query mappers (MapStruct)
+└── config/         # Application wiring
+```
+
+</details>
+
+---
 
 ## Prerequisites
 
-Install the following locally:
+- **JDK 21** — required; verify with `java -version`
+- Maven is **not** required locally — use the included wrapper (`./mvnw` / `mvnw.cmd`)
 
-- JDK 21
-- Maven 3.9+
+---
 
-Verify tools:
+## Getting Started
 
-- `java -version`
-- `mvn -version`
+```bash
+# Clone and enter the project
+git clone <repo-url>
+cd library-management-app
 
-## Setup
+# Compile all modules
+./mvnw compile --no-transfer-progress -DskipTests
+```
 
-1. Clone the repository.
-2. Open the root directory.
-3. Compile all modules from project root:
+---
 
-	 `mvn compile --no-transfer-progress -DskipTests`
+## Running the App
 
+> [!NOTE]
+> Requires `@SpringBootApplication` to be added to `library-api` first.
 
+```bash
+# Run via Spring Boot plugin
+./mvnw -pl library-api spring-boot:run --no-transfer-progress
 
-## How to Run the App
+# Or build and run the JAR
+./mvnw -pl library-api package --no-transfer-progress
+java -jar library-api/target/library-api-*.jar
+```
 
-### Once the main class is added
-
-- From root:
-
-	`mvn -pl library-api spring-boot:run --no-transfer-progress`
-
-- Or package first, then run JAR (example workflow):
-
-	`mvn -pl library-api package --no-transfer-progress`
+---
 
 ## Developer Guide
 
-### File Structure Summary
+### Before Every Push
 
-- `library-shared-kernel` - shared value objects and cross-cutting abstractions.
-- `library-domain` - entities, domain services, domain events, domain exceptions, and inbound ports.
-- `library-application` - use-case orchestration (commands, queries, application services).
-- `library-infrastructure` - persistence, messaging, and technical adapters.
-- `library-api` - REST controllers, DTOs, mappers, and application wiring.
-- `config/checkstyle/checkstyle.xml` - linting rules used by Checkstyle.
-- `.github/workflows/ci.yml` - CI pipeline definition.
+```bash
+# Auto-format all sources (Google Java Format)
+./mvnw spotless:apply --no-transfer-progress
 
-### Commands to Run After Implementation
+# Run all checks: compile + format + lint + tests
+./mvnw verify --no-transfer-progress
+```
 
-Use these before pushing changes:
+Individual checks:
 
-- Auto-format sources:
+```bash
+./mvnw spotless:check --no-transfer-progress   # formatting
+./mvnw checkstyle:check --no-transfer-progress  # lint
+```
 
-	`mvn spotless:apply --no-transfer-progress`
+### Test Layers
 
-- Verify formatting (same rule set as CI):
+| Layer | Type | Tooling |
+|---|---|---|
+| Domain model | Unit | JUnit 5 + AssertJ |
+| Application services | Unit (mocked ports) | JUnit 5 + Mockito |
+| Infrastructure / Persistence | Integration | `@DataJpaTest` + Testcontainers |
+| REST API | Slice | `@WebMvcTest` + MockMvc |
+| Full flow | Acceptance | `@SpringBootTest` + Testcontainers + RestAssured |
 
-	`mvn spotless:check --no-transfer-progress`
+### Test Naming Convention
 
-- Run linter (same rule set as CI):
+```java
+// BDD-style
+void should_raise_BookBorrowed_event_when_available_book_is_borrowed() { ... }
+void should_throw_BookNotAvailable_when_book_is_already_on_loan() { ... }
+```
 
-	`mvn checkstyle:check --no-transfer-progress`
+---
 
-- Compile all modules:
+## CI
 
-	`mvn compile --no-transfer-progress -DskipTests`
+The GitHub Actions pipeline (`.github/workflows/ci.yml`) runs on every push and pull request to `main`:
 
-### Run All Maven Checks
+| Job | What it checks |
+|---|---|
+| **Build** | `mvn compile -DskipTests` |
+| **Format** | Spotless (Google Java Format) |
+| **Lint** | Checkstyle |
 
-Recommended single command from root:
-
-- `mvn verify --no-transfer-progress`
-
-Why this command:
-
-- Runs full Maven lifecycle up to `verify`.
-- Executes Spotless and Checkstyle checks bound to `verify` in parent POM.
-- Includes tests when test classes are present.
-
-## CI Overview
-
-Current CI workflow validates:
-
-- Build (compile, tests skipped)
-- Formatting compliance (Spotless)
-- Lint compliance (Checkstyle)
-
-Coverage job template exists in CI and can be enabled later when tests and coverage thresholds are finalized.
+A coverage job (JaCoCo) is templated in the workflow and can be enabled once test classes exist.
