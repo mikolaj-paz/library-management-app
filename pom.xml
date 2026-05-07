@@ -35,10 +35,10 @@
         <sqlite-jdbc.version>3.45.3.0</sqlite-jdbc.version>
 
         <!-- Plugin versions -->
-        <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
-        <spotless-plugin.version>2.43.0</spotless-plugin.version>
-        <checkstyle-plugin.version>3.3.1</checkstyle-plugin.version>
-        <google-java-format.version>1.22.0</google-java-format.version>
+        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+        <spotless-plugin.version>3.4.0</spotless-plugin.version>
+        <checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
+        <google-java-format.version>1.35.0</google-java-format.version>
     </properties>
 
     <dependencyManagement>

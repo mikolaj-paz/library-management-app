@@ -2,8 +2,8 @@
 
 A modular Java 21 library management system built with **Domain-Driven Design** and **Hexagonal Architecture**. The project is structured as a Maven multi-module build with strict layer isolation enforced at the module level.
 
-> [!CAUTION]
-> The runtime bootstrap class (`@SpringBootApplication`) is not yet present. The project is currently in **build-first / skeleton mode** — domain implementation begins once the Strategist and Tactician deliver their design documents.
+> [!NOTE]
+> The project remains in **build-first / skeleton mode** for domain implementation until the Strategist and Tactician design documents are delivered.
 
 ---
 
@@ -126,9 +126,6 @@ cd library-management-app
 ---
 
 ## Running the App
-
-> [!NOTE]
-> Requires `@SpringBootApplication` to be added to `library-api` first.
 
 ```bash
 # Run via Spring Boot plugin

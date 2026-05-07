@@ -56,42 +56,31 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>copy-frontend-static</id>
                         <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
+                        <goals><goal>run</goal></goals>
                         <configuration>
-                            <outputDirectory>${project.build.outputDirectory}/static</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${maven.multiModuleProjectDirectory}/library-frontend</directory>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
+                            <target>
+                                <copy todir="${project.build.outputDirectory}/static">
+                                    <fileset dir="${maven.multiModuleProjectDirectory}/library-frontend"/>
+                                </copy>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <!--
-              spring-boot-maven-plugin: packages the fat JAR / runs the app.
-              Add the main class to configuration once @SpringBootApplication is created:
-                <configuration>
-                    <mainClass>com.example.library.api.LibraryApplication</mainClass>
-                </configuration>
-            -->
+            <!-- spring-boot-maven-plugin: packages the fat JAR / runs the app. -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <!-- Skip repackage until the main application class is created -->
-                    <skip>true</skip>
+                    <mainClass>com.example.library.api.LibraryApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
