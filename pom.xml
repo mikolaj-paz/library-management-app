@@ -37,6 +37,7 @@
         <spotless-plugin.version>3.4.0</spotless-plugin.version>
         <checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
         <google-java-format.version>1.35.0</google-java-format.version>
+        <jacoco-plugin.version>0.8.14</jacoco-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -160,6 +161,16 @@
                         <includeTestSourceDirectory>false</includeTestSourceDirectory>
                     </configuration>
                 </plugin>
+
+                <!--
+                  JaCoCo — coverage instrumentation and report generation.
+                  No <rules> block = no minimum threshold; report is informational only.
+                -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-plugin.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -192,6 +203,28 @@
                         <phase>verify</phase>
                         <goals>
                             <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <!-- Instruments the JVM before Surefire runs tests -->
+                    <execution>
+                        <id>jacoco-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <!-- Generates HTML/XML report; no <rules> = no threshold enforcement -->
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
                         </goals>
                     </execution>
                 </executions>
