@@ -12,13 +12,11 @@ A modular Java 21 library management system built with **Domain-Driven Design** 
 | Technology | Version | Purpose |
 |---|---|---|
 | Java | 21 | Language |
-| Spring Boot | 3.3.5 | Application framework (API module only) |
+| Spring Boot | 3.5.14 | Application framework (API module only) |
 | Maven | 3.9.15 (via wrapper) | Build & dependency management |
-| Spotless + Google Java Format | 1.22.0 | Code formatting |
+| Spotless + Google Java Format | 1.35.0 | Code formatting |
 | Checkstyle | — | Lint / style enforcement |
-| ArchUnit | 1.3.0 | Architecture fitness functions |
-| MapStruct | 1.5.5.Final | DTO ↔ domain mapping |
-| Testcontainers | 1.19.8 | Integration test infrastructure |
+| MapStruct | 1.6.3 | DTO ↔ domain mapping |
 | JUnit 5 + AssertJ + Mockito | (via Spring Boot BOM) | Testing |
 
 ---
@@ -52,7 +50,7 @@ The project follows Hexagonal Architecture. The domain model has zero framework 
 
 ```
 library-shared-kernel   →  (no library-* deps)
-library-domain          →  (no library-* deps)
+library-domain          →  library-shared-kernel
 library-application     →  library-domain
 library-infrastructure  →  library-domain, library-application
 library-api             →  library-application, library-infrastructure
@@ -168,9 +166,9 @@ Individual checks:
 |---|---|---|
 | Domain model | Unit | JUnit 5 + AssertJ |
 | Application services | Unit (mocked ports) | JUnit 5 + Mockito |
-| Infrastructure / Persistence | Integration | `@DataJpaTest` + Testcontainers |
+| Infrastructure / Persistence | Integration | `@DataJpaTest` |
 | REST API | Slice | `@WebMvcTest` + MockMvc |
-| Full flow | Acceptance | `@SpringBootTest` + Testcontainers + RestAssured |
+| Full flow | Acceptance | `@SpringBootTest` + RestAssured |
 
 ### Test Naming Convention
 
@@ -188,8 +186,5 @@ The GitHub Actions pipeline (`.github/workflows/ci.yml`) runs on every push and 
 
 | Job | What it checks |
 |---|---|
-| **Build** | `mvn compile -DskipTests` |
-| **Format** | Spotless (Google Java Format) |
-| **Lint** | Checkstyle |
-
-A coverage job (JaCoCo) is templated in the workflow and can be enabled once test classes exist.
+| **Build · Format · Lint** | `mvn compile -DskipTests`, Spotless, Checkstyle |
+| **Test Coverage** | `mvn verify` + JaCoCo report uploaded as artifact |
