@@ -12,11 +12,10 @@
     <name>Library Management App</name>
 
     <modules>
-        <module>library-shared-kernel</module>
-        <module>library-domain</module>
-        <module>library-application</module>
-        <module>library-infrastructure</module>
-        <module>library-api</module>
+        <module>shared-kernel</module>
+        <module>lending</module>
+        <module>bootstrap</module>
+        <!-- <module>library-api</module> -->
     </modules>
 
     <properties>
@@ -81,22 +80,27 @@
             <!-- Internal modules -->
             <dependency>
                 <groupId>com.example</groupId>
-                <artifactId>library-shared-kernel</artifactId>
+                <artifactId>shared-kernel</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.example</groupId>
-                <artifactId>library-domain</artifactId>
+                <artifactId>lending-domain</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.example</groupId>
-                <artifactId>library-application</artifactId>
+                <artifactId>lending-application</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.example</groupId>
-                <artifactId>library-infrastructure</artifactId>
+                <artifactId>lending-infrastructure</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>bootstrap</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
