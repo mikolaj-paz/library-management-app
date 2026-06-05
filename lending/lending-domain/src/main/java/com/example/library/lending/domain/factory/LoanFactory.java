@@ -1,10 +1,10 @@
 package com.example.library.lending.domain.factory;
 
-import com.example.library.lending.domain.copy.BookCopyId;
 import com.example.library.lending.domain.loan.Loan;
 import com.example.library.lending.domain.loan.LoanId;
 import com.example.library.lending.domain.loan.LoanPeriod;
-import com.example.library.lending.domain.patron.PatronId;
+import com.example.library.sharedkernel.identifier.BookCopyId;
+import com.example.library.sharedkernel.identifier.PatronId;
 
 public class LoanFactory {
 

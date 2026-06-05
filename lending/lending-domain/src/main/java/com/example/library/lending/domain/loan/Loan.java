@@ -1,7 +1,7 @@
 package com.example.library.lending.domain.loan;
 
-import com.example.library.lending.domain.copy.BookCopyId;
-import com.example.library.lending.domain.patron.PatronId;
+import com.example.library.sharedkernel.identifier.BookCopyId;
+import com.example.library.sharedkernel.identifier.PatronId;
 import com.example.library.sharedkernel.primitives.AggregateRoot;
 
 public class Loan extends AggregateRoot<LoanId> {

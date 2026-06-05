@@ -3,8 +3,9 @@ package com.example.library.lending.domain.factory;
 import com.example.library.lending.domain.copy.BookCopy;
 import com.example.library.lending.domain.patron.Patron;
 import com.example.library.lending.domain.reservation.Reservation;
-import com.example.library.lending.domain.reservation.ReservationId;
 import com.example.library.lending.domain.reservation.ReservationStatus;
+import com.example.library.sharedkernel.identifier.ReservationId;
+
 import java.time.LocalDate;
 
 public class ReservationFactory {

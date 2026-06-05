@@ -1,5 +1,6 @@
 package com.example.library.lending.domain.patron;
 
+import com.example.library.sharedkernel.identifier.PatronId;
 import com.example.library.sharedkernel.primitives.Entity;
 
 public class Patron extends Entity<PatronId> {

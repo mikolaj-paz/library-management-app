@@ -1,7 +1,8 @@
 package com.example.library.lending.domain.reservation;
 
-import com.example.library.lending.domain.copy.BookCopyId;
-import com.example.library.lending.domain.patron.PatronId;
+import com.example.library.sharedkernel.identifier.BookCopyId;
+import com.example.library.sharedkernel.identifier.PatronId;
+import com.example.library.sharedkernel.identifier.ReservationId;
 import com.example.library.sharedkernel.primitives.AggregateRoot;
 import java.time.LocalDate;
 

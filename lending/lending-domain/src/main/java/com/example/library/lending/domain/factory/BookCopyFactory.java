@@ -1,8 +1,8 @@
 package com.example.library.lending.domain.factory;
 
 import com.example.library.lending.domain.copy.BookCopy;
-import com.example.library.lending.domain.copy.BookCopyId;
 import com.example.library.lending.domain.copy.BookCopyStatus;
+import com.example.library.sharedkernel.identifier.BookCopyId;
 
 public class BookCopyFactory {
 
