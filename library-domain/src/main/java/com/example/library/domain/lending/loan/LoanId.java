@@ -1,4 +1,4 @@
-package com.example.library.domain.model;
+package com.example.library.domain.lending.loan;
 
 import java.util.Objects;
 import java.util.UUID;

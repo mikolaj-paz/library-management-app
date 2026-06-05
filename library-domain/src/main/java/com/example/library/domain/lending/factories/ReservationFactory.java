@@ -1,10 +1,11 @@
-package com.example.library.domain.factory;
+package com.example.library.domain.lending.factories;
 
-import com.example.library.domain.model.BookCopy;
+import com.example.library.domain.lending.copy.BookCopy;
+import com.example.library.domain.lending.reservation.Reservation;
+import com.example.library.domain.lending.reservation.ReservationId;
+import com.example.library.domain.lending.reservation.ReservationStatus;
 import com.example.library.domain.model.Patron;
-import com.example.library.domain.model.Reservation;
-import com.example.library.domain.model.ReservationId;
-import com.example.library.domain.model.ReservationStatus;
+
 import java.time.LocalDate;
 
 public class ReservationFactory {

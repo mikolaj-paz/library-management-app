@@ -1,4 +1,4 @@
-package com.example.library.domain.model;
+package com.example.library.domain.lending.reservation;
 
 public enum ReservationStatus {
   PENDING,
