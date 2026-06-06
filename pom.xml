@@ -13,6 +13,7 @@
 
     <modules>
         <module>shared-kernel</module>
+        <module>catalog</module>
         <module>lending</module>
         <module>bootstrap</module>
     </modules>
@@ -72,6 +73,21 @@
             <dependency>
                 <groupId>com.example</groupId>
                 <artifactId>shared-kernel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>catalog-domain</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>catalog-application</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>catalog-infrastructure</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
