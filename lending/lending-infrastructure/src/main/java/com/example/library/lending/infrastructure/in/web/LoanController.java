@@ -2,40 +2,43 @@ package com.example.library.lending.infrastructure.in.web;
 
 import com.example.library.lending.application.command.LendBookCopy;
 import com.example.library.lending.application.port.in.ILendBookCopy;
+import com.example.library.lending.domain.exception.BookCopyNotAvailableException;
+import com.example.library.lending.domain.exception.LoanLimitExceededException;
+import com.example.library.lending.domain.exception.ReaderBlockedException;
 import com.example.library.sharedkernel.identifier.BookCopyId;
-import com.example.library.sharedkernel.identifier.PatronId;
-import java.time.LocalDate;
-import java.util.Objects;
-import java.util.UUID;
+import com.example.library.sharedkernel.identifier.ReaderId;
+import java.util.Map;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
+@RequestMapping("/loans")
 public class LoanController {
 
   private final ILendBookCopy lendBookCopy;
 
   public LoanController(ILendBookCopy lendBookCopy) {
-    this.lendBookCopy = Objects.requireNonNull(lendBookCopy, "Lending use case must not be null");
+    this.lendBookCopy = lendBookCopy;
   }
 
-  public LoanResponse lend(LendBookCopyRequest request) {
-    Objects.requireNonNull(request, "Request must not be null");
+  @PostMapping
+  public ResponseEntity<?> lendBookCopy(@RequestBody LendBookCopyRequest request) {
     try {
-      LendBookCopy command =
-          new LendBookCopy(
-              new BookCopyId(request.copyId()),
-              new PatronId(request.patronId()),
-              request.startDate(),
-              request.dueDate());
-      lendBookCopy.lendBookCopy(command);
-      return new LoanResponse(201, "Loan created");
-    } catch (IllegalArgumentException exception) {
-      return new LoanResponse(400, exception.getMessage());
-    } catch (IllegalStateException exception) {
-      return new LoanResponse(409, exception.getMessage());
+      var command =
+          new LendBookCopy(BookCopyId.of(request.bookCopyId()), ReaderId.of(request.readerId()));
+      var loanId = lendBookCopy.execute(command);
+      return ResponseEntity.ok(Map.of("loanId", loanId.value().toString()));
+    } catch (ReaderBlockedException | LoanLimitExceededException e) {
+      return ResponseEntity.unprocessableEntity().body(Map.of("error", e.getMessage()));
+    } catch (BookCopyNotAvailableException e) {
+      return ResponseEntity.status(409).body(Map.of("error", e.getMessage()));
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     }
   }
 
-  public record LendBookCopyRequest(
-      UUID copyId, UUID patronId, LocalDate startDate, LocalDate dueDate) {}
-
-  public record LoanResponse(int statusCode, String message) {}
+  record LendBookCopyRequest(String bookCopyId, String readerId, String dueDate) {}
 }

@@ -2,53 +2,70 @@ package com.example.library.lending.application.service;
 
 import com.example.library.lending.application.command.LendBookCopy;
 import com.example.library.lending.application.port.in.ILendBookCopy;
+import com.example.library.lending.application.port.out.BookCopyRepository;
 import com.example.library.lending.application.port.out.LoanRepository;
+import com.example.library.lending.application.port.out.ReaderRepository;
+import com.example.library.lending.domain.exception.LoanLimitExceededException;
+import com.example.library.lending.domain.exception.ReaderBlockedException;
 import com.example.library.lending.domain.loan.Loan;
-import com.example.library.lending.domain.loan.LoanFactory;
 import com.example.library.lending.domain.loan.LoanId;
+import com.example.library.sharedkernel.identifier.ReaderId;
 import java.util.Objects;
 
 public class LendBookCopyService implements ILendBookCopy {
 
-  private static final int MAX_ACTIVE_LOANS = 5;
-
   private final LoanRepository loanRepository;
-  private final LoanFactory loanFactory;
+  private final BookCopyRepository bookCopyRepository;
+  private final ReaderRepository readerRepository;
 
-  public LendBookCopyService(LoanRepository loanRepository, LoanFactory loanFactory) {
+  private void verifyLoanLimitNotExceededBy(ReaderId readerId) {
+    int activeLoans = loanRepository.countActiveLoansForReader(readerId);
+    if (activeLoans >= LoanLimitExceededException.MAX_ACTIVE_LOANS) {
+      throw new LoanLimitExceededException(readerId);
+    }
+  }
+
+  public LendBookCopyService(
+      LoanRepository loanRepository,
+      BookCopyRepository bookCopyRepository,
+      ReaderRepository readerRepository) {
     this.loanRepository =
         Objects.requireNonNull(loanRepository, "Loan repository must not be null");
-    this.loanFactory = Objects.requireNonNull(loanFactory, "Loan factory must not be null");
+    this.bookCopyRepository =
+        Objects.requireNonNull(bookCopyRepository, "Book copy repository must not be null");
+    this.readerRepository =
+        Objects.requireNonNull(readerRepository, "Reader repository must not be null");
   }
 
   @Override
-  public void lendBookCopy(LendBookCopy command) {
-    Objects.requireNonNull(command, "Lend command must not be null");
+  public LoanId execute(LendBookCopy command) {
+    var readerId = command.readerId();
+    var bookCopyId = command.bookCopyId();
 
-    if (loanRepository.isPatronBlocked(command.patronId())) {
-      throw new IllegalStateException("Patron account is blocked");
+    var reader =
+        readerRepository
+            .findById(readerId)
+            .orElseThrow(() -> new IllegalArgumentException("Reader not found: " + readerId));
+
+    if (reader.isBlocked()) {
+      throw new ReaderBlockedException(readerId);
     }
 
-    if (loanRepository.countActiveLoansForPatron(command.patronId()) >= MAX_ACTIVE_LOANS) {
-      throw new IllegalStateException("Patron reached active loan limit");
-    }
+    verifyLoanLimitNotExceededBy(readerId);
 
-    if (loanRepository.existsActiveLoanForCopy(command.copyId())) {
-      throw new IllegalStateException("Book copy already has an active loan");
-    }
+    var bookCopy =
+        bookCopyRepository
+            .findById(bookCopyId)
+            .orElseThrow(() -> new IllegalArgumentException("Book copy not found: " + bookCopyId));
+    bookCopy.verifyCanBeLoanedBy(readerId);
 
-    boolean available = loanRepository.isCopyAvailable(command.copyId());
-    boolean reservedForPatron =
-        loanRepository.isCopyReservedForPatron(command.copyId(), command.patronId());
-    if (!available && !reservedForPatron) {
-      throw new IllegalStateException("Book copy is not available for this patron");
-    }
+    var loan = Loan.create(command.readerId(), command.bookCopyId());
 
-    Loan loan =
-        loanFactory.open(
-            LoanId.newId(), command.patronId(), command.copyId(), command.loanPeriod());
-    loanRepository.save(loan);
-    loanRepository.markCopyAsLoaned(command.copyId());
-    loanRepository.publishDomainEvents(loan.pullDomainEvents());
+    bookCopy.updateStatusAsLoaned();
+
+    loanRepository.create(loan);
+    bookCopyRepository.update(bookCopy);
+
+    return loan.id();
   }
 }

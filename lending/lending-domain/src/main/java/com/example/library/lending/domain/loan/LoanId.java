@@ -3,13 +3,17 @@ package com.example.library.lending.domain.loan;
 import java.util.Objects;
 import java.util.UUID;
 
-public record LoanId(UUID id) {
+public record LoanId(UUID value) {
 
   public LoanId {
-    Objects.requireNonNull(id, "Loan ID must not be null");
+    Objects.requireNonNull(value, "Loan ID must not be null");
   }
 
-  public static LoanId newId() {
+  public static LoanId create() {
     return new LoanId(UUID.randomUUID());
+  }
+
+  public static LoanId of(String id) {
+    return new LoanId(UUID.fromString(id));
   }
 }

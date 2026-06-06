@@ -1,22 +1,44 @@
 package com.example.library.lending.domain.copy;
 
+import com.example.library.lending.domain.exception.BookCopyNotAvailableException;
 import com.example.library.sharedkernel.identifier.BookCopyId;
+import com.example.library.sharedkernel.identifier.ReaderId;
 import com.example.library.sharedkernel.primitives.AggregateRoot;
 
 public class BookCopy extends AggregateRoot<BookCopyId> {
 
   private BookCopyStatus status;
+  private final ReaderId reservedBy;
 
-  public BookCopy(BookCopyId id, BookCopyStatus status) {
+  private BookCopy(BookCopyId id, BookCopyStatus status, ReaderId reservedBy) {
     super(id);
-    changeStatus(status);
+    this.reservedBy = reservedBy;
+    this.status = status;
   }
 
-  public void changeStatus(BookCopyStatus newStatus) {
-    this.status = newStatus;
+  public static BookCopy create(BookCopyId id, BookCopyStatus status, ReaderId reservedBy) {
+    return new BookCopy(id, status, reservedBy);
   }
 
   public BookCopyStatus status() {
     return status;
+  }
+
+  public ReaderId reservedBy() {
+    return reservedBy;
+  }
+
+  public void verifyCanBeLoanedBy(ReaderId readerId) {
+    if (status == BookCopyStatus.AVAILABLE) {
+      return;
+    }
+    if (status == BookCopyStatus.RESERVED && readerId.equals(reservedBy)) {
+      return;
+    }
+    throw new BookCopyNotAvailableException(this.id());
+  }
+
+  public void updateStatusAsLoaned() {
+    this.status = BookCopyStatus.LOANED;
   }
 }

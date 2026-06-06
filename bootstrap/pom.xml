@@ -45,6 +45,21 @@
             <artifactId>mapstruct</artifactId>
         </dependency>
 
+        <!-- Database runtime for the runnable app (SQLite + JDBC) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- Test dependencies — @WebMvcTest slice tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
