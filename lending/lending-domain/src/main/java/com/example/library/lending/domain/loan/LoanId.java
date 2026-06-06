@@ -8,4 +8,8 @@ public record LoanId(UUID id) {
   public LoanId {
     Objects.requireNonNull(id, "Loan ID must not be null");
   }
+
+  public static LoanId newId() {
+    return new LoanId(UUID.randomUUID());
+  }
 }

@@ -1,16 +1,16 @@
-package com.example.library.lending.domain.factory;
+package com.example.library.lending.domain.reservation;
 
 import com.example.library.lending.domain.copy.BookCopy;
 import com.example.library.lending.domain.patron.Patron;
-import com.example.library.lending.domain.reservation.Reservation;
-import com.example.library.lending.domain.reservation.ReservationStatus;
 import com.example.library.sharedkernel.identifier.ReservationId;
-
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class ReservationFactory {
   public Reservation place(ReservationId id, BookCopy copy, Patron patron) {
-    // This should also register the event in the domain event system
+    Objects.requireNonNull(id, "Reservation ID must not be null");
+    Objects.requireNonNull(copy, "Book copy must not be null");
+    Objects.requireNonNull(patron, "Patron must not be null");
     return new Reservation(id, copy.id(), patron.id(), ReservationStatus.PENDING, LocalDate.now());
   }
 }

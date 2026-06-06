@@ -15,7 +15,6 @@
         <module>shared-kernel</module>
         <module>lending</module>
         <module>bootstrap</module>
-        <!-- <module>library-api</module> -->
     </modules>
 
     <properties>
