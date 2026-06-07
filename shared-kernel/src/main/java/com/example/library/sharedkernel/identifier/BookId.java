@@ -1,4 +1,4 @@
-package com.example.library.catalog.domain.book;
+package com.example.library.sharedkernel.identifier;
 
 import java.util.UUID;
 

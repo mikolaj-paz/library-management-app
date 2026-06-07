@@ -4,8 +4,8 @@ import com.example.library.catalog.application.port.in.IGetBookDetails;
 import com.example.library.catalog.application.port.in.ISearchCatalog;
 import com.example.library.catalog.application.query.GetBookDetails;
 import com.example.library.catalog.application.query.SearchCatalog;
-import com.example.library.catalog.domain.book.BookId;
 import com.example.library.catalog.domain.exception.BookNotFoundException;
+import com.example.library.sharedkernel.identifier.BookId;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,8 @@ public class CatalogController {
   private final ISearchCatalog searchCatalogService;
   private final IGetBookDetails getBookDetailsService;
 
-  public CatalogController(ISearchCatalog searchCatalogService, IGetBookDetails getBookDetailsService) {
+  public CatalogController(
+      ISearchCatalog searchCatalogService, IGetBookDetails getBookDetailsService) {
     this.searchCatalogService = searchCatalogService;
     this.getBookDetailsService = getBookDetailsService;
   }

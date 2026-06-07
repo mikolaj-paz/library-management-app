@@ -1,5 +1,5 @@
 package com.example.library.catalog.application.query;
 
-import com.example.library.catalog.domain.book.BookId;
+import com.example.library.sharedkernel.identifier.BookId;
 
 public record GetBookDetails(BookId bookId) {}

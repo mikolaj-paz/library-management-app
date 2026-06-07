@@ -9,7 +9,7 @@ import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 public class BookCopy extends AggregateRoot<BookCopyId> {
 
   private BookCopyStatus status;
-  private final ReaderId reservedBy;
+  private ReaderId reservedBy;
 
   private BookCopy(BookCopyId id, BookCopyStatus status, ReaderId reservedBy) {
     super(id);
@@ -41,5 +41,11 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
 
   public void updateStatusAsLoaned() {
     this.status = BookCopyStatus.LOANED;
+    this.reservedBy = null;
+  }
+
+  public void updateStatusAsReserved(ReaderId readerId) {
+    this.status = BookCopyStatus.RESERVED;
+    this.reservedBy = readerId;
   }
 }

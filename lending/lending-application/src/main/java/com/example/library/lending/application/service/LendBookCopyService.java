@@ -44,7 +44,7 @@ public class LendBookCopyService implements ILendBookCopy {
 
     var reader =
         readerRepository
-            .findById(readerId)
+            .find(readerId)
             .orElseThrow(() -> new IllegalArgumentException("Reader not found: " + readerId));
 
     if (reader.isBlocked()) {
@@ -55,7 +55,7 @@ public class LendBookCopyService implements ILendBookCopy {
 
     var bookCopy =
         bookCopyRepository
-            .findById(bookCopyId)
+            .find(bookCopyId)
             .orElseThrow(() -> new IllegalArgumentException("Book copy not found: " + bookCopyId));
     bookCopy.verifyCanBeLoanedBy(readerId);
 

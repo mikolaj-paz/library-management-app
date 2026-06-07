@@ -2,7 +2,7 @@ package com.example.library.catalog.application.port.out;
 
 import com.example.library.catalog.application.query.BookDetails;
 import com.example.library.catalog.application.query.BookSearchResult;
-import com.example.library.catalog.domain.book.BookId;
+import com.example.library.sharedkernel.identifier.BookId;
 import java.util.List;
 import java.util.Optional;
 

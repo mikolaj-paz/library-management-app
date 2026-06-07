@@ -16,7 +16,7 @@ public class JdbcReaderRepository implements ReaderRepository {
   }
 
   @Override
-  public Optional<Reader> findById(ReaderId id) {
+  public Optional<Reader> find(ReaderId id) {
     var results =
         jdbc.query(
             "SELECT id, status FROM readers WHERE id = ?",

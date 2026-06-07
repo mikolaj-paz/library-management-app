@@ -1,13 +1,17 @@
 package com.example.library.lending.infrastructure.config;
 
 import com.example.library.lending.application.port.in.ILendBookCopy;
+import com.example.library.lending.application.port.in.IReserveBook;
 import com.example.library.lending.application.port.out.BookCopyRepository;
 import com.example.library.lending.application.port.out.LoanRepository;
 import com.example.library.lending.application.port.out.ReaderRepository;
+import com.example.library.lending.application.port.out.ReservationRepository;
 import com.example.library.lending.application.service.LendBookCopyService;
+import com.example.library.lending.application.service.ReserveBookService;
 import com.example.library.lending.infrastructure.out.persistence.JdbcBookCopyRepository;
 import com.example.library.lending.infrastructure.out.persistence.JdbcLoanRepository;
 import com.example.library.lending.infrastructure.out.persistence.JdbcReaderRepository;
+import com.example.library.lending.infrastructure.out.persistence.JdbcReservationRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -31,10 +35,25 @@ public class LendingConfig {
   }
 
   @Bean
+  ReservationRepository reservationRepository(JdbcTemplate jdbc) {
+    return new JdbcReservationRepository(jdbc);
+  }
+
+  @Bean
   ILendBookCopy lendBookCopy(
       LoanRepository loanRepository,
       BookCopyRepository bookCopyRepository,
       ReaderRepository readerRepository) {
     return new LendBookCopyService(loanRepository, bookCopyRepository, readerRepository);
+  }
+
+  @Bean
+  IReserveBook reserveBook(
+      ReaderRepository readerRepository,
+      LoanRepository loanRepository,
+      BookCopyRepository bookCopyRepository,
+      ReservationRepository reservationRepository) {
+    return new ReserveBookService(
+        readerRepository, loanRepository, bookCopyRepository, reservationRepository);
   }
 }

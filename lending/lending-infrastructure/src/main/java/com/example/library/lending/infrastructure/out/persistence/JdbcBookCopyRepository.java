@@ -3,8 +3,11 @@ package com.example.library.lending.infrastructure.out.persistence;
 import com.example.library.lending.application.port.out.BookCopyRepository;
 import com.example.library.lending.domain.copy.BookCopy;
 import com.example.library.sharedkernel.identifier.BookCopyId;
+import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import com.example.library.sharedkernel.valueobject.BookCopyStatus;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -16,19 +19,30 @@ public class JdbcBookCopyRepository implements BookCopyRepository {
     this.jdbc = jdbc;
   }
 
+  private BookCopy createBookCopyFromResultSet(ResultSet rs) throws SQLException {
+    return BookCopy.create(
+        BookCopyId.of(rs.getString("id")),
+        BookCopyStatus.valueOf(rs.getString("status")),
+        rs.getString("reserved_by") != null ? ReaderId.of(rs.getString("reserved_by")) : null);
+  }
+
   @Override
-  public Optional<BookCopy> findById(BookCopyId id) {
+  public Optional<BookCopy> find(BookCopyId id) {
     var results =
         jdbc.query(
             "SELECT id, status, reserved_by FROM book_copies WHERE id = ?",
-            (rs, rowNum) ->
-                BookCopy.create(
-                    BookCopyId.of(rs.getString("id")),
-                    BookCopyStatus.valueOf(rs.getString("status")),
-                    rs.getString("reserved_by") != null
-                        ? ReaderId.of(rs.getString("reserved_by"))
-                        : null),
+            (rs, rowNum) -> createBookCopyFromResultSet(rs),
             id.value().toString());
+    return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+  }
+
+  @Override
+  public Optional<BookCopy> findAvailableBookCopy(BookId bookId) {
+    var results =
+        jdbc.query(
+            "SELECT id, status, reserved_by FROM book_copies WHERE book_id = ? AND status = 'AVAILABLE' LIMIT 1",
+            (rs, rowNum) -> createBookCopyFromResultSet(rs),
+            bookId.value().toString());
     return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
   }
 

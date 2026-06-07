@@ -5,5 +5,5 @@ import com.example.library.sharedkernel.identifier.ReaderId;
 import java.util.Optional;
 
 public interface ReaderRepository {
-  Optional<Reader> findById(ReaderId id);
+  Optional<Reader> find(ReaderId id);
 }

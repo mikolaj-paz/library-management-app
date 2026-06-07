@@ -1,6 +1,6 @@
 package com.example.library.catalog.domain.exception;
 
-import com.example.library.catalog.domain.book.BookId;
+import com.example.library.sharedkernel.identifier.BookId;
 
 public class BookNotFoundException extends RuntimeException {
   public BookNotFoundException(BookId bookId) {
