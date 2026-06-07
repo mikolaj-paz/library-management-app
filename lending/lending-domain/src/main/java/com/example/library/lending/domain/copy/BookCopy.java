@@ -1,7 +1,7 @@
 package com.example.library.lending.domain.copy;
 
 import com.example.library.lending.domain.exception.BookCopyNotAvailableException;
-import com.example.library.sharedkernel.aggregate.AggregateRoot;
+import com.example.library.sharedkernel.entity.AggregateRoot;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import com.example.library.sharedkernel.valueobject.BookCopyStatus;

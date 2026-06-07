@@ -1,10 +1,8 @@
 package com.example.library.lending.domain.loan;
 
-import com.example.library.lending.domain.event.LoanedBookCopy;
-import com.example.library.sharedkernel.aggregate.AggregateRoot;
+import com.example.library.sharedkernel.entity.AggregateRoot;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
-import java.time.Instant;
 import java.time.LocalDate;
 
 public class Loan extends AggregateRoot<LoanId> {
@@ -20,7 +18,6 @@ public class Loan extends AggregateRoot<LoanId> {
     this.bookCopyId = bookCopyId;
     this.readerId = readerId;
     this.dueDate = dueDate;
-    registerEvent(new LoanedBookCopy(this.id(), bookCopyId, readerId, dueDate, Instant.now()));
   }
 
   public static Loan create(ReaderId readerId, BookCopyId bookCopyId) {

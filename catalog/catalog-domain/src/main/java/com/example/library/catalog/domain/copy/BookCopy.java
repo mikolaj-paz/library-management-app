@@ -1,6 +1,6 @@
 package com.example.library.catalog.domain.copy;
 
-import com.example.library.sharedkernel.aggregate.AggregateRoot;
+import com.example.library.sharedkernel.entity.AggregateRoot;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;

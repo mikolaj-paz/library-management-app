@@ -1,4 +1,4 @@
-package com.example.library.sharedkernel.aggregate;
+package com.example.library.sharedkernel.entity;
 
 import com.example.library.sharedkernel.event.DomainEvent;
 import java.util.ArrayList;

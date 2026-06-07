@@ -1,22 +1,29 @@
 package com.example.library.lending.domain.reservation;
 
-import com.example.library.sharedkernel.entity.AggregateRoot;
+import com.example.library.sharedkernel.event.DomainEvent;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 
-public class Reservation extends AggregateRoot<ReservationId> {
+public class BookCopyReserved extends DomainEvent {
 
+  private final ReservationId reservationId;
   private final ReaderId readerId;
   private final BookCopyId bookCopyId;
 
-  private Reservation(ReservationId id, ReaderId readerId, BookCopyId bookCopyId) {
-    super(id);
+  public BookCopyReserved(ReservationId reservationId, ReaderId readerId, BookCopyId bookCopyId) {
+    super();
+    this.reservationId = reservationId;
     this.readerId = readerId;
     this.bookCopyId = bookCopyId;
   }
 
-  public static Reservation create(ReaderId readerId, BookCopyId bookCopyId) {
-    return new Reservation(ReservationId.create(), readerId, bookCopyId);
+  @Override
+  public String eventName() {
+    return "BookCopyReserved";
+  }
+
+  public ReservationId reservationId() {
+    return reservationId;
   }
 
   public ReaderId readerId() {

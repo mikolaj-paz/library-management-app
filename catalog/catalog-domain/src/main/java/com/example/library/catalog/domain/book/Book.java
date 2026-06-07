@@ -1,6 +1,6 @@
 package com.example.library.catalog.domain.book;
 
-import com.example.library.sharedkernel.aggregate.AggregateRoot;
+import com.example.library.sharedkernel.entity.AggregateRoot;
 import com.example.library.sharedkernel.identifier.BookId;
 
 public class Book extends AggregateRoot<BookId> {

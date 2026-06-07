@@ -9,9 +9,11 @@ import com.example.library.lending.application.port.out.ReservationRepository;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.NoAvailableBookCopyException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;
+import com.example.library.lending.domain.reservation.BookCopyReserved;
 import com.example.library.lending.domain.reservation.Reservation;
 import com.example.library.lending.domain.reservation.ReservationId;
 import com.example.library.sharedkernel.identifier.ReaderId;
+import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 
 public class ReserveBookService implements IReserveBook {
 
@@ -19,6 +21,7 @@ public class ReserveBookService implements IReserveBook {
   private final LoanRepository loanRepository;
   private final BookCopyRepository bookCopyRepository;
   private final ReservationRepository reservationRepository;
+  private final DomainEventPublisher eventPublisher;
 
   private void verifyReaderEligibility(ReaderId readerId) {
     var reader =
@@ -37,11 +40,13 @@ public class ReserveBookService implements IReserveBook {
       ReaderRepository readerRepository,
       LoanRepository loanRepository,
       BookCopyRepository bookCopyRepository,
-      ReservationRepository reservationRepository) {
+      ReservationRepository reservationRepository,
+      DomainEventPublisher eventPublisher) {
     this.readerRepository = readerRepository;
     this.loanRepository = loanRepository;
     this.bookCopyRepository = bookCopyRepository;
     this.reservationRepository = reservationRepository;
+    this.eventPublisher = eventPublisher;
   }
 
   @Override
@@ -56,12 +61,16 @@ public class ReserveBookService implements IReserveBook {
     }
 
     var bookCopy = availableCopy.get();
+    var bookCopyId = bookCopy.id();
 
-    var reservation = Reservation.create(readerId, bookCopy.id());
+    var reservation = Reservation.create(readerId, bookCopyId);
+    var reservationId = reservation.id();
 
     reservationRepository.create(reservation);
     bookCopyRepository.update(bookCopy);
 
-    return reservation.id();
+    eventPublisher.publish(new BookCopyReserved(reservationId, readerId, bookCopyId));
+
+    return reservationId;
   }
 }

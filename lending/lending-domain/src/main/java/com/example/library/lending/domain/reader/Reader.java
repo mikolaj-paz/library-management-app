@@ -1,6 +1,6 @@
 package com.example.library.lending.domain.reader;
 
-import com.example.library.sharedkernel.aggregate.AggregateRoot;
+import com.example.library.sharedkernel.entity.AggregateRoot;
 import com.example.library.sharedkernel.identifier.ReaderId;
 
 public class Reader extends AggregateRoot<ReaderId> {
