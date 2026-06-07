@@ -4,6 +4,7 @@ import com.example.library.lending.domain.exception.BookCopyNotAvailableExceptio
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import com.example.library.sharedkernel.primitives.AggregateRoot;
+import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 
 public class BookCopy extends AggregateRoot<BookCopyId> {
 

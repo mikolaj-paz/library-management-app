@@ -2,9 +2,9 @@ package com.example.library.lending.infrastructure.out.persistence;
 
 import com.example.library.lending.application.port.out.BookCopyRepository;
 import com.example.library.lending.domain.copy.BookCopy;
-import com.example.library.lending.domain.copy.BookCopyStatus;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
+import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 

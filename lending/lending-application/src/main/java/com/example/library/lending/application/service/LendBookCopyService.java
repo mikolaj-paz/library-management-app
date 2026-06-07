@@ -38,7 +38,7 @@ public class LendBookCopyService implements ILendBookCopy {
   }
 
   @Override
-  public LoanId execute(LendBookCopy command) {
+  public LoanId lend(LendBookCopy command) {
     var readerId = command.readerId();
     var bookCopyId = command.bookCopyId();
 

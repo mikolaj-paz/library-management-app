@@ -1,4 +1,4 @@
-package com.example.library.lending.domain.copy;
+package com.example.library.sharedkernel.valueobject;
 
 public enum BookCopyStatus {
   AVAILABLE,

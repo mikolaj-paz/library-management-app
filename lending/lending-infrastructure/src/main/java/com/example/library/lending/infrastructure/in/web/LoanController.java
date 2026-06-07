@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/loans")
 public class LoanController {
 
-  private final ILendBookCopy lendBookCopy;
+  private final ILendBookCopy lendBookCopyService;
 
-  public LoanController(ILendBookCopy lendBookCopy) {
-    this.lendBookCopy = lendBookCopy;
+  public LoanController(ILendBookCopy lendBookCopyService) {
+    this.lendBookCopyService = lendBookCopyService;
   }
 
   @PostMapping
@@ -29,7 +29,7 @@ public class LoanController {
     try {
       var command =
           new LendBookCopy(BookCopyId.of(request.bookCopyId()), ReaderId.of(request.readerId()));
-      var loanId = lendBookCopy.execute(command);
+      var loanId = lendBookCopyService.lend(command);
       return ResponseEntity.ok(Map.of("loanId", loanId.value().toString()));
     } catch (ReaderBlockedException | LoanLimitExceededException e) {
       return ResponseEntity.unprocessableEntity().body(Map.of("error", e.getMessage()));

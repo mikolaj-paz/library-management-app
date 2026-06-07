@@ -5,5 +5,5 @@ import com.example.library.lending.domain.loan.LoanId;
 
 public interface ILendBookCopy {
 
-  LoanId execute(LendBookCopy command);
+  LoanId lend(LendBookCopy command);
 }
