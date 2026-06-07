@@ -7,7 +7,7 @@ import com.example.library.catalog.domain.book.Book;
 import com.example.library.lending.domain.loan.Loan;
 import com.example.library.lending.domain.reader.Reader;
 import com.example.library.lending.domain.reservation.Reservation;
-import com.example.library.sharedkernel.aggregate.AggregateRoot;
+import com.example.library.sharedkernel.entity.AggregateRoot;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import org.junit.jupiter.api.Test;

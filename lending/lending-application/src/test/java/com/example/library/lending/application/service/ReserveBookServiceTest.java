@@ -22,6 +22,7 @@ import com.example.library.lending.domain.reservation.Reservation;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;
+import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,6 +45,8 @@ class ReserveBookServiceTest {
 
   @Mock private ReservationRepository reservationRepository;
 
+  @Mock private DomainEventPublisher eventPublisher;
+
   private ReserveBookService service;
   private ReaderId readerId;
   private BookId bookId;
@@ -52,7 +55,11 @@ class ReserveBookServiceTest {
   void setUp() {
     service =
         new ReserveBookService(
-            readerRepository, loanRepository, bookCopyRepository, reservationRepository);
+            readerRepository,
+            loanRepository,
+            bookCopyRepository,
+            reservationRepository,
+            eventPublisher);
     readerId = ReaderId.create();
     bookId = BookId.of(UUID.randomUUID().toString());
   }

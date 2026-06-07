@@ -20,6 +20,7 @@ import com.example.library.lending.domain.reader.Reader;
 import com.example.library.lending.domain.reader.ReaderStatus;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
+import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,13 +39,17 @@ class LendBookCopyServiceTest {
 
   @Mock private ReaderRepository readerRepository;
 
+  @Mock private DomainEventPublisher eventPublisher;
+
   private LendBookCopyService service;
   private ReaderId readerId;
   private BookCopyId copyId;
 
   @BeforeEach
   void setUp() {
-    service = new LendBookCopyService(loanRepository, bookCopyRepository, readerRepository);
+    service =
+        new LendBookCopyService(
+            loanRepository, bookCopyRepository, readerRepository, eventPublisher);
     readerId = ReaderId.create();
     copyId = BookCopyId.create();
   }

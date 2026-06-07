@@ -14,6 +14,7 @@ import com.example.library.catalog.domain.book.Book;
 import com.example.library.catalog.domain.book.ISBN;
 import com.example.library.catalog.domain.copy.BookCopy;
 import com.example.library.sharedkernel.identifier.BookId;
+import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -29,13 +30,15 @@ class AddBookCopyServiceTest {
 
   @Mock private BookRepository bookRepository;
 
+  @Mock private DomainEventPublisher eventPublisher;
+
   @Test
   void should_create_book_copy_when_book_exists() {
     var bookId = BookId.of(UUID.randomUUID().toString());
     var book =
         Book.create(bookId, "Clean Architecture", "Robert C. Martin", new ISBN("978-0134494166"));
     when(bookRepository.find(bookId)).thenReturn(Optional.of(book));
-    var service = new AddBookCopyService(bookCopyRepository, bookRepository);
+    var service = new AddBookCopyService(bookCopyRepository, bookRepository, eventPublisher);
 
     var copyId = service.add(new AddBookCopy(bookId));
 
@@ -50,7 +53,7 @@ class AddBookCopyServiceTest {
   void should_throw_when_book_does_not_exist() {
     var bookId = BookId.of(UUID.randomUUID().toString());
     when(bookRepository.find(bookId)).thenReturn(Optional.empty());
-    var service = new AddBookCopyService(bookCopyRepository, bookRepository);
+    var service = new AddBookCopyService(bookCopyRepository, bookRepository, eventPublisher);
 
     assertThatThrownBy(() -> service.add(new AddBookCopy(bookId)))
         .isInstanceOf(IllegalArgumentException.class)
