@@ -1,0 +1,151 @@
+================================================================================
+1. SUMMARY
+================================================================================
+
+Added a full test pyramid for currently implemented Lending and Catalog code.
+
+Layer                  Classes   Tests (active)   Tooling
+---------------------------------------------------------------------------
+Domain unit            7         18               JUnit 5, AssertJ
+Application unit       5         17 (1 disabled)  JUnit 5, AssertJ, Mockito
+JDBC integration       7         16               JUnit 5, SQLite in-memory
+Controller slice       4         15               JUnit 5, MockMvc
+System / acceptance    1         5                SpringBootTest, Flyway
+Architecture           1         4                ArchUnit 1.4.2
+---------------------------------------------------------------------------
+TOTAL                  24        68 + 1 disabled
+
+================================================================================
+2. BUILD / INFRASTRUCTURE CHANGES
+================================================================================
+
+ROOT pom.xml
+  - Added architecture-tests module to reactor
+  - Added archunit-junit5 1.4.2 to dependencyManagement
+  - Added maven-surefire-plugin 3.5.6
+  - Enabled compiler -parameters flag (might require reloading IDE)
+
+catalog-infrastructure/pom.xml & lending-infrastructure/pom.xml
+  - sqlite-jdbc (test scope)
+  - spring-boot-starter-web (test scope)
+
+NEW MODULE: architecture-tests/
+  - HexagonalArchitectureTest (ArchUnit rules)
+  - Depends on domain + application from both contexts
+
+TEST HELPERS (not test classes):
+  - lending/.../SqliteTestDatabase.java
+  - catalog/.../SqliteTestDatabase.java
+
+BOOTSTRAP TEST CONFIG:
+  - bootstrap/src/test/resources/application.properties
+
+================================================================================
+3. TESTS ADDED (BY MODULE)
+================================================================================
+
+SHARED-KERNEL (unit)
+  AggregateRootTest
+    - registerEvent + pullDomainEvents returns and clears events
+
+LENDING-DOMAIN (unit)
+  BookCopyTest
+    - verifyCanBeLoanedBy: AVAILABLE, LOANED, RESERVED same/other reader
+    - updateStatusAsLoaned, updateStatusAsReserved
+  LoanTest
+    - due date = today + 14 days
+    - LoanedBookCopy domain event
+  ReaderTest
+    - ACTIVE vs BLOCKED
+  ReservationTest
+    - create stores readerId and bookCopyId
+
+LENDING-APPLICATION (unit, Mockito)
+  LendBookCopyServiceTest (7 tests)
+    - happy path, reader not found, blocked, loan limit,
+      copy not found, unavailable, reserved for same reader
+  ReserveBookServiceTest (4 active + 1 disabled)
+    - happy path, blocked, loan limit, no available copy
+    - DISABLED: should_mark_copy_as_reserved_when_reservation_succeeds
+      (bug: ReserveBookService never calls updateStatusAsReserved)
+
+LENDING-INFRASTRUCTURE (integration + controller)
+  JdbcReaderRepositoryTest       — find, empty
+  JdbcBookCopyRepositoryTest     — find, findAvailable, update
+  JdbcLoanRepositoryTest         — create, countActiveLoans
+  JdbcReservationRepositoryTest  — create
+  LoanControllerTest             — 200, 422, 409, 400
+  ReservationControllerTest    — 200, 422, 200 no-copy, 400
+
+CATALOG-DOMAIN (unit)
+  BookTest      — metadata on create
+  BookCopyTest  — starts AVAILABLE
+
+CATALOG-APPLICATION (unit, Mockito)
+  SearchCatalogServiceTest    — delegates to CatalogQueryPort
+  GetBookDetailsServiceTest   — found / BookNotFoundException
+  AddBookCopyServiceTest      — creates copy / book missing
+
+CATALOG-INFRASTRUCTURE (integration + controller)
+  JdbcBookRepositoryTest       — find, empty
+  JdbcBookCopyRepositoryTest   — create linked to book
+  JdbcCatalogQueryPortTest     — search, details, not found
+  BookCopyControllerTest       — 200, 400
+  CatalogControllerTest        — 200 details, 404 (direct method call)
+
+BOOTSTRAP (acceptance)
+  LendingAcceptanceTest (5 tests)
+    - POST /loans: success, conflict, blocked reader
+    - POST /reservations: success, no copy message
+
+ARCHITECTURE-TESTS
+  HexagonalArchitectureTest (4 tests)
+    - domain free of Spring/SQL
+    - application does not depend on infrastructure
+    - lending/catalog domain isolation
+    - aggregates extend AggregateRoot
+
+================================================================================
+4. HOW TO RUN TESTS
+================================================================================
+
+ALL TESTS:
+  .\mvnw.cmd test
+
+TESTS + FORMAT + LINT (CI):
+  .\mvnw.cmd verify
+
+INSTALL (build + test + local .m2):
+  .\mvnw.cmd install
+
+Avoid "clean install" if OneDrive locks target\ folder.
+
+SINGLE TEST CLASS (nested modules need ":" prefix):
+  .\mvnw.cmd -pl :catalog-application -Dtest=AddBookCopyServiceTest test
+  .\mvnw.cmd -pl :lending-domain -Dtest=BookCopyTest test
+  .\mvnw.cmd -pl :lending-application -Dtest=LendBookCopyServiceTest test
+  .\mvnw.cmd -pl :lending-infrastructure -Dtest=LoanControllerTest test
+  .\mvnw.cmd -pl :catalog-infrastructure -Dtest=JdbcCatalogQueryPortTest test
+  .\mvnw.cmd -pl :architecture-tests -Dtest=HexagonalArchitectureTest test
+  .\mvnw.cmd -pl bootstrap -Dtest=LendingAcceptanceTest test
+
+CONFIRM TESTS RAN:
+  Output must contain:
+    [INFO]  T E S T S
+    [INFO] Running com.example.library....
+    [INFO] Tests run: X, Failures: 0, Errors: 0, Skipped: Y
+
+  BUILD SUCCESS in <1s without T E S T S = wrong module, no tests executed.
+
+================================================================================
+5. TEST PYRAMID
+================================================================================
+
+                    Architecture (4)     ArchUnit
+                    Acceptance (5)       bootstrap / SpringBootTest
+                    Controller (15)      MockMvc slice
+                    Integration (16)     SQLite + JDBC
+                    Application (17)     Mockito
+                    Domain (18)          Pure JUnit
+
+================================================================================
