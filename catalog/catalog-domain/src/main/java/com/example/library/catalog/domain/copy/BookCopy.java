@@ -1,9 +1,9 @@
 package com.example.library.catalog.domain.copy;
 
+import com.example.library.sharedkernel.aggregate.AggregateRoot;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;
-import com.example.library.sharedkernel.primitives.AggregateRoot;
 import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 
 public class BookCopy extends AggregateRoot<BookCopyId> {

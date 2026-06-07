@@ -1,4 +1,4 @@
-package com.example.library.sharedkernel.primitives;
+package com.example.library.sharedkernel.aggregate;
 
 import java.util.Objects;
 

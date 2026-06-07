@@ -1,5 +1,6 @@
-package com.example.library.sharedkernel.primitives;
+package com.example.library.sharedkernel.aggregate;
 
+import com.example.library.sharedkernel.event.DomainEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

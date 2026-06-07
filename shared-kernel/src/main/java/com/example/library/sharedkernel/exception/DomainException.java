@@ -1,4 +1,4 @@
-package com.example.library.sharedkernel.primitives;
+package com.example.library.sharedkernel.exception;
 
 public abstract class DomainException extends RuntimeException {
 

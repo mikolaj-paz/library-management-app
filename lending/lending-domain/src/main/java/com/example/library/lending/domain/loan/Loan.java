@@ -1,9 +1,9 @@
 package com.example.library.lending.domain.loan;
 
 import com.example.library.lending.domain.event.LoanedBookCopy;
+import com.example.library.sharedkernel.aggregate.AggregateRoot;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
-import com.example.library.sharedkernel.primitives.AggregateRoot;
 import java.time.Instant;
 import java.time.LocalDate;
 

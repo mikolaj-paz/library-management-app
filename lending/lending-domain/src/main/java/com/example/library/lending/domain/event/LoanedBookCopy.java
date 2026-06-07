@@ -1,9 +1,9 @@
 package com.example.library.lending.domain.event;
 
 import com.example.library.lending.domain.loan.LoanId;
+import com.example.library.sharedkernel.event.DomainEvent;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
-import com.example.library.sharedkernel.primitives.DomainEvent;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
