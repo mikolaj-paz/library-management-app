@@ -48,4 +48,8 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
     this.status = BookCopyStatus.RESERVED;
     this.reservedBy = readerId;
   }
+
+  public void updateStatusAsAvailable() {
+    this.status = BookCopyStatus.AVAILABLE;
+  }
 }

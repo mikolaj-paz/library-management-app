@@ -16,5 +16,5 @@ public abstract class DomainEvent extends Entity<EventId> {
     return occuredOn;
   }
 
-  public abstract String eventName();
+  public abstract String name();
 }

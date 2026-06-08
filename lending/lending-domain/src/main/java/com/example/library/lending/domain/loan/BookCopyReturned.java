@@ -1,29 +1,31 @@
-package com.example.library.lending.domain.reservation;
+package com.example.library.lending.domain.loan;
 
 import com.example.library.sharedkernel.event.DomainEvent;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 
-public class BookCopyReserved extends DomainEvent {
+public class BookCopyReturned extends DomainEvent {
 
-  private final ReservationId reservationId;
+  private final LoanId loanId;
   private final ReaderId readerId;
   private final BookCopyId bookCopyId;
+  private final boolean isOverdue;
 
-  public BookCopyReserved(ReservationId reservationId, ReaderId readerId, BookCopyId bookCopyId) {
-    super();
-    this.reservationId = reservationId;
+  public BookCopyReturned(
+      LoanId loanId, ReaderId readerId, BookCopyId bookCopyId, boolean isOverdue) {
+    this.loanId = loanId;
     this.readerId = readerId;
     this.bookCopyId = bookCopyId;
+    this.isOverdue = isOverdue;
   }
 
   @Override
   public String name() {
-    return "BookCopyReserved";
+    return "BookCopyReturned";
   }
 
-  public ReservationId reservationId() {
-    return reservationId;
+  public LoanId loanId() {
+    return loanId;
   }
 
   public ReaderId readerId() {
@@ -32,5 +34,9 @@ public class BookCopyReserved extends DomainEvent {
 
   public BookCopyId bookCopyId() {
     return bookCopyId;
+  }
+
+  public boolean isOverdue() {
+    return isOverdue;
   }
 }

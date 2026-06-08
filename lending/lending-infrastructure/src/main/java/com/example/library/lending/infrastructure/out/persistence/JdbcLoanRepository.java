@@ -2,7 +2,12 @@ package com.example.library.lending.infrastructure.out.persistence;
 
 import com.example.library.lending.application.port.out.LoanRepository;
 import com.example.library.lending.domain.loan.Loan;
+import com.example.library.lending.domain.loan.LoanId;
+import com.example.library.lending.domain.loan.LoanStatus;
+import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
+import java.time.LocalDate;
+import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class JdbcLoanRepository implements LoanRepository {
@@ -16,11 +21,21 @@ public class JdbcLoanRepository implements LoanRepository {
   @Override
   public void create(Loan loan) {
     jdbc.update(
-        "INSERT INTO loans (id, book_copy_id, reader_id, due_date) VALUES (?, ?, ?, ?)",
+        "INSERT INTO loans (id, book_copy_id, reader_id, due_date, status) VALUES (?, ?, ?, ?, ?)",
         loan.id().value().toString(),
         loan.bookCopyId().value().toString(),
         loan.readerId().value().toString(),
-        loan.dueDate());
+        loan.dueDate(),
+        loan.status().toString());
+  }
+
+  @Override
+  public void update(Loan loan) {
+    jdbc.update(
+        "UPDATE loans SET due_date = ?, status = ? WHERE id = ?",
+        loan.dueDate(),
+        loan.status().toString(),
+        loan.id().value().toString());
   }
 
   @Override
@@ -31,5 +46,25 @@ public class JdbcLoanRepository implements LoanRepository {
             Integer.class,
             readerId.value().toString());
     return count != null ? count : 0;
+  }
+
+  @Override
+  public Optional<Loan> findActiveLoan(BookCopyId bookCopyId) {
+    var results =
+        jdbc.query(
+            """
+      SELECT id, book_copy_id, reader_id, due_date, status
+      FROM loans
+      WHERE book_copy_id = ? AND (status = 'ACTIVE' OR status = 'EXTENDED')
+      """,
+            (rs, rowNum) ->
+                Loan.create(
+                    LoanId.of(rs.getString("id")),
+                    ReaderId.of(rs.getString("reader_id")),
+                    BookCopyId.of(rs.getString("book_copy_id")),
+                    LocalDate.parse(rs.getString("due_date")),
+                    LoanStatus.valueOf(rs.getString("status"))),
+            bookCopyId.value().toString());
+    return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
   }
 }

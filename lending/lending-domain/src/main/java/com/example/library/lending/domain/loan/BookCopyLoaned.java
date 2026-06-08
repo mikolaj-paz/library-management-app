@@ -22,7 +22,7 @@ public class BookCopyLoaned extends DomainEvent {
   }
 
   @Override
-  public String eventName() {
+  public String name() {
     return "BookCopyLoaned";
   }
 

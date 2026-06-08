@@ -10,19 +10,31 @@ public class Loan extends AggregateRoot<LoanId> {
   private final BookCopyId bookCopyId;
   private final ReaderId readerId;
   private final LocalDate dueDate;
+  private LoanStatus status;
 
   private static final int LOAN_DURATION_DAYS = 14;
 
-  private Loan(LoanId id, BookCopyId bookCopyId, ReaderId readerId, LocalDate dueDate) {
+  private Loan(
+      LoanId id, BookCopyId bookCopyId, ReaderId readerId, LocalDate dueDate, LoanStatus status) {
     super(id);
     this.bookCopyId = bookCopyId;
     this.readerId = readerId;
     this.dueDate = dueDate;
+    this.status = status;
   }
 
   public static Loan create(ReaderId readerId, BookCopyId bookCopyId) {
     return new Loan(
-        LoanId.create(), bookCopyId, readerId, LocalDate.now().plusDays(LOAN_DURATION_DAYS));
+        LoanId.create(),
+        bookCopyId,
+        readerId,
+        LocalDate.now().plusDays(LOAN_DURATION_DAYS),
+        LoanStatus.ACTIVE);
+  }
+
+  public static Loan create(
+      LoanId id, ReaderId readerId, BookCopyId bookCopyId, LocalDate dueDate, LoanStatus status) {
+    return new Loan(id, bookCopyId, readerId, dueDate, status);
   }
 
   public BookCopyId bookCopyId() {
@@ -35,5 +47,17 @@ public class Loan extends AggregateRoot<LoanId> {
 
   public LocalDate dueDate() {
     return dueDate;
+  }
+
+  public LoanStatus status() {
+    return status;
+  }
+
+  public boolean isOverdue(LocalDate on) {
+    return on.isAfter(dueDate);
+  }
+
+  public void close() {
+    this.status = LoanStatus.CLOSED;
   }
 }

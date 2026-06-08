@@ -2,12 +2,14 @@ package com.example.library.lending.infrastructure.config;
 
 import com.example.library.lending.application.port.in.ILendBookCopy;
 import com.example.library.lending.application.port.in.IReserveBook;
+import com.example.library.lending.application.port.in.IReturnBookCopy;
 import com.example.library.lending.application.port.out.BookCopyRepository;
 import com.example.library.lending.application.port.out.LoanRepository;
 import com.example.library.lending.application.port.out.ReaderRepository;
 import com.example.library.lending.application.port.out.ReservationRepository;
 import com.example.library.lending.application.service.LendBookCopyService;
 import com.example.library.lending.application.service.ReserveBookService;
+import com.example.library.lending.application.service.ReturnBookCopyService;
 import com.example.library.lending.infrastructure.out.DomainEventPublisherImpl;
 import com.example.library.lending.infrastructure.out.persistence.JdbcBookCopyRepository;
 import com.example.library.lending.infrastructure.out.persistence.JdbcLoanRepository;
@@ -70,5 +72,13 @@ public class LendingConfig {
         bookCopyRepository,
         reservationRepository,
         eventPublisher);
+  }
+
+  @Bean
+  IReturnBookCopy returnBookCopy(
+      LoanRepository loanRepository,
+      BookCopyRepository bookCopyRepository,
+      DomainEventPublisher eventPublisher) {
+    return new ReturnBookCopyService(loanRepository, bookCopyRepository, eventPublisher);
   }
 }

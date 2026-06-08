@@ -16,7 +16,7 @@ public class BookCopyAdded extends DomainEvent {
   }
 
   @Override
-  public String eventName() {
+  public String name() {
     return "BookCopyAdded";
   }
 
