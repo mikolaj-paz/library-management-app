@@ -3,6 +3,7 @@ package com.example.library.lending.domain.copy;
 import com.example.library.lending.domain.exception.BookCopyNotAvailableException;
 import com.example.library.sharedkernel.entity.AggregateRoot;
 import com.example.library.sharedkernel.identifier.BookCopyId;
+import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 
@@ -10,15 +11,18 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
 
   private BookCopyStatus status;
   private ReaderId reservedBy;
+  private final BookId bookId;
 
-  private BookCopy(BookCopyId id, BookCopyStatus status, ReaderId reservedBy) {
+  private BookCopy(BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
     super(id);
     this.reservedBy = reservedBy;
     this.status = status;
+    this.bookId = bookId;
   }
 
-  public static BookCopy create(BookCopyId id, BookCopyStatus status, ReaderId reservedBy) {
-    return new BookCopy(id, status, reservedBy);
+  public static BookCopy create(
+      BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
+    return new BookCopy(id, status, reservedBy, bookId);
   }
 
   public BookCopyStatus status() {
@@ -27,6 +31,10 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
 
   public ReaderId reservedBy() {
     return reservedBy;
+  }
+
+  public BookId bookId() {
+    return bookId;
   }
 
   public void verifyCanBeLoanedBy(ReaderId readerId) {

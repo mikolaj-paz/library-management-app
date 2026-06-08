@@ -1,13 +1,17 @@
 package com.example.library.lending.infrastructure.in.web;
 
+import com.example.library.lending.application.command.ExtendLoanCommand;
 import com.example.library.lending.application.command.LendBookCopy;
 import com.example.library.lending.application.command.ReturnBookCopy;
+import com.example.library.lending.application.port.in.IExtendLoan;
 import com.example.library.lending.application.port.in.ILendBookCopy;
 import com.example.library.lending.application.port.in.IReturnBookCopy;
 import com.example.library.lending.domain.exception.BookCopyNotAvailableException;
+import com.example.library.lending.domain.exception.ExtensionNotAllowedException;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.LoanNotFoundException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;
+import com.example.library.lending.domain.loan.LoanId;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import java.util.Map;
@@ -24,10 +28,15 @@ public class LoanController {
 
   private final ILendBookCopy lendBookCopyService;
   private final IReturnBookCopy returnBookCopyService;
+  private final IExtendLoan extendLoanService;
 
-  public LoanController(ILendBookCopy lendBookCopyService, IReturnBookCopy returnBookCopyService) {
+  public LoanController(
+      ILendBookCopy lendBookCopyService,
+      IReturnBookCopy returnBookCopyService,
+      IExtendLoan extendLoanService) {
     this.lendBookCopyService = lendBookCopyService;
     this.returnBookCopyService = returnBookCopyService;
+    this.extendLoanService = extendLoanService;
   }
 
   @PostMapping
@@ -59,4 +68,20 @@ public class LoanController {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     }
   }
+
+  @PostMapping("/extend/{loanId}")
+  public ResponseEntity<?> extendLoan(
+      @PathVariable String loanId, @RequestBody ExtendLoanRequest request) {
+    try {
+      var command = new ExtendLoanCommand(LoanId.of(loanId), ReaderId.of(request.readerId()));
+      extendLoanService.extend(command);
+      return ResponseEntity.ok(Map.of("message", "Loan extended successfully"));
+    } catch (ExtensionNotAllowedException e) {
+      return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    }
+  }
+
+  record ExtendLoanRequest(String readerId) {}
 }

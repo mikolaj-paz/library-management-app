@@ -6,6 +6,8 @@ import com.example.library.lending.domain.loan.LoanId;
 import com.example.library.lending.domain.loan.LoanStatus;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,6 +18,15 @@ public class JdbcLoanRepository implements LoanRepository {
 
   public JdbcLoanRepository(JdbcTemplate jdbc) {
     this.jdbc = jdbc;
+  }
+
+  private Loan createLoanFromResultSet(ResultSet rs) throws SQLException {
+    return Loan.create(
+        LoanId.of(rs.getString("id")),
+        ReaderId.of(rs.getString("reader_id")),
+        BookCopyId.of(rs.getString("book_copy_id")),
+        LocalDate.parse(rs.getString("due_date")),
+        LoanStatus.valueOf(rs.getString("status")));
   }
 
   @Override
@@ -57,14 +68,18 @@ public class JdbcLoanRepository implements LoanRepository {
       FROM loans
       WHERE book_copy_id = ? AND (status = 'ACTIVE' OR status = 'EXTENDED')
       """,
-            (rs, rowNum) ->
-                Loan.create(
-                    LoanId.of(rs.getString("id")),
-                    ReaderId.of(rs.getString("reader_id")),
-                    BookCopyId.of(rs.getString("book_copy_id")),
-                    LocalDate.parse(rs.getString("due_date")),
-                    LoanStatus.valueOf(rs.getString("status"))),
+            (rs, rowNum) -> createLoanFromResultSet(rs),
             bookCopyId.value().toString());
+    return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+  }
+
+  @Override
+  public Optional<Loan> find(LoanId loanId) {
+    var results =
+        jdbc.query(
+            "SELECT id, book_copy_id, reader_id, due_date, status FROM loans WHERE id = ?",
+            (rs, rowNum) -> createLoanFromResultSet(rs),
+            loanId.value().toString());
     return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
   }
 }

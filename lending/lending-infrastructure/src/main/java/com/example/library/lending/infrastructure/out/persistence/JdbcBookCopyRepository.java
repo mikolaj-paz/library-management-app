@@ -23,14 +23,15 @@ public class JdbcBookCopyRepository implements BookCopyRepository {
     return BookCopy.create(
         BookCopyId.of(rs.getString("id")),
         BookCopyStatus.valueOf(rs.getString("status")),
-        rs.getString("reserved_by") != null ? ReaderId.of(rs.getString("reserved_by")) : null);
+        rs.getString("reserved_by") != null ? ReaderId.of(rs.getString("reserved_by")) : null,
+        BookId.of(rs.getString("book_id")));
   }
 
   @Override
   public Optional<BookCopy> find(BookCopyId id) {
     var results =
         jdbc.query(
-            "SELECT id, status, reserved_by FROM book_copies WHERE id = ?",
+            "SELECT id, status, reserved_by, book_id FROM book_copies WHERE id = ?",
             (rs, rowNum) -> createBookCopyFromResultSet(rs),
             id.value().toString());
     return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
@@ -40,7 +41,7 @@ public class JdbcBookCopyRepository implements BookCopyRepository {
   public Optional<BookCopy> findAvailableBookCopy(BookId bookId) {
     var results =
         jdbc.query(
-            "SELECT id, status, reserved_by FROM book_copies WHERE book_id = ? AND status = 'AVAILABLE' LIMIT 1",
+            "SELECT id, status, reserved_by, book_id FROM book_copies WHERE book_id = ? AND status = 'AVAILABLE' LIMIT 1",
             (rs, rowNum) -> createBookCopyFromResultSet(rs),
             bookId.value().toString());
     return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));

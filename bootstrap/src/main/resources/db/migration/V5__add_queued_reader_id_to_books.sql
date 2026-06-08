@@ -1,0 +1,1 @@
+ALTER TABLE books ADD COLUMN queued_reader_id TEXT REFERENCES readers(id);

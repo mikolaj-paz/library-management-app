@@ -1,5 +1,6 @@
 package com.example.library.lending.domain.loan;
 
+import com.example.library.lending.domain.exception.ExtensionNotAllowedException;
 import com.example.library.sharedkernel.entity.AggregateRoot;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
@@ -7,12 +8,13 @@ import java.time.LocalDate;
 
 public class Loan extends AggregateRoot<LoanId> {
 
+  private static final int LOAN_DURATION_DAYS = 14;
+  private static final int EXTENSION_DURATION_DAYS = 14;
+
   private final BookCopyId bookCopyId;
   private final ReaderId readerId;
-  private final LocalDate dueDate;
+  private LocalDate dueDate;
   private LoanStatus status;
-
-  private static final int LOAN_DURATION_DAYS = 14;
 
   private Loan(
       LoanId id, BookCopyId bookCopyId, ReaderId readerId, LocalDate dueDate, LoanStatus status) {
@@ -21,6 +23,14 @@ public class Loan extends AggregateRoot<LoanId> {
     this.readerId = readerId;
     this.dueDate = dueDate;
     this.status = status;
+  }
+
+  private boolean isClosed() {
+    return status == LoanStatus.CLOSED;
+  }
+
+  private boolean isExtended() {
+    return status == LoanStatus.EXTENDED;
   }
 
   public static Loan create(ReaderId readerId, BookCopyId bookCopyId) {
@@ -59,5 +69,18 @@ public class Loan extends AggregateRoot<LoanId> {
 
   public void close() {
     this.status = LoanStatus.CLOSED;
+  }
+
+  public void extend() {
+    if (this.isClosed()) {
+      throw new ExtensionNotAllowedException("Loan is already closed.");
+    }
+
+    if (this.isExtended()) {
+      throw new ExtensionNotAllowedException("Loan has already been extended once.");
+    }
+
+    this.dueDate = dueDate.plusDays(EXTENSION_DURATION_DAYS);
+    this.status = LoanStatus.EXTENDED;
   }
 }
