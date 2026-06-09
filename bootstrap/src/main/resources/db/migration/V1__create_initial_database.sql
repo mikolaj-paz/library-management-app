@@ -6,12 +6,12 @@ CREATE TABLE IF NOT EXISTS readers (
 CREATE TABLE IF NOT EXISTS book_copies (
     id          TEXT PRIMARY KEY,
     status      TEXT NOT NULL DEFAULT 'AVAILABLE',
-    reserved_by TEXT NULL
+    reserved_by TEXT NULL REFERENCES readers(id)
 );
 
 CREATE TABLE IF NOT EXISTS loans (
     id           TEXT PRIMARY KEY,
-    reader_id    TEXT NOT NULL,
-    book_copy_id TEXT NOT NULL,
+    reader_id    TEXT NOT NULL REFERENCES readers(id),
+    book_copy_id TEXT NOT NULL REFERENCES book_copies(id),
     due_date     TEXT NOT NULL
 );

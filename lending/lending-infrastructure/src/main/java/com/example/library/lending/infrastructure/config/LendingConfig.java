@@ -4,6 +4,7 @@ import com.example.library.lending.application.port.in.IExtendLoan;
 import com.example.library.lending.application.port.in.ILendBookCopy;
 import com.example.library.lending.application.port.in.IReserveBook;
 import com.example.library.lending.application.port.in.IReturnBookCopy;
+import com.example.library.lending.application.port.in.IShowLoans;
 import com.example.library.lending.application.port.out.BookCopyRepository;
 import com.example.library.lending.application.port.out.BookRepository;
 import com.example.library.lending.application.port.out.LoanRepository;
@@ -13,6 +14,7 @@ import com.example.library.lending.application.service.ExtendLoanService;
 import com.example.library.lending.application.service.LendBookCopyService;
 import com.example.library.lending.application.service.ReserveBookService;
 import com.example.library.lending.application.service.ReturnBookCopyService;
+import com.example.library.lending.application.service.ShowLoansService;
 import com.example.library.lending.infrastructure.out.DomainEventPublisherImpl;
 import com.example.library.lending.infrastructure.out.persistence.JdbcBookCopyRepository;
 import com.example.library.lending.infrastructure.out.persistence.JdbcBookRepository;
@@ -99,5 +101,10 @@ public class LendingConfig {
       DomainEventPublisher domainEventPublisher) {
     return new ExtendLoanService(
         loanRepository, bookRepository, bookCopyRepository, domainEventPublisher);
+  }
+
+  @Bean
+  IShowLoans showLoans(LoanRepository loanRepository) {
+    return new ShowLoansService(loanRepository);
   }
 }

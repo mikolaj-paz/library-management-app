@@ -6,6 +6,8 @@ import com.example.library.lending.application.command.ReturnBookCopy;
 import com.example.library.lending.application.port.in.IExtendLoan;
 import com.example.library.lending.application.port.in.ILendBookCopy;
 import com.example.library.lending.application.port.in.IReturnBookCopy;
+import com.example.library.lending.application.port.in.IShowLoans;
+import com.example.library.lending.application.query.ShowLoans;
 import com.example.library.lending.domain.exception.BookCopyNotAvailableException;
 import com.example.library.lending.domain.exception.ExtensionNotAllowedException;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,14 +32,17 @@ public class LoanController {
   private final ILendBookCopy lendBookCopyService;
   private final IReturnBookCopy returnBookCopyService;
   private final IExtendLoan extendLoanService;
+  private final IShowLoans showLoansService;
 
   public LoanController(
       ILendBookCopy lendBookCopyService,
       IReturnBookCopy returnBookCopyService,
-      IExtendLoan extendLoanService) {
+      IExtendLoan extendLoanService,
+      IShowLoans showLoansService) {
     this.lendBookCopyService = lendBookCopyService;
     this.returnBookCopyService = returnBookCopyService;
     this.extendLoanService = extendLoanService;
+    this.showLoansService = showLoansService;
   }
 
   @PostMapping
@@ -84,4 +90,10 @@ public class LoanController {
   }
 
   record ExtendLoanRequest(String readerId) {}
+
+  @PostMapping("/list")
+  public ResponseEntity<?> showLoans(@RequestParam String readerId) {
+    var results = showLoansService.show(new ShowLoans(ReaderId.of(readerId)));
+    return ResponseEntity.ok(results);
+  }
 }
