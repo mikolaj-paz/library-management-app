@@ -2,12 +2,14 @@ package com.example.library.catalog.infrastructure.config;
 
 import com.example.library.catalog.application.port.in.IAddBookCopy;
 import com.example.library.catalog.application.port.in.IGetBookDetails;
+import com.example.library.catalog.application.port.in.IRemoveBookCopy;
 import com.example.library.catalog.application.port.in.ISearchCatalog;
 import com.example.library.catalog.application.port.out.BookCopyRepository;
 import com.example.library.catalog.application.port.out.BookRepository;
 import com.example.library.catalog.application.port.out.CatalogQueryPort;
 import com.example.library.catalog.application.service.AddBookCopyService;
 import com.example.library.catalog.application.service.GetBookDetailsService;
+import com.example.library.catalog.application.service.RemoveBookCopyService;
 import com.example.library.catalog.application.service.SearchCatalogService;
 import com.example.library.catalog.infrastructure.out.DomainEventPublisherImpl;
 import com.example.library.catalog.infrastructure.out.persistence.JdbcBookCopyRepository;
@@ -58,5 +60,11 @@ public class CatalogConfig {
       BookRepository bookRepository,
       DomainEventPublisher domainEventPublisher) {
     return new AddBookCopyService(bookCopyRepository, bookRepository, domainEventPublisher);
+  }
+
+  @Bean
+  IRemoveBookCopy removeBookCopy(
+      BookCopyRepository bookCopyRepository, DomainEventPublisher domainEventPublisher) {
+    return new RemoveBookCopyService(bookCopyRepository, domainEventPublisher);
   }
 }

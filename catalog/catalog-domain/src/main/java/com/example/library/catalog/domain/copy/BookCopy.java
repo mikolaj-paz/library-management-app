@@ -12,15 +12,20 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
   private ReaderId reservedBy;
   private final BookId bookId;
 
-  private BookCopy(BookCopyId id, BookId bookId) {
+  private BookCopy(BookCopyId id, BookId bookId, BookCopyStatus status, ReaderId reservedBy) {
     super(id);
-    this.status = BookCopyStatus.AVAILABLE;
-    this.reservedBy = null;
+    this.status = status;
+    this.reservedBy = reservedBy;
     this.bookId = bookId;
   }
 
   public static BookCopy create(BookId bookId) {
-    return new BookCopy(BookCopyId.create(), bookId);
+    return new BookCopy(BookCopyId.create(), bookId, BookCopyStatus.AVAILABLE, null);
+  }
+
+  public static BookCopy create(
+      BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
+    return new BookCopy(id, bookId, status, reservedBy);
   }
 
   public BookCopyStatus status() {
@@ -37,5 +42,9 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
 
   public boolean isAvailable() {
     return status == BookCopyStatus.AVAILABLE;
+  }
+
+  public void updateStatusAsUnavailable() {
+    this.status = BookCopyStatus.UNAVAILABLE;
   }
 }
