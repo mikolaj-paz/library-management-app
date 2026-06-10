@@ -16,8 +16,8 @@ public class Reservation extends AggregateRoot<ReservationId> {
     this.bookCopyId = bookCopyId;
   }
 
-  public static Reservation create(ReaderId readerId, BookCopyId bookCopyId) {
-    return new Reservation(ReservationId.create(), readerId, bookCopyId);
+  public static Reservation of(ReservationId id, ReaderId readerId, BookCopyId bookCopyId) {
+    return new Reservation(id, readerId, bookCopyId);
   }
 
   public ReaderId readerId() {

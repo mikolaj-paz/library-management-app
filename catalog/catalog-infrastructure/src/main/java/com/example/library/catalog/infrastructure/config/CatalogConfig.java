@@ -11,6 +11,10 @@ import com.example.library.catalog.application.service.AddBookCopyService;
 import com.example.library.catalog.application.service.GetBookDetailsService;
 import com.example.library.catalog.application.service.RemoveBookCopyService;
 import com.example.library.catalog.application.service.SearchCatalogService;
+import com.example.library.catalog.domain.book.BookFactory;
+import com.example.library.catalog.domain.book.BookFactoryImpl;
+import com.example.library.catalog.domain.copy.BookCopyFactory;
+import com.example.library.catalog.domain.copy.BookCopyFactoryImpl;
 import com.example.library.catalog.infrastructure.out.DomainEventPublisherImpl;
 import com.example.library.catalog.infrastructure.out.persistence.JdbcBookCopyRepository;
 import com.example.library.catalog.infrastructure.out.persistence.JdbcBookRepository;
@@ -25,6 +29,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class CatalogConfig {
 
   @Bean
+  BookCopyFactory bookCopyFactory() {
+    return new BookCopyFactoryImpl();
+  }
+
+  @Bean
+  BookFactory bookFactory() {
+    return new BookFactoryImpl();
+  }
+
+  @Bean
   DomainEventPublisher domainEventPublisher(ApplicationEventPublisher springPublisher) {
     return new DomainEventPublisherImpl(springPublisher);
   }
@@ -35,13 +49,13 @@ public class CatalogConfig {
   }
 
   @Bean
-  BookCopyRepository bookCopyRepository(JdbcTemplate jdbc) {
-    return new JdbcBookCopyRepository(jdbc);
+  BookCopyRepository bookCopyRepository(JdbcTemplate jdbc, BookCopyFactory bookCopyFactory) {
+    return new JdbcBookCopyRepository(jdbc, bookCopyFactory);
   }
 
   @Bean
-  BookRepository bookRepository(JdbcTemplate jdbc) {
-    return new JdbcBookRepository(jdbc);
+  BookRepository bookRepository(JdbcTemplate jdbc, BookFactory bookFactory) {
+    return new JdbcBookRepository(jdbc, bookFactory);
   }
 
   @Bean
@@ -56,10 +70,12 @@ public class CatalogConfig {
 
   @Bean
   IAddBookCopy addBookCopy(
+      BookCopyFactory bookCopyFactory,
       BookCopyRepository bookCopyRepository,
       BookRepository bookRepository,
       DomainEventPublisher domainEventPublisher) {
-    return new AddBookCopyService(bookCopyRepository, bookRepository, domainEventPublisher);
+    return new AddBookCopyService(
+        bookCopyFactory, bookCopyRepository, bookRepository, domainEventPublisher);
   }
 
   @Bean

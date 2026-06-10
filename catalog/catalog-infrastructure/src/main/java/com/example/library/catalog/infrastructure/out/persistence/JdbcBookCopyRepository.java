@@ -2,6 +2,7 @@ package com.example.library.catalog.infrastructure.out.persistence;
 
 import com.example.library.catalog.application.port.out.BookCopyRepository;
 import com.example.library.catalog.domain.copy.BookCopy;
+import com.example.library.catalog.domain.copy.BookCopyFactory;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;
@@ -12,9 +13,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class JdbcBookCopyRepository implements BookCopyRepository {
 
   private final JdbcTemplate jdbc;
+  private final BookCopyFactory factory;
 
-  public JdbcBookCopyRepository(JdbcTemplate jdbc) {
+  public JdbcBookCopyRepository(JdbcTemplate jdbc, BookCopyFactory factory) {
     this.jdbc = jdbc;
+    this.factory = factory;
   }
 
   @Override
@@ -33,7 +36,7 @@ public class JdbcBookCopyRepository implements BookCopyRepository {
         jdbc.query(
             "SELECT id, status, reserved_by, book_id FROM book_copies WHERE id = ?",
             (rs, rowNum) ->
-                BookCopy.create(
+                factory.reconstitute(
                     BookCopyId.of(rs.getString("id")),
                     BookCopyStatus.valueOf(rs.getString("status")),
                     rs.getString("reserved_by") != null

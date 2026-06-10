@@ -19,12 +19,7 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
     this.bookId = bookId;
   }
 
-  public static BookCopy create(BookId bookId) {
-    return new BookCopy(BookCopyId.create(), bookId, BookCopyStatus.AVAILABLE, null);
-  }
-
-  public static BookCopy create(
-      BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
+  static BookCopy of(BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
     return new BookCopy(id, bookId, status, reservedBy);
   }
 

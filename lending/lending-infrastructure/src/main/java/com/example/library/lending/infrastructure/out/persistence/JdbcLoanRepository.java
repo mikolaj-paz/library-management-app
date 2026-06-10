@@ -3,6 +3,7 @@ package com.example.library.lending.infrastructure.out.persistence;
 import com.example.library.lending.application.port.out.LoanRepository;
 import com.example.library.lending.application.query.LoanSummary;
 import com.example.library.lending.domain.loan.Loan;
+import com.example.library.lending.domain.loan.LoanFactory;
 import com.example.library.lending.domain.loan.LoanStatus;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.LoanId;
@@ -17,13 +18,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class JdbcLoanRepository implements LoanRepository {
 
   private final JdbcTemplate jdbc;
+  private final LoanFactory loanFactory;
 
-  public JdbcLoanRepository(JdbcTemplate jdbc) {
+  public JdbcLoanRepository(JdbcTemplate jdbc, LoanFactory loanFactory) {
     this.jdbc = jdbc;
+    this.loanFactory = loanFactory;
   }
 
   private Loan createLoanFromResultSet(ResultSet rs) throws SQLException {
-    return Loan.create(
+    return loanFactory.reconstitute(
         LoanId.of(rs.getString("id")),
         ReaderId.of(rs.getString("reader_id")),
         BookCopyId.of(rs.getString("book_copy_id")),

@@ -2,6 +2,7 @@ package com.example.library.lending.infrastructure.out.persistence;
 
 import com.example.library.lending.application.port.out.BookCopyRepository;
 import com.example.library.lending.domain.copy.BookCopy;
+import com.example.library.lending.domain.copy.BookCopyFactory;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;
@@ -14,13 +15,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class JdbcBookCopyRepository implements BookCopyRepository {
 
   private final JdbcTemplate jdbc;
+  private final BookCopyFactory bookCopyFactory;
 
-  public JdbcBookCopyRepository(JdbcTemplate jdbc) {
+  public JdbcBookCopyRepository(JdbcTemplate jdbc, BookCopyFactory bookCopyFactory) {
     this.jdbc = jdbc;
+    this.bookCopyFactory = bookCopyFactory;
   }
 
   private BookCopy createBookCopyFromResultSet(ResultSet rs) throws SQLException {
-    return BookCopy.create(
+    return bookCopyFactory.reconstitute(
         BookCopyId.of(rs.getString("id")),
         BookCopyStatus.valueOf(rs.getString("status")),
         rs.getString("reserved_by") != null ? ReaderId.of(rs.getString("reserved_by")) : null,

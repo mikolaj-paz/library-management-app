@@ -10,5 +10,5 @@ public interface BookCopyRepository {
 
   Optional<BookCopy> find(BookCopyId bookCopyId);
 
-  void update(BookCopy bookCopyId);
+  void update(BookCopy bookCopy);
 }

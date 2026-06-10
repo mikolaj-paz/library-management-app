@@ -7,7 +7,7 @@ import com.example.library.lending.application.port.out.LoanRepository;
 import com.example.library.lending.application.port.out.ReaderRepository;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;
-import com.example.library.lending.domain.loan.Loan;
+import com.example.library.lending.domain.loan.LoanFactory;
 import com.example.library.sharedkernel.event.BookCopyLoaned;
 import com.example.library.sharedkernel.identifier.LoanId;
 import com.example.library.sharedkernel.identifier.ReaderId;
@@ -16,6 +16,7 @@ import java.util.Objects;
 
 public class LendBookCopyService implements ILendBookCopy {
 
+  private final LoanFactory loanFactory;
   private final LoanRepository loanRepository;
   private final BookCopyRepository bookCopyRepository;
   private final ReaderRepository readerRepository;
@@ -32,11 +33,13 @@ public class LendBookCopyService implements ILendBookCopy {
       LoanRepository loanRepository,
       BookCopyRepository bookCopyRepository,
       ReaderRepository readerRepository,
+      LoanFactory loanFactory,
       DomainEventPublisher eventPublisher) {
     this.loanRepository =
         Objects.requireNonNull(loanRepository, "Loan repository must not be null");
     this.bookCopyRepository =
         Objects.requireNonNull(bookCopyRepository, "Book copy repository must not be null");
+    this.loanFactory = Objects.requireNonNull(loanFactory, "Loan factory must not be null");
     this.readerRepository =
         Objects.requireNonNull(readerRepository, "Reader repository must not be null");
     this.eventPublisher =
@@ -65,7 +68,7 @@ public class LendBookCopyService implements ILendBookCopy {
             .orElseThrow(() -> new IllegalArgumentException("Book copy not found: " + bookCopyId));
     bookCopy.verifyCanBeLoanedBy(readerId);
 
-    var loan = Loan.create(command.readerId(), command.bookCopyId());
+    var loan = loanFactory.create(command.readerId(), command.bookCopyId());
     var loanId = loan.id();
 
     bookCopy.updateStatusAsLoaned();

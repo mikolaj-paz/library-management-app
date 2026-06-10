@@ -9,7 +9,7 @@ import com.example.library.lending.application.port.out.ReservationRepository;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.NoAvailableBookCopyException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;
-import com.example.library.lending.domain.reservation.Reservation;
+import com.example.library.lending.domain.reservation.ReservationFactory;
 import com.example.library.sharedkernel.event.BookCopyReserved;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import com.example.library.sharedkernel.identifier.ReservationId;
@@ -20,6 +20,7 @@ public class ReserveBookService implements IReserveBook {
   private final ReaderRepository readerRepository;
   private final LoanRepository loanRepository;
   private final BookCopyRepository bookCopyRepository;
+  private final ReservationFactory reservationFactory;
   private final ReservationRepository reservationRepository;
   private final DomainEventPublisher eventPublisher;
 
@@ -40,11 +41,13 @@ public class ReserveBookService implements IReserveBook {
       ReaderRepository readerRepository,
       LoanRepository loanRepository,
       BookCopyRepository bookCopyRepository,
+      ReservationFactory reservationFactory,
       ReservationRepository reservationRepository,
       DomainEventPublisher eventPublisher) {
     this.readerRepository = readerRepository;
     this.loanRepository = loanRepository;
     this.bookCopyRepository = bookCopyRepository;
+    this.reservationFactory = reservationFactory;
     this.reservationRepository = reservationRepository;
     this.eventPublisher = eventPublisher;
   }
@@ -63,7 +66,7 @@ public class ReserveBookService implements IReserveBook {
     var bookCopy = availableCopy.get();
     var bookCopyId = bookCopy.id();
 
-    var reservation = Reservation.create(readerId, bookCopyId);
+    var reservation = reservationFactory.create(readerId, bookCopyId);
     var reservationId = reservation.id();
 
     reservationRepository.create(reservation);

@@ -2,6 +2,7 @@ package com.example.library.catalog.infrastructure.out.persistence;
 
 import com.example.library.catalog.application.port.out.BookRepository;
 import com.example.library.catalog.domain.book.Book;
+import com.example.library.catalog.domain.book.BookFactory;
 import com.example.library.catalog.domain.book.ISBN;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;
@@ -11,9 +12,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class JdbcBookRepository implements BookRepository {
 
   private final JdbcTemplate jdbc;
+  private final BookFactory factory;
 
-  public JdbcBookRepository(JdbcTemplate jdbc) {
+  public JdbcBookRepository(JdbcTemplate jdbc, BookFactory factory) {
     this.jdbc = jdbc;
+    this.factory = factory;
   }
 
   @Override
@@ -22,7 +25,7 @@ public class JdbcBookRepository implements BookRepository {
         jdbc.query(
             "SELECT id, title, author, isbn, queued_reader_id FROM books WHERE id = ?",
             (rs, rowNum) ->
-                Book.create(
+                factory.reconstitute(
                     BookId.of(rs.getString("id")),
                     rs.getString("title"),
                     rs.getString("author"),

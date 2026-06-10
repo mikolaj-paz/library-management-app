@@ -15,13 +15,12 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
 
   private BookCopy(BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
     super(id);
-    this.reservedBy = reservedBy;
     this.status = status;
+    this.reservedBy = reservedBy;
     this.bookId = bookId;
   }
 
-  public static BookCopy create(
-      BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
+  static BookCopy of(BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
     return new BookCopy(id, status, reservedBy, bookId);
   }
 

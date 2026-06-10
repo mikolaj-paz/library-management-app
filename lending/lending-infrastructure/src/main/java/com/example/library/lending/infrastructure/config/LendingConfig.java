@@ -15,6 +15,14 @@ import com.example.library.lending.application.service.LendBookCopyService;
 import com.example.library.lending.application.service.ReserveBookService;
 import com.example.library.lending.application.service.ReturnBookCopyService;
 import com.example.library.lending.application.service.ShowLoansService;
+import com.example.library.lending.domain.copy.BookCopyFactory;
+import com.example.library.lending.domain.copy.BookCopyFactoryImpl;
+import com.example.library.lending.domain.loan.LoanFactory;
+import com.example.library.lending.domain.loan.LoanFactoryImpl;
+import com.example.library.lending.domain.reader.ReaderFactory;
+import com.example.library.lending.domain.reader.ReaderFactoryImpl;
+import com.example.library.lending.domain.reservation.ReservationFactory;
+import com.example.library.lending.domain.reservation.ReservationFactoryImpl;
 import com.example.library.lending.infrastructure.out.DomainEventPublisherImpl;
 import com.example.library.lending.infrastructure.out.persistence.JdbcBookCopyRepository;
 import com.example.library.lending.infrastructure.out.persistence.JdbcBookRepository;
@@ -36,8 +44,13 @@ public class LendingConfig {
   }
 
   @Bean
-  LoanRepository loanRepository(JdbcTemplate jdbc) {
-    return new JdbcLoanRepository(jdbc);
+  LoanFactory loanFactory() {
+    return new LoanFactoryImpl();
+  }
+
+  @Bean
+  LoanRepository loanRepository(JdbcTemplate jdbc, LoanFactory loanFactory) {
+    return new JdbcLoanRepository(jdbc, loanFactory);
   }
 
   @Bean
@@ -46,13 +59,23 @@ public class LendingConfig {
   }
 
   @Bean
-  BookCopyRepository bookCopyRepository(JdbcTemplate jdbc) {
-    return new JdbcBookCopyRepository(jdbc);
+  BookCopyFactory bookCopyFactory() {
+    return new BookCopyFactoryImpl();
   }
 
   @Bean
-  ReaderRepository readerRepository(JdbcTemplate jdbc) {
-    return new JdbcReaderRepository(jdbc);
+  BookCopyRepository bookCopyRepository(JdbcTemplate jdbc, BookCopyFactory bookCopyFactory) {
+    return new JdbcBookCopyRepository(jdbc, bookCopyFactory);
+  }
+
+  @Bean
+  ReaderFactory readerFactory() {
+    return new ReaderFactoryImpl();
+  }
+
+  @Bean
+  ReaderRepository readerRepository(JdbcTemplate jdbc, ReaderFactory readerFactory) {
+    return new JdbcReaderRepository(jdbc, readerFactory);
   }
 
   @Bean
@@ -65,9 +88,15 @@ public class LendingConfig {
       LoanRepository loanRepository,
       BookCopyRepository bookCopyRepository,
       ReaderRepository readerRepository,
+      LoanFactory loanFactory,
       DomainEventPublisher domainEventPublisher) {
     return new LendBookCopyService(
-        loanRepository, bookCopyRepository, readerRepository, domainEventPublisher);
+        loanRepository, bookCopyRepository, readerRepository, loanFactory, domainEventPublisher);
+  }
+
+  @Bean
+  ReservationFactory reservationFactory() {
+    return new ReservationFactoryImpl();
   }
 
   @Bean
@@ -76,11 +105,13 @@ public class LendingConfig {
       LoanRepository loanRepository,
       BookCopyRepository bookCopyRepository,
       ReservationRepository reservationRepository,
+      ReservationFactory reservationFactory,
       DomainEventPublisher domainEventPublisher) {
     return new ReserveBookService(
         readerRepository,
         loanRepository,
         bookCopyRepository,
+        reservationFactory,
         reservationRepository,
         domainEventPublisher);
   }

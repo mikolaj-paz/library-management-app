@@ -9,7 +9,6 @@ import java.time.LocalDate;
 
 public class Loan extends AggregateRoot<LoanId> {
 
-  private static final int LOAN_DURATION_DAYS = 14;
   private static final int EXTENSION_DURATION_DAYS = 14;
 
   private final BookCopyId bookCopyId;
@@ -34,16 +33,7 @@ public class Loan extends AggregateRoot<LoanId> {
     return status == LoanStatus.EXTENDED;
   }
 
-  public static Loan create(ReaderId readerId, BookCopyId bookCopyId) {
-    return new Loan(
-        LoanId.create(),
-        bookCopyId,
-        readerId,
-        LocalDate.now().plusDays(LOAN_DURATION_DAYS),
-        LoanStatus.ACTIVE);
-  }
-
-  public static Loan create(
+  static Loan of(
       LoanId id, ReaderId readerId, BookCopyId bookCopyId, LocalDate dueDate, LoanStatus status) {
     return new Loan(id, bookCopyId, readerId, dueDate, status);
   }

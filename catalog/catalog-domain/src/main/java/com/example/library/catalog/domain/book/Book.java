@@ -18,12 +18,7 @@ public class Book extends AggregateRoot<BookId> {
     this.queuedReaderId = queuedReaderId;
   }
 
-  public static Book create(BookId id, String title, String author, ISBN isbn) {
-    return new Book(id, title, author, isbn, null);
-  }
-
-  public static Book create(
-      BookId id, String title, String author, ISBN isbn, ReaderId queuedReaderId) {
+  static Book of(BookId id, String title, String author, ISBN isbn, ReaderId queuedReaderId) {
     return new Book(id, title, author, isbn, queuedReaderId);
   }
 

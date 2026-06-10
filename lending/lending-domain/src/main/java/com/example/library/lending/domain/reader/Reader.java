@@ -12,7 +12,7 @@ public class Reader extends AggregateRoot<ReaderId> {
     this.status = status;
   }
 
-  public static Reader create(ReaderId id, ReaderStatus status) {
+  static Reader of(ReaderId id, ReaderStatus status) {
     return new Reader(id, status);
   }
 
