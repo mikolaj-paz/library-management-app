@@ -1,8 +1,8 @@
-package com.example.library.lending.domain.reservation;
+package com.example.library.sharedkernel.event;
 
-import com.example.library.sharedkernel.event.DomainEvent;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
+import com.example.library.sharedkernel.identifier.ReservationId;
 
 public class BookCopyReserved extends DomainEvent {
 
@@ -15,11 +15,6 @@ public class BookCopyReserved extends DomainEvent {
     this.reservationId = reservationId;
     this.readerId = readerId;
     this.bookCopyId = bookCopyId;
-  }
-
-  @Override
-  public String name() {
-    return "BookCopyReserved";
   }
 
   public ReservationId reservationId() {

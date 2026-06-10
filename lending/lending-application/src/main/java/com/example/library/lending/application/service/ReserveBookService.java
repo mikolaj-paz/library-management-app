@@ -9,10 +9,10 @@ import com.example.library.lending.application.port.out.ReservationRepository;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.NoAvailableBookCopyException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;
-import com.example.library.lending.domain.reservation.BookCopyReserved;
 import com.example.library.lending.domain.reservation.Reservation;
-import com.example.library.lending.domain.reservation.ReservationId;
+import com.example.library.sharedkernel.event.BookCopyReserved;
 import com.example.library.sharedkernel.identifier.ReaderId;
+import com.example.library.sharedkernel.identifier.ReservationId;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 
 public class ReserveBookService implements IReserveBook {

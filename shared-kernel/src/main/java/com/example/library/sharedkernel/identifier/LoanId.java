@@ -1,4 +1,4 @@
-package com.example.library.lending.domain.loan;
+package com.example.library.sharedkernel.identifier;
 
 import java.util.Objects;
 import java.util.UUID;

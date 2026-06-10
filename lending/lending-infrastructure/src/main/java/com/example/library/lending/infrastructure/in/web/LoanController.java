@@ -13,8 +13,8 @@ import com.example.library.lending.domain.exception.ExtensionNotAllowedException
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.LoanNotFoundException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;
-import com.example.library.lending.domain.loan.LoanId;
 import com.example.library.sharedkernel.identifier.BookCopyId;
+import com.example.library.sharedkernel.identifier.LoanId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;

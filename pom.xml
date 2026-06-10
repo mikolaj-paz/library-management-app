@@ -15,6 +15,7 @@
         <module>shared-kernel</module>
         <module>catalog</module>
         <module>lending</module>
+        <module>notifications</module>
         <module>bootstrap</module>
     </modules>
 

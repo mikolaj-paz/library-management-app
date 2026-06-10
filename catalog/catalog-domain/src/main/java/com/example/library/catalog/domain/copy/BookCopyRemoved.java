@@ -12,11 +12,6 @@ public class BookCopyRemoved extends DomainEvent {
     this.bookCopyId = bookCopyId;
   }
 
-  @Override
-  public String name() {
-    return "BookCopyRemoved";
-  }
-
   public BookCopyId bookCopyId() {
     return bookCopyId;
   }

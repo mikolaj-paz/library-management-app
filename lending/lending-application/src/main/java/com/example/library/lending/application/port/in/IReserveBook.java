@@ -1,7 +1,7 @@
 package com.example.library.lending.application.port.in;
 
 import com.example.library.lending.application.command.ReserveBook;
-import com.example.library.lending.domain.reservation.ReservationId;
+import com.example.library.sharedkernel.identifier.ReservationId;
 
 public interface IReserveBook {
 

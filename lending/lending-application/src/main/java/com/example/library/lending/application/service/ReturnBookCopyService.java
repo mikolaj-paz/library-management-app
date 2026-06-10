@@ -5,7 +5,7 @@ import com.example.library.lending.application.port.in.IReturnBookCopy;
 import com.example.library.lending.application.port.out.BookCopyRepository;
 import com.example.library.lending.application.port.out.LoanRepository;
 import com.example.library.lending.domain.exception.LoanNotFoundException;
-import com.example.library.lending.domain.loan.BookCopyReturned;
+import com.example.library.sharedkernel.event.BookCopyReturned;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 import java.time.LocalDate;
 
@@ -51,6 +51,6 @@ public class ReturnBookCopyService implements IReturnBookCopy {
     loanRepository.update(loan);
     bookCopyRepository.update(bookCopy);
 
-    eventPublisher.publish(new BookCopyReturned(loan.id(), loan.readerId(), bookCopyId, isOverdue));
+    eventPublisher.publish(new BookCopyReturned(loan.readerId(), bookCopyId, isOverdue));
   }
 }

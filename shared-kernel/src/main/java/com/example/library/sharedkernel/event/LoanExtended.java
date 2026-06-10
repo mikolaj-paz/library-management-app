@@ -1,29 +1,24 @@
-package com.example.library.lending.domain.loan;
+package com.example.library.sharedkernel.event;
 
-import com.example.library.sharedkernel.event.DomainEvent;
 import com.example.library.sharedkernel.identifier.BookCopyId;
+import com.example.library.sharedkernel.identifier.LoanId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import java.time.LocalDate;
 
-public class BookCopyLoaned extends DomainEvent {
+public class LoanExtended extends DomainEvent {
 
   private final LoanId loanId;
   private final ReaderId readerId;
   private final BookCopyId bookCopyId;
-  private final LocalDate loanDueDate;
+  private final LocalDate newDueDate;
 
-  public BookCopyLoaned(
-      LoanId loanId, ReaderId readerId, BookCopyId bookCopyId, LocalDate loanDueDate) {
+  public LoanExtended(
+      LoanId loanId, ReaderId readerId, BookCopyId bookCopyId, LocalDate newDueDate) {
     super();
     this.loanId = loanId;
     this.readerId = readerId;
     this.bookCopyId = bookCopyId;
-    this.loanDueDate = loanDueDate;
-  }
-
-  @Override
-  public String name() {
-    return "BookCopyLoaned";
+    this.newDueDate = newDueDate;
   }
 
   public LoanId loanId() {
@@ -38,7 +33,7 @@ public class BookCopyLoaned extends DomainEvent {
     return bookCopyId;
   }
 
-  public LocalDate loanDueDate() {
-    return loanDueDate;
+  public LocalDate newDueDate() {
+    return newDueDate;
   }
 }

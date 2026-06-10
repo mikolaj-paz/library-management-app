@@ -6,7 +6,7 @@ import com.example.library.lending.application.port.out.BookCopyRepository;
 import com.example.library.lending.application.port.out.BookRepository;
 import com.example.library.lending.application.port.out.LoanRepository;
 import com.example.library.lending.domain.exception.ExtensionNotAllowedException;
-import com.example.library.lending.domain.loan.LoanExtended;
+import com.example.library.sharedkernel.event.LoanExtended;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 
 public class ExtendLoanService implements IExtendLoan {
