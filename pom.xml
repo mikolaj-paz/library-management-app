@@ -27,7 +27,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Dependency versions -->
-        <spring-boot.version>3.5.14</spring-boot.version>
+        <spring-boot.version>3.5.15</spring-boot.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <sqlite-jdbc.version>3.53.0.0</sqlite-jdbc.version>
 
