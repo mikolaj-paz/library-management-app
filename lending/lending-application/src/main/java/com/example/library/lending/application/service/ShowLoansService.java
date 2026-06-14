@@ -17,6 +17,6 @@ public class ShowLoansService implements IShowLoans {
   @Override
   public List<LoanSummary> show(ShowLoans query) {
     var readerId = query.readerId();
-    return loanRepository.findLoansFor(readerId);
+    return loanRepository.findFor(readerId);
   }
 }

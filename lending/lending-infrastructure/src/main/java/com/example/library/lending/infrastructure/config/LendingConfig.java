@@ -15,6 +15,8 @@ import com.example.library.lending.application.service.LendBookCopyService;
 import com.example.library.lending.application.service.ReserveBookService;
 import com.example.library.lending.application.service.ReturnBookCopyService;
 import com.example.library.lending.application.service.ShowLoansService;
+import com.example.library.lending.domain.book.BookFactory;
+import com.example.library.lending.domain.book.BookFactoryImpl;
 import com.example.library.lending.domain.copy.BookCopyFactory;
 import com.example.library.lending.domain.copy.BookCopyFactoryImpl;
 import com.example.library.lending.domain.loan.LoanFactory;
@@ -55,8 +57,13 @@ public class LendingConfig {
   }
 
   @Bean
-  BookRepository lendingBookRepository(JdbcTemplate jdbc) {
-    return new JdbcBookRepository(jdbc);
+  BookFactory lendingBookFactory() {
+    return new BookFactoryImpl();
+  }
+
+  @Bean
+  BookRepository lendingBookRepository(JdbcTemplate jdbc, BookFactory lendingBookFactory) {
+    return new JdbcBookRepository(jdbc, lendingBookFactory);
   }
 
   @Bean

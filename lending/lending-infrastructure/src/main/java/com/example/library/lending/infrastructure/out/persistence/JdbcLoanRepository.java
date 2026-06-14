@@ -89,7 +89,7 @@ public class JdbcLoanRepository implements LoanRepository {
   }
 
   @Override
-  public List<LoanSummary> findLoansFor(ReaderId readerId) {
+  public List<LoanSummary> findFor(ReaderId readerId) {
     return jdbc.query(
         """
       SELECT l.id, l.book_copy_id, b.title, b.author, l.due_date, l.status

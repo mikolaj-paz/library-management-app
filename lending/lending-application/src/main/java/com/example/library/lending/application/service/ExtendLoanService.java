@@ -47,7 +47,12 @@ public class ExtendLoanService implements IExtendLoan {
             .find(bookCopyId)
             .orElseThrow(() -> new IllegalStateException("Book copy not found: " + bookCopyId));
 
-    if (bookRepository.existsReaderInQueue(bookCopy.bookId())) {
+    var book =
+        bookRepository
+            .find(bookCopy.bookId())
+            .orElseThrow(() -> new IllegalStateException("Book not found: " + bookCopy.bookId()));
+
+    if (book.hasQueuedReader()) {
       throw new ExtensionNotAllowedException(
           "Cannot extend loan " + loanId + " because there are readers in the queue.");
     }

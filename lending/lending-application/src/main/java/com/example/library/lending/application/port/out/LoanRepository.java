@@ -20,5 +20,5 @@ public interface LoanRepository {
 
   Optional<Loan> find(LoanId loanId);
 
-  List<LoanSummary> findLoansFor(ReaderId readerId);
+  List<LoanSummary> findFor(ReaderId readerId);
 }

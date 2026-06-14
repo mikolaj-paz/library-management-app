@@ -57,12 +57,10 @@ public class ReserveBookService implements IReserveBook {
 
     verifyReaderEligibility(readerId);
 
-    var availableCopy = bookCopyRepository.findAvailableBookCopy(command.bookId());
-    if (availableCopy.isEmpty()) {
-      throw new NoAvailableBookCopyException(command.bookId());
-    }
-
-    var bookCopy = availableCopy.get();
+    var bookCopy =
+        bookCopyRepository
+            .findAvailableBookCopy(command.bookId())
+            .orElseThrow(() -> new NoAvailableBookCopyException(command.bookId()));
     var bookCopyId = bookCopy.id();
 
     var reservation = reservationFactory.create(readerId, bookCopyId);
