@@ -8,11 +8,9 @@ import com.example.library.lending.application.port.out.ReaderRepository;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;
 import com.example.library.lending.domain.loan.LoanFactory;
-import com.example.library.sharedkernel.event.BookCopyLoaned;
 import com.example.library.sharedkernel.identifier.LoanId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
-import java.util.Objects;
 
 public class LendBookCopyService implements ILendBookCopy {
 
@@ -35,15 +33,11 @@ public class LendBookCopyService implements ILendBookCopy {
       ReaderRepository readerRepository,
       LoanFactory loanFactory,
       DomainEventPublisher eventPublisher) {
-    this.loanRepository =
-        Objects.requireNonNull(loanRepository, "Loan repository must not be null");
-    this.bookCopyRepository =
-        Objects.requireNonNull(bookCopyRepository, "Book copy repository must not be null");
-    this.loanFactory = Objects.requireNonNull(loanFactory, "Loan factory must not be null");
-    this.readerRepository =
-        Objects.requireNonNull(readerRepository, "Reader repository must not be null");
-    this.eventPublisher =
-        Objects.requireNonNull(eventPublisher, "Event publisher must not be null");
+    this.loanRepository = loanRepository;
+    this.bookCopyRepository = bookCopyRepository;
+    this.loanFactory = loanFactory;
+    this.readerRepository = readerRepository;
+    this.eventPublisher = eventPublisher;
   }
 
   @Override
@@ -71,12 +65,12 @@ public class LendBookCopyService implements ILendBookCopy {
     var loan = loanFactory.create(command.readerId(), command.bookCopyId());
     var loanId = loan.id();
 
-    bookCopy.updateStatusAsLoaned();
+    bookCopy.lend(loan.readerId(), loanId);
 
     loanRepository.create(loan);
     bookCopyRepository.update(bookCopy);
 
-    eventPublisher.publish(new BookCopyLoaned(loanId, readerId, bookCopyId, loan.dueDate()));
+    bookCopy.pullDomainEvents().forEach(eventPublisher::publish);
 
     return loanId;
   }

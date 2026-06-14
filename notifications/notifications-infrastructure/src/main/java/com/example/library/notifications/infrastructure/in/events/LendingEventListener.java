@@ -42,9 +42,7 @@ public class LendingEventListener {
         NotificationType.BOOK_COPY_LOANED,
         "You have borrowed "
             + event.bookCopyId()
-            + ". Congratulations! Your due date: "
-            + event.loanDueDate()
-            + ". Loan number: "
+            + ". Congratulations! Loan number: "
             + event.loanId()
             + ".");
   }

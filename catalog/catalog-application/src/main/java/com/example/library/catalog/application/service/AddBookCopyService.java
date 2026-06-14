@@ -5,7 +5,6 @@ import com.example.library.catalog.application.port.in.IAddBookCopy;
 import com.example.library.catalog.application.port.out.BookCopyRepository;
 import com.example.library.catalog.application.port.out.BookRepository;
 import com.example.library.catalog.domain.copy.BookCopy;
-import com.example.library.catalog.domain.copy.BookCopyAdded;
 import com.example.library.catalog.domain.copy.BookCopyFactory;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
@@ -40,7 +39,7 @@ public class AddBookCopyService implements IAddBookCopy {
 
     bookCopyRepository.create(bookCopy);
 
-    eventPublisher.publish(new BookCopyAdded(bookCopyId, bookId));
+    bookCopy.pullDomainEvents().forEach(eventPublisher::publish);
 
     return bookCopyId;
   }

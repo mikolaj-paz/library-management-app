@@ -17,6 +17,7 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
     this.status = status;
     this.reservedBy = reservedBy;
     this.bookId = bookId;
+    this.registerEvent(new BookCopyAdded(this.id(), bookId));
   }
 
   static BookCopy of(BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
@@ -39,7 +40,8 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
     return status == BookCopyStatus.AVAILABLE;
   }
 
-  public void updateStatusAsUnavailable() {
+  public void remove() {
     this.status = BookCopyStatus.UNAVAILABLE;
+    this.registerEvent(new BookCopyRemoved(this.id()));
   }
 }

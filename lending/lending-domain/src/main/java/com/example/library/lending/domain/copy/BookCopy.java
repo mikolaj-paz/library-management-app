@@ -2,9 +2,14 @@ package com.example.library.lending.domain.copy;
 
 import com.example.library.lending.domain.exception.BookCopyNotAvailableException;
 import com.example.library.sharedkernel.entity.AggregateRoot;
+import com.example.library.sharedkernel.event.BookCopyLoaned;
+import com.example.library.sharedkernel.event.BookCopyReserved;
+import com.example.library.sharedkernel.event.BookCopyReturned;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.BookId;
+import com.example.library.sharedkernel.identifier.LoanId;
 import com.example.library.sharedkernel.identifier.ReaderId;
+import com.example.library.sharedkernel.identifier.ReservationId;
 import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 
 public class BookCopy extends AggregateRoot<BookCopyId> {
@@ -46,17 +51,20 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
     throw new BookCopyNotAvailableException(this.id());
   }
 
-  public void updateStatusAsLoaned() {
+  public void lend(ReaderId readerId, LoanId loanId) {
     this.status = BookCopyStatus.LOANED;
     this.reservedBy = null;
+    this.registerEvent(new BookCopyLoaned(loanId, readerId, this.id()));
   }
 
-  public void updateStatusAsReserved(ReaderId readerId) {
+  public void reserve(ReservationId reservationId, ReaderId readerId) {
     this.status = BookCopyStatus.RESERVED;
     this.reservedBy = readerId;
+    this.registerEvent(new BookCopyReserved(reservationId, readerId, this.id()));
   }
 
-  public void updateStatusAsAvailable() {
+  public void returnIt(ReaderId readerId, boolean isOverdue) {
     this.status = BookCopyStatus.AVAILABLE;
+    this.registerEvent(new BookCopyReturned(readerId, this.id(), isOverdue));
   }
 }

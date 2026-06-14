@@ -5,7 +5,6 @@ import com.example.library.lending.application.port.in.IReturnBookCopy;
 import com.example.library.lending.application.port.out.BookCopyRepository;
 import com.example.library.lending.application.port.out.LoanRepository;
 import com.example.library.lending.domain.exception.LoanNotFoundException;
-import com.example.library.sharedkernel.event.BookCopyReturned;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 import java.time.LocalDate;
 
@@ -46,11 +45,12 @@ public class ReturnBookCopyService implements IReturnBookCopy {
         bookCopyRepository
             .find(bookCopyId)
             .orElseThrow(() -> new IllegalArgumentException("Book copy not found: " + bookCopyId));
-    bookCopy.updateStatusAsAvailable();
+
+    bookCopy.returnIt(loan.readerId(), isOverdue);
 
     loanRepository.update(loan);
     bookCopyRepository.update(bookCopy);
 
-    eventPublisher.publish(new BookCopyReturned(loan.readerId(), bookCopyId, isOverdue));
+    bookCopy.pullDomainEvents().forEach(eventPublisher::publish);
   }
 }

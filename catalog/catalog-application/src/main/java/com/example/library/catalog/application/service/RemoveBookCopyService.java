@@ -3,7 +3,6 @@ package com.example.library.catalog.application.service;
 import com.example.library.catalog.application.command.RemoveBookCopy;
 import com.example.library.catalog.application.port.in.IRemoveBookCopy;
 import com.example.library.catalog.application.port.out.BookCopyRepository;
-import com.example.library.catalog.domain.copy.BookCopyRemoved;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 
 public class RemoveBookCopyService implements IRemoveBookCopy {
@@ -26,10 +25,10 @@ public class RemoveBookCopyService implements IRemoveBookCopy {
             .orElseThrow(
                 () -> new IllegalArgumentException("Book copy not found: " + bookCopyId.value()));
 
-    bookCopy.updateStatusAsUnavailable();
+    bookCopy.remove();
 
     bookCopyRepository.update(bookCopy);
 
-    eventPublisher.publish(new BookCopyRemoved(command.bookCopyId()));
+    bookCopy.pullDomainEvents().forEach(eventPublisher::publish);
   }
 }

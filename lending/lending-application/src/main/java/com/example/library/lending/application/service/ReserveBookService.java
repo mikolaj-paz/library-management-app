@@ -10,7 +10,6 @@ import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.NoAvailableBookCopyException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;
 import com.example.library.lending.domain.reservation.ReservationFactory;
-import com.example.library.sharedkernel.event.BookCopyReserved;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import com.example.library.sharedkernel.identifier.ReservationId;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
@@ -69,10 +68,12 @@ public class ReserveBookService implements IReserveBook {
     var reservation = reservationFactory.create(readerId, bookCopyId);
     var reservationId = reservation.id();
 
+    bookCopy.reserve(reservationId, readerId);
+
     reservationRepository.create(reservation);
     bookCopyRepository.update(bookCopy);
 
-    eventPublisher.publish(new BookCopyReserved(reservationId, readerId, bookCopyId));
+    bookCopy.pullDomainEvents().forEach(eventPublisher::publish);
 
     return reservationId;
   }
