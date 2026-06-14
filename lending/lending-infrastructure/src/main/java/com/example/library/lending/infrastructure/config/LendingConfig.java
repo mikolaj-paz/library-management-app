@@ -30,6 +30,7 @@ import com.example.library.lending.infrastructure.out.persistence.JdbcLoanReposi
 import com.example.library.lending.infrastructure.out.persistence.JdbcReaderRepository;
 import com.example.library.lending.infrastructure.out.persistence.JdbcReservationRepository;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,103 +40,112 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class LendingConfig {
 
   @Bean
-  DomainEventPublisher domainEventPublisher(ApplicationEventPublisher springPublisher) {
+  DomainEventPublisher lendingDomainEventPublisher(ApplicationEventPublisher springPublisher) {
     return new DomainEventPublisherImpl(springPublisher);
   }
 
   @Bean
-  LoanFactory loanFactory() {
+  LoanFactory lendingLoanFactory() {
     return new LoanFactoryImpl();
   }
 
   @Bean
-  LoanRepository loanRepository(JdbcTemplate jdbc, LoanFactory loanFactory) {
-    return new JdbcLoanRepository(jdbc, loanFactory);
+  LoanRepository lendingLoanRepository(JdbcTemplate jdbc, LoanFactory lendingLoanFactory) {
+    return new JdbcLoanRepository(jdbc, lendingLoanFactory);
   }
 
   @Bean
-  BookRepository bookRepository(JdbcTemplate jdbc) {
+  BookRepository lendingBookRepository(JdbcTemplate jdbc) {
     return new JdbcBookRepository(jdbc);
   }
 
   @Bean
-  BookCopyFactory bookCopyFactory() {
+  BookCopyFactory lendingBookCopyFactory() {
     return new BookCopyFactoryImpl();
   }
 
   @Bean
-  BookCopyRepository bookCopyRepository(JdbcTemplate jdbc, BookCopyFactory bookCopyFactory) {
-    return new JdbcBookCopyRepository(jdbc, bookCopyFactory);
+  BookCopyRepository lendingBookCopyRepository(
+      JdbcTemplate jdbc, BookCopyFactory lendingBookCopyFactory) {
+    return new JdbcBookCopyRepository(jdbc, lendingBookCopyFactory);
   }
 
   @Bean
-  ReaderFactory readerFactory() {
+  ReaderFactory lendingReaderFactory() {
     return new ReaderFactoryImpl();
   }
 
   @Bean
-  ReaderRepository readerRepository(JdbcTemplate jdbc, ReaderFactory readerFactory) {
-    return new JdbcReaderRepository(jdbc, readerFactory);
+  ReaderRepository lendingReaderRepository(JdbcTemplate jdbc, ReaderFactory lendingReaderFactory) {
+    return new JdbcReaderRepository(jdbc, lendingReaderFactory);
   }
 
   @Bean
-  ReservationRepository reservationRepository(JdbcTemplate jdbc) {
+  ReservationRepository lendingReservationRepository(JdbcTemplate jdbc) {
     return new JdbcReservationRepository(jdbc);
   }
 
   @Bean
   ILendBookCopy lendBookCopy(
-      LoanRepository loanRepository,
-      BookCopyRepository bookCopyRepository,
-      ReaderRepository readerRepository,
-      LoanFactory loanFactory,
-      DomainEventPublisher domainEventPublisher) {
+      LoanRepository lendingLoanRepository,
+      BookCopyRepository lendingBookCopyRepository,
+      ReaderRepository lendingReaderRepository,
+      LoanFactory lendingLoanFactory,
+      @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
     return new LendBookCopyService(
-        loanRepository, bookCopyRepository, readerRepository, loanFactory, domainEventPublisher);
+        lendingLoanRepository,
+        lendingBookCopyRepository,
+        lendingReaderRepository,
+        lendingLoanFactory,
+        lendingDomainEventPublisher);
   }
 
   @Bean
-  ReservationFactory reservationFactory() {
+  ReservationFactory lendingReservationFactory() {
     return new ReservationFactoryImpl();
   }
 
   @Bean
   IReserveBook reserveBook(
-      ReaderRepository readerRepository,
-      LoanRepository loanRepository,
-      BookCopyRepository bookCopyRepository,
-      ReservationRepository reservationRepository,
-      ReservationFactory reservationFactory,
-      DomainEventPublisher domainEventPublisher) {
+      ReaderRepository lendingReaderRepository,
+      LoanRepository lendingLoanRepository,
+      BookCopyRepository lendingBookCopyRepository,
+      ReservationRepository lendingReservationRepository,
+      ReservationFactory lendingReservationFactory,
+      @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
     return new ReserveBookService(
-        readerRepository,
-        loanRepository,
-        bookCopyRepository,
-        reservationFactory,
-        reservationRepository,
-        domainEventPublisher);
+        lendingReaderRepository,
+        lendingLoanRepository,
+        lendingBookCopyRepository,
+        lendingReservationFactory,
+        lendingReservationRepository,
+        lendingDomainEventPublisher);
   }
 
   @Bean
   IReturnBookCopy returnBookCopy(
-      LoanRepository loanRepository,
-      BookCopyRepository bookCopyRepository,
-      DomainEventPublisher domainEventPublisher) {
-    return new ReturnBookCopyService(loanRepository, bookCopyRepository, domainEventPublisher);
+      LoanRepository lendingLoanRepository,
+      BookCopyRepository lendingBookCopyRepository,
+      @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
+    return new ReturnBookCopyService(
+        lendingLoanRepository, lendingBookCopyRepository, lendingDomainEventPublisher);
   }
 
   @Bean
   IExtendLoan extendLoan(
-      LoanRepository loanRepository,
-      BookRepository bookRepository,
-      BookCopyRepository bookCopyRepository,
-      DomainEventPublisher domainEventPublisher) {
+      LoanRepository lendingLoanRepository,
+      BookRepository lendingBookRepository,
+      BookCopyRepository lendingBookCopyRepository,
+      @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
     return new ExtendLoanService(
-        loanRepository, bookRepository, bookCopyRepository, domainEventPublisher);
+        lendingLoanRepository,
+        lendingBookRepository,
+        lendingBookCopyRepository,
+        lendingDomainEventPublisher);
   }
 
   @Bean
-  IShowLoans showLoans(LoanRepository loanRepository) {
-    return new ShowLoansService(loanRepository);
+  IShowLoans showLoans(LoanRepository lendingLoanRepository) {
+    return new ShowLoansService(lendingLoanRepository);
   }
 }

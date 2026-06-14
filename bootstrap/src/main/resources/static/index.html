@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Library Management</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Library Management</h1>
+      <p>Backend capabilities demo</p>
+    </header>
+
+    <main class="container">
+
+      <section class="panel">
+        <h2>Catalog</h2>
+
+        <h3>Search Catalog</h3>
+        <form id="catalog-search-form">
+          <label>
+            Phrase
+            <input name="phrase" type="text" required />
+          </label>
+          <button type="submit">Search</button>
+        </form>
+        <pre id="catalog-search-output"></pre>
+
+        <h3>Book Details</h3>
+        <form id="book-details-form">
+          <label>
+            Book ID
+            <input name="bookId" type="text" required />
+          </label>
+          <button type="submit">Get Details</button>
+        </form>
+        <pre id="book-details-output"></pre>
+      </section>
+
+      <section class="panel">
+        <h2>Inventory</h2>
+
+        <h3>Add Book Copy</h3>
+        <form id="add-book-copy-form">
+          <label>
+            Book ID
+            <input name="bookId" type="text" required />
+          </label>
+          <button type="submit">Add Copy</button>
+        </form>
+        <pre id="add-book-copy-output"></pre>
+
+        <h3>Remove Book Copy</h3>
+        <form id="remove-book-copy-form">
+          <label>
+            Book Copy ID
+            <input name="bookCopyId" type="text" required />
+          </label>
+          <button type="submit">Remove Copy</button>
+        </form>
+        <pre id="remove-book-copy-output"></pre>
+      </section>
+
+      <section class="panel">
+        <h2>Lending</h2>
+
+        <h3>Lend Book Copy</h3>
+        <form id="lend-book-copy-form">
+          <label>
+            Book Copy ID
+            <input name="bookCopyId" type="text" required />
+          </label>
+          <label>
+            Reader ID
+            <input name="readerId" type="text" required />
+          </label>
+          <label>
+            Due Date (optional)
+            <input name="dueDate" type="text" />
+          </label>
+          <button type="submit">Lend</button>
+        </form>
+        <pre id="lend-book-copy-output"></pre>
+
+        <h3>Return Book Copy</h3>
+        <form id="return-book-copy-form">
+          <label>
+            Book Copy ID
+            <input name="bookCopyId" type="text" required />
+          </label>
+          <button type="submit">Return</button>
+        </form>
+        <pre id="return-book-copy-output"></pre>
+
+        <h3>Extend Loan</h3>
+        <form id="extend-loan-form">
+          <label>
+            Loan ID
+            <input name="loanId" type="text" required />
+          </label>
+          <label>
+            Reader ID
+            <input name="readerId" type="text" required />
+          </label>
+          <button type="submit">Extend</button>
+        </form>
+        <pre id="extend-loan-output"></pre>
+
+        <h3>List Loans</h3>
+        <form id="list-loans-form">
+          <label>
+            Reader ID
+            <input name="readerId" type="text" required />
+          </label>
+          <button type="submit">List</button>
+        </form>
+        <pre id="list-loans-output"></pre>
+      </section>
+
+      <section class="panel">
+        <h2>Reservations</h2>
+
+        <h3>Reserve Book</h3>
+        <form id="reserve-book-form">
+          <label>
+            Reader ID
+            <input name="readerId" type="text" required />
+          </label>
+          <label>
+            Book ID
+            <input name="bookId" type="text" required />
+          </label>
+          <button type="submit">Reserve</button>
+        </form>
+        <pre id="reserve-book-output"></pre>
+      </section>
+    </main>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>

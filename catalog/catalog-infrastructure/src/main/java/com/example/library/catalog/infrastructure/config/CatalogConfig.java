@@ -20,6 +20,7 @@ import com.example.library.catalog.infrastructure.out.persistence.JdbcBookCopyRe
 import com.example.library.catalog.infrastructure.out.persistence.JdbcBookRepository;
 import com.example.library.catalog.infrastructure.out.persistence.JdbcCatalogQueryPort;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,17 +30,17 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class CatalogConfig {
 
   @Bean
-  BookCopyFactory bookCopyFactory() {
+  BookCopyFactory catalogBookCopyFactory() {
     return new BookCopyFactoryImpl();
   }
 
   @Bean
-  BookFactory bookFactory() {
+  BookFactory catalogBookFactory() {
     return new BookFactoryImpl();
   }
 
   @Bean
-  DomainEventPublisher domainEventPublisher(ApplicationEventPublisher springPublisher) {
+  DomainEventPublisher catalogDomainEventPublisher(ApplicationEventPublisher springPublisher) {
     return new DomainEventPublisherImpl(springPublisher);
   }
 
@@ -49,13 +50,14 @@ public class CatalogConfig {
   }
 
   @Bean
-  BookCopyRepository bookCopyRepository(JdbcTemplate jdbc, BookCopyFactory bookCopyFactory) {
-    return new JdbcBookCopyRepository(jdbc, bookCopyFactory);
+  BookCopyRepository catalogBookCopyRepository(
+      JdbcTemplate jdbc, BookCopyFactory catalogBookCopyFactory) {
+    return new JdbcBookCopyRepository(jdbc, catalogBookCopyFactory);
   }
 
   @Bean
-  BookRepository bookRepository(JdbcTemplate jdbc, BookFactory bookFactory) {
-    return new JdbcBookRepository(jdbc, bookFactory);
+  BookRepository catalogBookRepository(JdbcTemplate jdbc, BookFactory catalogBookFactory) {
+    return new JdbcBookRepository(jdbc, catalogBookFactory);
   }
 
   @Bean
@@ -70,17 +72,21 @@ public class CatalogConfig {
 
   @Bean
   IAddBookCopy addBookCopy(
-      BookCopyFactory bookCopyFactory,
-      BookCopyRepository bookCopyRepository,
-      BookRepository bookRepository,
-      DomainEventPublisher domainEventPublisher) {
+      BookCopyFactory catalogBookCopyFactory,
+      BookCopyRepository catalogBookCopyRepository,
+      BookRepository catalogBookRepository,
+      @Qualifier("catalogDomainEventPublisher") DomainEventPublisher catalogDomainEventPublisher) {
     return new AddBookCopyService(
-        bookCopyFactory, bookCopyRepository, bookRepository, domainEventPublisher);
+        catalogBookCopyFactory,
+        catalogBookCopyRepository,
+        catalogBookRepository,
+        catalogDomainEventPublisher);
   }
 
   @Bean
   IRemoveBookCopy removeBookCopy(
-      BookCopyRepository bookCopyRepository, DomainEventPublisher domainEventPublisher) {
-    return new RemoveBookCopyService(bookCopyRepository, domainEventPublisher);
+      BookCopyRepository catalogBookCopyRepository,
+      @Qualifier("catalogDomainEventPublisher") DomainEventPublisher catalogDomainEventPublisher) {
+    return new RemoveBookCopyService(catalogBookCopyRepository, catalogDomainEventPublisher);
   }
 }

@@ -64,7 +64,7 @@ public class LoanController {
   record LendBookCopyRequest(String bookCopyId, String readerId, String dueDate) {}
 
   @PostMapping("/return/{bookCopyId}")
-  public ResponseEntity<?> returnBookCopy(@PathVariable String bookCopyId) {
+  public ResponseEntity<?> returnBookCopy(@PathVariable("bookCopyId") String bookCopyId) {
     try {
       returnBookCopyService.returnCopy(new ReturnBookCopy(BookCopyId.of(bookCopyId)));
       return ResponseEntity.ok(Map.of("message", "Book copy returned successfully"));
@@ -77,7 +77,7 @@ public class LoanController {
 
   @PostMapping("/extend/{loanId}")
   public ResponseEntity<?> extendLoan(
-      @PathVariable String loanId, @RequestBody ExtendLoanRequest request) {
+      @PathVariable("loanId") String loanId, @RequestBody ExtendLoanRequest request) {
     try {
       var command = new ExtendLoanCommand(LoanId.of(loanId), ReaderId.of(request.readerId()));
       extendLoanService.extend(command);
@@ -92,7 +92,7 @@ public class LoanController {
   record ExtendLoanRequest(String readerId) {}
 
   @PostMapping("/list")
-  public ResponseEntity<?> showLoans(@RequestParam String readerId) {
+  public ResponseEntity<?> showLoans(@RequestParam("readerId") String readerId) {
     var results = showLoansService.show(new ShowLoans(ReaderId.of(readerId)));
     return ResponseEntity.ok(results);
   }
