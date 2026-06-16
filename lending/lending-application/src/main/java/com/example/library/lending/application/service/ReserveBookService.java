@@ -2,10 +2,10 @@ package com.example.library.lending.application.service;
 
 import com.example.library.lending.application.command.ReserveBook;
 import com.example.library.lending.application.port.in.IReserveBook;
-import com.example.library.lending.application.port.out.BookCopyRepository;
-import com.example.library.lending.application.port.out.LoanRepository;
-import com.example.library.lending.application.port.out.ReaderRepository;
-import com.example.library.lending.application.port.out.ReservationRepository;
+import com.example.library.lending.application.repository.BookCopyRepository;
+import com.example.library.lending.application.repository.LoanRepository;
+import com.example.library.lending.application.repository.ReaderRepository;
+import com.example.library.lending.application.repository.ReservationRepository;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.NoAvailableBookCopyException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;

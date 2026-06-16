@@ -5,7 +5,7 @@ import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.BookId;
 import java.util.Optional;
 
-public interface BookCopyRepository {
+public interface BookCopyPersistencePort {
 
   void update(BookCopy bookCopy);
 

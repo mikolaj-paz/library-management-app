@@ -2,7 +2,7 @@ package com.example.library.catalog.application.service;
 
 import com.example.library.catalog.application.command.RemoveBookCopy;
 import com.example.library.catalog.application.port.in.IRemoveBookCopy;
-import com.example.library.catalog.application.port.out.BookCopyRepository;
+import com.example.library.catalog.application.repository.BookCopyRepository;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 
 public class RemoveBookCopyService implements IRemoveBookCopy {

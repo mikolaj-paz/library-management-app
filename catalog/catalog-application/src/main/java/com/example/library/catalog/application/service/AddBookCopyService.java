@@ -2,8 +2,8 @@ package com.example.library.catalog.application.service;
 
 import com.example.library.catalog.application.command.AddBookCopy;
 import com.example.library.catalog.application.port.in.IAddBookCopy;
-import com.example.library.catalog.application.port.out.BookCopyRepository;
-import com.example.library.catalog.application.port.out.BookRepository;
+import com.example.library.catalog.application.repository.BookCopyRepository;
+import com.example.library.catalog.application.repository.BookRepository;
 import com.example.library.catalog.domain.copy.BookCopy;
 import com.example.library.catalog.domain.copy.BookCopyFactory;
 import com.example.library.sharedkernel.identifier.BookCopyId;

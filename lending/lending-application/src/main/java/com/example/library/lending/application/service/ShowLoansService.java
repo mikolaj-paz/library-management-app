@@ -1,9 +1,9 @@
 package com.example.library.lending.application.service;
 
 import com.example.library.lending.application.port.in.IShowLoans;
-import com.example.library.lending.application.port.out.LoanRepository;
 import com.example.library.lending.application.query.LoanSummary;
 import com.example.library.lending.application.query.ShowLoans;
+import com.example.library.lending.application.repository.LoanRepository;
 import java.util.List;
 
 public class ShowLoansService implements IShowLoans {

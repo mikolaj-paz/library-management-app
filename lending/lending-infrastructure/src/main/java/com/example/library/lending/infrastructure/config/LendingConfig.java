@@ -5,11 +5,16 @@ import com.example.library.lending.application.port.in.ILendBookCopy;
 import com.example.library.lending.application.port.in.IReserveBook;
 import com.example.library.lending.application.port.in.IReturnBookCopy;
 import com.example.library.lending.application.port.in.IShowLoans;
-import com.example.library.lending.application.port.out.BookCopyRepository;
-import com.example.library.lending.application.port.out.BookRepository;
-import com.example.library.lending.application.port.out.LoanRepository;
-import com.example.library.lending.application.port.out.ReaderRepository;
-import com.example.library.lending.application.port.out.ReservationRepository;
+import com.example.library.lending.application.port.out.BookCopyPersistencePort;
+import com.example.library.lending.application.port.out.BookPersistencePort;
+import com.example.library.lending.application.port.out.LoanPersistencePort;
+import com.example.library.lending.application.port.out.ReaderPersistencePort;
+import com.example.library.lending.application.port.out.ReservationPersistencePort;
+import com.example.library.lending.application.repository.BookCopyRepository;
+import com.example.library.lending.application.repository.BookRepository;
+import com.example.library.lending.application.repository.LoanRepository;
+import com.example.library.lending.application.repository.ReaderRepository;
+import com.example.library.lending.application.repository.ReservationRepository;
 import com.example.library.lending.application.service.ExtendLoanService;
 import com.example.library.lending.application.service.LendBookCopyService;
 import com.example.library.lending.application.service.ReserveBookService;
@@ -52,7 +57,8 @@ public class LendingConfig {
   }
 
   @Bean
-  LoanRepository lendingLoanRepository(JdbcTemplate jdbc, LoanFactory lendingLoanFactory) {
+  LoanPersistencePort lendingLoanPersistencePort(
+      JdbcTemplate jdbc, LoanFactory lendingLoanFactory) {
     return new JdbcLoanRepository(jdbc, lendingLoanFactory);
   }
 
@@ -62,7 +68,8 @@ public class LendingConfig {
   }
 
   @Bean
-  BookRepository lendingBookRepository(JdbcTemplate jdbc, BookFactory lendingBookFactory) {
+  BookPersistencePort lendingBookPersistencePort(
+      JdbcTemplate jdbc, BookFactory lendingBookFactory) {
     return new JdbcBookRepository(jdbc, lendingBookFactory);
   }
 
@@ -72,7 +79,7 @@ public class LendingConfig {
   }
 
   @Bean
-  BookCopyRepository lendingBookCopyRepository(
+  BookCopyPersistencePort lendingBookCopyPersistencePort(
       JdbcTemplate jdbc, BookCopyFactory lendingBookCopyFactory) {
     return new JdbcBookCopyRepository(jdbc, lendingBookCopyFactory);
   }
@@ -83,13 +90,41 @@ public class LendingConfig {
   }
 
   @Bean
-  ReaderRepository lendingReaderRepository(JdbcTemplate jdbc, ReaderFactory lendingReaderFactory) {
+  ReaderPersistencePort lendingReaderPersistencePort(
+      JdbcTemplate jdbc, ReaderFactory lendingReaderFactory) {
     return new JdbcReaderRepository(jdbc, lendingReaderFactory);
   }
 
   @Bean
-  ReservationRepository lendingReservationRepository(JdbcTemplate jdbc) {
+  ReservationPersistencePort lendingReservationPersistencePort(JdbcTemplate jdbc) {
     return new JdbcReservationRepository(jdbc);
+  }
+
+  @Bean
+  LoanRepository lendingLoanRepository(LoanPersistencePort lendingLoanPersistencePort) {
+    return new LoanRepository(lendingLoanPersistencePort);
+  }
+
+  @Bean
+  BookRepository lendingBookRepository(BookPersistencePort lendingBookPersistencePort) {
+    return new BookRepository(lendingBookPersistencePort);
+  }
+
+  @Bean
+  BookCopyRepository lendingBookCopyRepository(
+      BookCopyPersistencePort lendingBookCopyPersistencePort) {
+    return new BookCopyRepository(lendingBookCopyPersistencePort);
+  }
+
+  @Bean
+  ReaderRepository lendingReaderRepository(ReaderPersistencePort lendingReaderPersistencePort) {
+    return new ReaderRepository(lendingReaderPersistencePort);
+  }
+
+  @Bean
+  ReservationRepository lendingReservationRepository(
+      ReservationPersistencePort lendingReservationPersistencePort) {
+    return new ReservationRepository(lendingReservationPersistencePort);
   }
 
   @Bean

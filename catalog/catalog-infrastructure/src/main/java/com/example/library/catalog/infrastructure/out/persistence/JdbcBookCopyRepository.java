@@ -1,6 +1,6 @@
 package com.example.library.catalog.infrastructure.out.persistence;
 
-import com.example.library.catalog.application.port.out.BookCopyRepository;
+import com.example.library.catalog.application.port.out.BookCopyPersistencePort;
 import com.example.library.catalog.domain.copy.BookCopy;
 import com.example.library.catalog.domain.copy.BookCopyFactory;
 import com.example.library.sharedkernel.identifier.BookCopyId;
@@ -10,7 +10,7 @@ import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class JdbcBookCopyRepository implements BookCopyRepository {
+public class JdbcBookCopyRepository implements BookCopyPersistencePort {
 
   private final JdbcTemplate jdbc;
   private final BookCopyFactory factory;

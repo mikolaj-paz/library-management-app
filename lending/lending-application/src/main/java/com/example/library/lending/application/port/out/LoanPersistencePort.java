@@ -8,7 +8,7 @@ import com.example.library.sharedkernel.identifier.ReaderId;
 import java.util.List;
 import java.util.Optional;
 
-public interface LoanRepository {
+public interface LoanPersistencePort {
 
   void create(Loan loan);
 

@@ -2,8 +2,8 @@ package com.example.library.lending.application.service;
 
 import com.example.library.lending.application.command.ReturnBookCopy;
 import com.example.library.lending.application.port.in.IReturnBookCopy;
-import com.example.library.lending.application.port.out.BookCopyRepository;
-import com.example.library.lending.application.port.out.LoanRepository;
+import com.example.library.lending.application.repository.BookCopyRepository;
+import com.example.library.lending.application.repository.LoanRepository;
 import com.example.library.lending.domain.exception.LoanNotFoundException;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 import java.time.LocalDate;

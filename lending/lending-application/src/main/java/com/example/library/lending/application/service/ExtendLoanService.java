@@ -2,9 +2,9 @@ package com.example.library.lending.application.service;
 
 import com.example.library.lending.application.command.ExtendLoanCommand;
 import com.example.library.lending.application.port.in.IExtendLoan;
-import com.example.library.lending.application.port.out.BookCopyRepository;
-import com.example.library.lending.application.port.out.BookRepository;
-import com.example.library.lending.application.port.out.LoanRepository;
+import com.example.library.lending.application.repository.BookCopyRepository;
+import com.example.library.lending.application.repository.BookRepository;
+import com.example.library.lending.application.repository.LoanRepository;
 import com.example.library.lending.domain.exception.ExtensionNotAllowedException;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 

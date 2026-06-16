@@ -4,7 +4,7 @@ import com.example.library.catalog.domain.copy.BookCopy;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import java.util.Optional;
 
-public interface BookCopyRepository {
+public interface BookCopyPersistencePort {
 
   void create(BookCopy bookCopy);
 

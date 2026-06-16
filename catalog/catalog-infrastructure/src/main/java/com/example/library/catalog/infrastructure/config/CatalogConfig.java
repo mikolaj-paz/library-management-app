@@ -4,9 +4,11 @@ import com.example.library.catalog.application.port.in.IAddBookCopy;
 import com.example.library.catalog.application.port.in.IGetBookDetails;
 import com.example.library.catalog.application.port.in.IRemoveBookCopy;
 import com.example.library.catalog.application.port.in.ISearchCatalog;
-import com.example.library.catalog.application.port.out.BookCopyRepository;
-import com.example.library.catalog.application.port.out.BookRepository;
+import com.example.library.catalog.application.port.out.BookCopyPersistencePort;
+import com.example.library.catalog.application.port.out.BookPersistencePort;
 import com.example.library.catalog.application.port.out.CatalogQueryPort;
+import com.example.library.catalog.application.repository.BookCopyRepository;
+import com.example.library.catalog.application.repository.BookRepository;
 import com.example.library.catalog.application.service.AddBookCopyService;
 import com.example.library.catalog.application.service.GetBookDetailsService;
 import com.example.library.catalog.application.service.RemoveBookCopyService;
@@ -50,14 +52,26 @@ public class CatalogConfig {
   }
 
   @Bean
-  BookCopyRepository catalogBookCopyRepository(
+  BookCopyPersistencePort catalogBookCopyPersistencePort(
       JdbcTemplate jdbc, BookCopyFactory catalogBookCopyFactory) {
     return new JdbcBookCopyRepository(jdbc, catalogBookCopyFactory);
   }
 
   @Bean
-  BookRepository catalogBookRepository(JdbcTemplate jdbc, BookFactory catalogBookFactory) {
+  BookPersistencePort catalogBookPersistencePort(
+      JdbcTemplate jdbc, BookFactory catalogBookFactory) {
     return new JdbcBookRepository(jdbc, catalogBookFactory);
+  }
+
+  @Bean
+  BookCopyRepository catalogBookCopyRepository(
+      BookCopyPersistencePort catalogBookCopyPersistencePort) {
+    return new BookCopyRepository(catalogBookCopyPersistencePort);
+  }
+
+  @Bean
+  BookRepository catalogBookRepository(BookPersistencePort catalogBookPersistencePort) {
+    return new BookRepository(catalogBookPersistencePort);
   }
 
   @Bean

@@ -1,6 +1,6 @@
 package com.example.library.lending.infrastructure.out.persistence;
 
-import com.example.library.lending.application.port.out.LoanRepository;
+import com.example.library.lending.application.port.out.LoanPersistencePort;
 import com.example.library.lending.application.query.LoanSummary;
 import com.example.library.lending.domain.loan.Loan;
 import com.example.library.lending.domain.loan.LoanFactory;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class JdbcLoanRepository implements LoanRepository {
+public class JdbcLoanRepository implements LoanPersistencePort {
 
   private final JdbcTemplate jdbc;
   private final LoanFactory loanFactory;

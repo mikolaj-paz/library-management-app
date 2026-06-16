@@ -1,6 +1,6 @@
 package com.example.library.lending.infrastructure.out.persistence;
 
-import com.example.library.lending.application.port.out.BookRepository;
+import com.example.library.lending.application.port.out.BookPersistencePort;
 import com.example.library.lending.domain.book.Book;
 import com.example.library.lending.domain.book.BookFactory;
 import com.example.library.sharedkernel.identifier.BookId;
@@ -8,7 +8,7 @@ import com.example.library.sharedkernel.identifier.ReaderId;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class JdbcBookRepository implements BookRepository {
+public class JdbcBookRepository implements BookPersistencePort {
 
   private final JdbcTemplate jdbc;
   private final BookFactory bookFactory;

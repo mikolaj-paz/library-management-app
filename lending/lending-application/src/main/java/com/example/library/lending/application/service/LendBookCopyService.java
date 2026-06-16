@@ -2,9 +2,9 @@ package com.example.library.lending.application.service;
 
 import com.example.library.lending.application.command.LendBookCopy;
 import com.example.library.lending.application.port.in.ILendBookCopy;
-import com.example.library.lending.application.port.out.BookCopyRepository;
-import com.example.library.lending.application.port.out.LoanRepository;
-import com.example.library.lending.application.port.out.ReaderRepository;
+import com.example.library.lending.application.repository.BookCopyRepository;
+import com.example.library.lending.application.repository.LoanRepository;
+import com.example.library.lending.application.repository.ReaderRepository;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;
 import com.example.library.lending.domain.loan.LoanFactory;
