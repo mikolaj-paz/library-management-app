@@ -52,13 +52,17 @@ public class ExtendLoanService implements IExtendLoan {
             .find(bookCopy.bookId())
             .orElseThrow(() -> new IllegalStateException("Book not found: " + bookCopy.bookId()));
 
+    // 2. Sprawdzenie w bazie danych warunków pozwalających na przedłużenie (brak kolejki, nie
+    // przekroczony limit przedłużeń).
     if (book.hasQueuedReader()) {
       throw new ExtensionNotAllowedException(
           "Cannot extend loan " + loanId + " because there are readers in the queue.");
     }
 
+    // 3. Obliczenie nowego terminu zwrotu książki.
     loan.extend();
 
+    // 4. Aktualizacja terminu zwrotu w bazie danych dla danego wypożyczenia.
     loanRepository.update(loan);
 
     loan.pullDomainEvents().forEach(eventPublisher::publish);

@@ -17,6 +17,9 @@ public class ShowLoansService implements IShowLoans {
   @Override
   public List<LoanSummary> show(ShowLoans query) {
     var readerId = query.readerId();
+
+    // 2. Z bazy danych pobierana jest lista wszystkich aktywnych oraz archiwalnych wypożyczeń
+    // przypisanych do identyfikatora czytelnika.
     return loanRepository.findFor(readerId);
   }
 }

@@ -34,13 +34,14 @@ public class AddBookCopyService implements IAddBookCopy {
         .find(bookId)
         .orElseThrow(() -> new IllegalArgumentException("Book with id " + bookId + " not found"));
 
+    // 2. Tworzenie nowego obiektu egzemplarza w systemie i ustawienie jego statusu na “Dostępny”.
     BookCopy bookCopy = bookCopyFactory.create(command.bookId());
-    var bookCopyId = bookCopy.id();
 
+    // 3. Zapisanie nowego egzemplarza w bazie danych zasobów biblioteki.
     bookCopyRepository.create(bookCopy);
 
     bookCopy.pullDomainEvents().forEach(eventPublisher::publish);
 
-    return bookCopyId;
+    return bookCopy.id();
   }
 }

@@ -4,6 +4,7 @@ import com.example.library.catalog.application.command.AddBookCopy;
 import com.example.library.catalog.application.command.RemoveBookCopy;
 import com.example.library.catalog.application.port.in.IAddBookCopy;
 import com.example.library.catalog.application.port.in.IRemoveBookCopy;
+import com.example.library.catalog.domain.exception.BookCopyCantBeRemovedException;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.BookId;
 import java.util.Map;
@@ -48,6 +49,8 @@ public class BookCopyController {
       return ResponseEntity.ok(Map.of("message", "Book copy removed successfully."));
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (BookCopyCantBeRemovedException e) {
+      return ResponseEntity.status(409).body(Map.of("error", e.getMessage()));
     }
   }
 

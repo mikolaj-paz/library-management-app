@@ -32,22 +32,26 @@ public class ReturnBookCopyService implements IReturnBookCopy {
     var bookCopyId = command.bookCopyId();
     var today = LocalDate.now();
 
+    // 2. Pobranie aktywnego wypożyczenia z bazy danych na podstawie danych egzemplarza.
     var loan =
         loanRepository
             .findActiveLoan(bookCopyId)
             .orElseThrow(() -> new LoanNotFoundException(bookCopyId));
 
+    // 3. Weryfikacja terminu zwrotu.
     boolean isOverdue = loan.isOverdue(today);
 
+    // 4. Status wypożyczenia zostaje ustawiony na „Zamknięte”.
     loan.close();
 
+    // 5. Status egzemplarza zostaje zaktualizowany na „Dostępny”.
     var bookCopy =
         bookCopyRepository
             .find(bookCopyId)
             .orElseThrow(() -> new IllegalArgumentException("Book copy not found: " + bookCopyId));
-
     bookCopy.returnIt(loan.readerId(), isOverdue);
 
+    // 6. Zapisanie zaktualizowanych danych wypożyczenia oraz egzemplarza w bazie danych.
     loanRepository.update(loan);
     bookCopyRepository.update(bookCopy);
 

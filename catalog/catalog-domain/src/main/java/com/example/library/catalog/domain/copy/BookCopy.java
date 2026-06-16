@@ -1,5 +1,6 @@
 package com.example.library.catalog.domain.copy;
 
+import com.example.library.catalog.domain.exception.BookCopyCantBeRemovedException;
 import com.example.library.sharedkernel.entity.AggregateRoot;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.BookId;
@@ -18,6 +19,14 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
     this.reservedBy = reservedBy;
     this.bookId = bookId;
     this.registerEvent(new BookCopyAdded(this.id(), bookId));
+  }
+
+  private boolean isLoaned() {
+    return status == BookCopyStatus.LOANED;
+  }
+
+  private boolean isReserved() {
+    return status == BookCopyStatus.RESERVED;
   }
 
   static BookCopy of(BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
@@ -41,7 +50,10 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
   }
 
   public void remove() {
-    this.status = BookCopyStatus.UNAVAILABLE;
+    if (this.isLoaned() || this.isReserved()) {
+      throw new BookCopyCantBeRemovedException(this.id());
+    }
+    this.status = BookCopyStatus.WITHDRAWN;
     this.registerEvent(new BookCopyRemoved(this.id()));
   }
 }

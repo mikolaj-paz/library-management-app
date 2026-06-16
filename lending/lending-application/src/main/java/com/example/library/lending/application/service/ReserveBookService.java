@@ -53,22 +53,26 @@ public class ReserveBookService implements IReserveBook {
 
   @Override
   public ReservationId reserve(ReserveBook command) {
+    // 2. Weryfikacja reguł Konta Czytelnika.
     var readerId = command.readerId();
-
     verifyReaderEligibility(readerId);
 
+    // 3. System wyszukuje w bazie danych Egzemplarz tej książki o statusie „Dostępny”.
     var bookCopy =
         bookCopyRepository
             .findAvailableBookCopy(command.bookId())
             .orElseThrow(() -> new NoAvailableBookCopyException(command.bookId()));
-    var bookCopyId = bookCopy.id();
 
+    // 4. Utworzenie nowej Rezerwacji przypisanej do konta użytkownika i zapisanie jej w bazie.
+    var bookCopyId = bookCopy.id();
     var reservation = reservationFactory.create(readerId, bookCopyId);
     var reservationId = reservation.id();
+    reservationRepository.create(reservation);
 
+    // 5. Status wybranego Egzemplarza jest ustawiany na „Zarezerwowany”.
     bookCopy.reserve(reservationId, readerId);
 
-    reservationRepository.create(reservation);
+    // 6. Aktualizacja danych egzemplarza w bazie danych.
     bookCopyRepository.update(bookCopy);
 
     bookCopy.pullDomainEvents().forEach(eventPublisher::publish);

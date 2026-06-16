@@ -25,8 +25,12 @@ public class RemoveBookCopyService implements IRemoveBookCopy {
             .orElseThrow(
                 () -> new IllegalArgumentException("Book copy not found: " + bookCopyId.value()));
 
+    // 2. Weryfikacja w bazie danych warunków wstępnych (czy egzemplarz nie jest aktualnie
+    // wypożyczony bądź zarezerwowany).
+    // 3. Status wybranego egzemplarza zostaje ustawiony na „Wycofany”.
     bookCopy.remove();
 
+    // 4. Aktualizacja statusu obiektu i zapisanie zmian w bazie danych.
     bookCopyRepository.update(bookCopy);
 
     bookCopy.pullDomainEvents().forEach(eventPublisher::publish);

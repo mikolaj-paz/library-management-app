@@ -5,6 +5,7 @@ import com.example.library.lending.application.port.in.ILendBookCopy;
 import com.example.library.lending.application.repository.BookCopyRepository;
 import com.example.library.lending.application.repository.LoanRepository;
 import com.example.library.lending.application.repository.ReaderRepository;
+import com.example.library.lending.domain.copy.BookCopy;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;
 import com.example.library.lending.domain.loan.LoanFactory;
@@ -20,11 +21,19 @@ public class LendBookCopyService implements ILendBookCopy {
   private final ReaderRepository readerRepository;
   private final DomainEventPublisher eventPublisher;
 
-  private void verifyLoanLimitNotExceededBy(ReaderId readerId) {
+  private void verifyReaderEligibility(ReaderId readerId, BookCopy bookCopy) {
+    var reader =
+        readerRepository
+            .find(readerId)
+            .orElseThrow(() -> new IllegalArgumentException("Reader not found: " + readerId));
+
+    if (reader.isBlocked()) throw new ReaderBlockedException(readerId);
+
     int activeLoans = loanRepository.countActiveLoansForReader(readerId);
-    if (activeLoans >= LoanLimitExceededException.MAX_ACTIVE_LOANS) {
+    if (activeLoans >= LoanLimitExceededException.MAX_ACTIVE_LOANS)
       throw new LoanLimitExceededException(readerId);
-    }
+
+    bookCopy.verifyCanBeLoanedBy(readerId);
   }
 
   public LendBookCopyService(
@@ -45,29 +54,24 @@ public class LendBookCopyService implements ILendBookCopy {
     var readerId = command.readerId();
     var bookCopyId = command.bookCopyId();
 
-    var reader =
-        readerRepository
-            .find(readerId)
-            .orElseThrow(() -> new IllegalArgumentException("Reader not found: " + readerId));
-
-    if (reader.isBlocked()) {
-      throw new ReaderBlockedException(readerId);
-    }
-
-    verifyLoanLimitNotExceededBy(readerId);
-
+    // 2. System weryfikuje w bazie danych możliwość wypożyczenia książki przez tego czytelnika.
     var bookCopy =
         bookCopyRepository
             .find(bookCopyId)
             .orElseThrow(() -> new IllegalArgumentException("Book copy not found: " + bookCopyId));
-    bookCopy.verifyCanBeLoanedBy(readerId);
+    verifyReaderEligibility(readerId, bookCopy);
 
+    // 3. Utworzenie nowego obiektu wypożyczenia oraz automatyczne wyznaczenie terminu zwrotu.
     var loan = loanFactory.create(command.readerId(), command.bookCopyId());
     var loanId = loan.id();
 
+    // 4. Zapisanie nowego wypożyczenia w bazie danych.
+    loanRepository.create(loan);
+
+    // 5. Status egzemplarza jest ustawiany na “Wypożyczony”.
     bookCopy.lend(loan.readerId(), loanId);
 
-    loanRepository.create(loan);
+    // 6. Aktualizacja statusu egzemplarza w bazie danych.
     bookCopyRepository.update(bookCopy);
 
     bookCopy.pullDomainEvents().forEach(eventPublisher::publish);
