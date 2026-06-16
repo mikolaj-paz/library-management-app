@@ -16,6 +16,7 @@
         <module>catalog</module>
         <module>lending</module>
         <module>notifications</module>
+        <module>users</module>
         <module>bootstrap</module>
     </modules>
 
@@ -119,6 +120,21 @@
             <dependency>
                 <groupId>com.example</groupId>
                 <artifactId>notifications-infrastructure</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>users-domain</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>users-application</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>users-infrastructure</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
