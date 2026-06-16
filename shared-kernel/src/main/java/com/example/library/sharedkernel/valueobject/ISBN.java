@@ -1,4 +1,4 @@
-package com.example.library.catalog.domain.book;
+package com.example.library.sharedkernel.valueobject;
 
 public record ISBN(String value) {
   public ISBN {

@@ -1,5 +1,6 @@
 package com.example.library.catalog.infrastructure.config;
 
+import com.example.library.catalog.application.port.in.IAddBook;
 import com.example.library.catalog.application.port.in.IAddBookCopy;
 import com.example.library.catalog.application.port.in.IGetBookDetails;
 import com.example.library.catalog.application.port.in.IRemoveBookCopy;
@@ -10,6 +11,7 @@ import com.example.library.catalog.application.port.out.CatalogQueryPort;
 import com.example.library.catalog.application.repository.BookCopyRepository;
 import com.example.library.catalog.application.repository.BookRepository;
 import com.example.library.catalog.application.service.AddBookCopyService;
+import com.example.library.catalog.application.service.AddingBook;
 import com.example.library.catalog.application.service.GetBookDetailsService;
 import com.example.library.catalog.application.service.RemoveBookCopyService;
 import com.example.library.catalog.application.service.SearchCatalogService;
@@ -102,5 +104,13 @@ public class CatalogConfig {
       BookCopyRepository catalogBookCopyRepository,
       @Qualifier("catalogDomainEventPublisher") DomainEventPublisher catalogDomainEventPublisher) {
     return new RemoveBookCopyService(catalogBookCopyRepository, catalogDomainEventPublisher);
+  }
+
+  @Bean
+  IAddBook addBook(
+      BookFactory catalogBookFactory,
+      BookRepository catalogBookRepository,
+      @Qualifier("catalogDomainEventPublisher") DomainEventPublisher catalogDomainEventPublisher) {
+    return new AddingBook(catalogBookRepository, catalogBookFactory);
   }
 }

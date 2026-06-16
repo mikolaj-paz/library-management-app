@@ -3,9 +3,12 @@ package com.example.library.catalog.infrastructure.out.persistence;
 import com.example.library.catalog.application.port.out.BookPersistencePort;
 import com.example.library.catalog.domain.book.Book;
 import com.example.library.catalog.domain.book.BookFactory;
-import com.example.library.catalog.domain.book.ISBN;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;
+import com.example.library.sharedkernel.valueobject.ISBN;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -19,21 +22,49 @@ public class JdbcBookRepository implements BookPersistencePort {
     this.factory = factory;
   }
 
+  private Book createBookFromResultSet(ResultSet rs) throws SQLException {
+    return factory.reconstitute(
+        BookId.of(rs.getString("id")),
+        rs.getString("title"),
+        rs.getString("author"),
+        new ISBN(rs.getString("isbn")),
+        rs.getString("publisher"),
+        LocalDate.parse(rs.getString("publication_date")),
+        rs.getString("queued_reader_id") != null
+            ? ReaderId.of(rs.getString("queued_reader_id"))
+            : null);
+  }
+
+  @Override
+  public void create(Book book) {
+    jdbc.update(
+        "INSERT INTO books (id, title, author, isbn, publisher, publication_date, queued_reader_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        book.id().value().toString(),
+        book.title(),
+        book.author(),
+        book.isbn().value(),
+        book.publisher(),
+        book.publicationDate().toString(),
+        book.queuedReaderId() != null ? book.queuedReaderId().value().toString() : null);
+  }
+
   @Override
   public Optional<Book> find(BookId bookId) {
     var results =
         jdbc.query(
-            "SELECT id, title, author, isbn, queued_reader_id FROM books WHERE id = ?",
-            (rs, rowNum) ->
-                factory.reconstitute(
-                    BookId.of(rs.getString("id")),
-                    rs.getString("title"),
-                    rs.getString("author"),
-                    new ISBN(rs.getString("isbn")),
-                    rs.getString("queued_reader_id") != null
-                        ? ReaderId.of(rs.getString("queued_reader_id"))
-                        : null),
+            "SELECT * FROM books WHERE id = ?",
+            (rs, rowNum) -> createBookFromResultSet(rs),
             bookId.value().toString());
+    return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+  }
+
+  @Override
+  public Optional<Book> findByISBN(ISBN isbn) {
+    var results =
+        jdbc.query(
+            "SELECT * FROM books WHERE isbn = ?",
+            (rs, rowNum) -> createBookFromResultSet(rs),
+            isbn.value());
     return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
   }
 }
