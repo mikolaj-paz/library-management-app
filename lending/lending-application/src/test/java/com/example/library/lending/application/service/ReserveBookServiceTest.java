@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import com.example.library.lending.application.command.ReserveBook;
 import com.example.library.lending.application.repository.BookCopyRepository;
-import com.example.library.lending.application.repository.LoanRepository;
 import com.example.library.lending.application.repository.ReaderRepository;
 import com.example.library.lending.application.repository.ReservationRepository;
 import com.example.library.lending.domain.copy.BookCopy;
@@ -43,15 +42,13 @@ class ReserveBookServiceTest {
 
   @Mock private ReaderRepository readerRepository;
 
-  @Mock private LoanRepository loanRepository;
-
   @Mock private BookCopyRepository bookCopyRepository;
 
   @Mock private ReservationRepository reservationRepository;
 
   @Mock private DomainEventPublisher eventPublisher;
 
-  private ReserveBookService service;
+  private ReservingBook service;
   private ReaderId readerId;
   private BookId bookId;
   private BookCopyFactory bookCopyFactory;
@@ -59,9 +56,8 @@ class ReserveBookServiceTest {
   @BeforeEach
   void setUp() {
     service =
-        new ReserveBookService(
+        new ReservingBook(
             readerRepository,
-            loanRepository,
             bookCopyRepository,
             new ReservationFactoryImpl(),
             reservationRepository,
@@ -75,10 +71,9 @@ class ReserveBookServiceTest {
   void should_create_reservation_when_reader_is_eligible_and_copy_is_available() {
     var copy = copy(BookCopyStatus.AVAILABLE, null);
     givenActiveReader();
-    givenActiveLoanCount(0);
     when(bookCopyRepository.findAvailableBookCopy(bookId)).thenReturn(Optional.of(copy));
 
-    var reservationId = service.reserve(new ReserveBook(readerId, bookId));
+    var reservationId = service.reserveBook(new ReserveBook(readerId, bookId));
 
     assertThat(reservationId).isNotNull();
     var reservationCaptor = ArgumentCaptor.forClass(Reservation.class);
@@ -103,9 +98,9 @@ class ReserveBookServiceTest {
   void should_throw_when_reader_is_blocked() {
     when(readerRepository.find(readerId))
         .thenReturn(
-            Optional.of(new ReaderFactoryImpl().reconstitute(readerId, ReaderStatus.BLOCKED)));
+            Optional.of(new ReaderFactoryImpl().reconstitute(readerId, ReaderStatus.BLOCKED, 0)));
 
-    assertThatThrownBy(() -> service.reserve(new ReserveBook(readerId, bookId)))
+    assertThatThrownBy(() -> service.reserveBook(new ReserveBook(readerId, bookId)))
         .isInstanceOf(ReaderBlockedException.class);
 
     verify(reservationRepository, never()).create(any());
@@ -113,10 +108,9 @@ class ReserveBookServiceTest {
 
   @Test
   void should_throw_when_reader_reached_active_loan_limit() {
-    givenActiveReader();
-    givenActiveLoanCount(LoanLimitExceededException.MAX_ACTIVE_LOANS);
+    givenActiveReaderWithLoanCount(LoanLimitExceededException.MAX_ACTIVE_LOANS);
 
-    assertThatThrownBy(() -> service.reserve(new ReserveBook(readerId, bookId)))
+    assertThatThrownBy(() -> service.reserveBook(new ReserveBook(readerId, bookId)))
         .isInstanceOf(LoanLimitExceededException.class);
 
     verify(bookCopyRepository, never()).findAvailableBookCopy(any());
@@ -126,10 +120,9 @@ class ReserveBookServiceTest {
   @Test
   void should_throw_when_no_available_book_copy_exists() {
     givenActiveReader();
-    givenActiveLoanCount(0);
     when(bookCopyRepository.findAvailableBookCopy(bookId)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> service.reserve(new ReserveBook(readerId, bookId)))
+    assertThatThrownBy(() -> service.reserveBook(new ReserveBook(readerId, bookId)))
         .isInstanceOf(NoAvailableBookCopyException.class);
 
     verify(reservationRepository, never()).create(any());
@@ -139,23 +132,24 @@ class ReserveBookServiceTest {
   void should_mark_copy_as_reserved_when_reservation_succeeds() {
     var copy = copy(BookCopyStatus.AVAILABLE, null);
     givenActiveReader();
-    givenActiveLoanCount(0);
     when(bookCopyRepository.findAvailableBookCopy(bookId)).thenReturn(Optional.of(copy));
 
-    service.reserve(new ReserveBook(readerId, bookId));
+    service.reserveBook(new ReserveBook(readerId, bookId));
 
     assertThat(copy.status()).isEqualTo(BookCopyStatus.RESERVED);
     assertThat(copy.reservedBy()).isEqualTo(readerId);
   }
 
   private void givenActiveReader() {
-    when(readerRepository.find(readerId))
-        .thenReturn(
-            Optional.of(new ReaderFactoryImpl().reconstitute(readerId, ReaderStatus.ACTIVE)));
+    givenActiveReaderWithLoanCount(0);
   }
 
-  private void givenActiveLoanCount(int count) {
-    when(loanRepository.countActiveLoansForReader(readerId)).thenReturn(count);
+  private void givenActiveReaderWithLoanCount(int activeLoansCount) {
+    when(readerRepository.find(readerId))
+        .thenReturn(
+            Optional.of(
+                new ReaderFactoryImpl()
+                    .reconstitute(readerId, ReaderStatus.ACTIVE, activeLoansCount)));
   }
 
   private BookCopy copy(BookCopyStatus status, ReaderId reservedBy) {

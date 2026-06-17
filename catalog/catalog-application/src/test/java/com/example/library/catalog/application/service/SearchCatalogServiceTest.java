@@ -23,7 +23,7 @@ class SearchCatalogServiceTest {
 
   @Test
   void should_delegate_search_phrase_to_catalog_query_port() {
-    var service = new SearchCatalogService(catalogQueryPort);
+    var service = new SearchingCatalog(catalogQueryPort);
     var result =
         new BookSearchResult(
             BookId.of(UUID.randomUUID().toString()),
@@ -33,7 +33,7 @@ class SearchCatalogServiceTest {
             true);
     when(catalogQueryPort.searchBooks("domain")).thenReturn(List.of(result));
 
-    var results = service.search(new SearchCatalog("domain"));
+    var results = service.searchCatalog(new SearchCatalog("domain"));
 
     assertThat(results).containsExactly(result);
     verify(catalogQueryPort).searchBooks("domain");

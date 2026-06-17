@@ -40,9 +40,9 @@ class RemoveBookCopyServiceTest {
         new BookCopyFactoryImpl()
             .reconstitute(copyId, BookCopyStatus.AVAILABLE, null, BookId.create());
     when(bookCopyRepository.find(copyId)).thenReturn(Optional.of(copy));
-    var service = new RemoveBookCopyService(bookCopyRepository, eventPublisher);
+    var service = new RemovingBookCopy(bookCopyRepository, eventPublisher);
 
-    service.remove(new RemoveBookCopy(copyId));
+    service.removeBookCopy(new RemoveBookCopy(copyId));
 
     assertThat(copy.status()).isEqualTo(BookCopyStatus.WITHDRAWN);
     verify(bookCopyRepository).update(copy);
@@ -57,9 +57,9 @@ class RemoveBookCopyServiceTest {
   void should_throw_when_copy_does_not_exist() {
     var copyId = BookCopyId.create();
     when(bookCopyRepository.find(copyId)).thenReturn(Optional.empty());
-    var service = new RemoveBookCopyService(bookCopyRepository, eventPublisher);
+    var service = new RemovingBookCopy(bookCopyRepository, eventPublisher);
 
-    assertThatThrownBy(() -> service.remove(new RemoveBookCopy(copyId)))
+    assertThatThrownBy(() -> service.removeBookCopy(new RemoveBookCopy(copyId)))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("Book copy not found");
 

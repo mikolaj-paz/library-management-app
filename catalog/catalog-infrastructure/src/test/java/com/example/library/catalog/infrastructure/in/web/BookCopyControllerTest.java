@@ -45,7 +45,7 @@ class BookCopyControllerTest {
   void should_return_book_copy_id_when_copy_is_added() throws Exception {
     var bookId = UUID.randomUUID().toString();
     var copyId = BookCopyId.create();
-    when(addBookCopyService.add(any())).thenReturn(copyId);
+    when(addBookCopyService.addBookCopy(any())).thenReturn(copyId);
 
     mockMvc
         .perform(
@@ -59,7 +59,8 @@ class BookCopyControllerTest {
   @Test
   void should_return_bad_request_when_book_does_not_exist() throws Exception {
     var bookId = UUID.randomUUID().toString();
-    when(addBookCopyService.add(any())).thenThrow(new IllegalArgumentException("Book not found"));
+    when(addBookCopyService.addBookCopy(any()))
+        .thenThrow(new IllegalArgumentException("Book not found"));
 
     mockMvc
         .perform(
@@ -88,7 +89,7 @@ class BookCopyControllerTest {
     var bookCopyId = BookCopyId.create();
     doThrow(new BookCopyCantBeRemovedException(bookCopyId))
         .when(removeBookCopyService)
-        .remove(any());
+        .removeBookCopy(any());
 
     mockMvc
         .perform(

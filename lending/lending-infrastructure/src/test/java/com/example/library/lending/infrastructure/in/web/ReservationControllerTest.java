@@ -3,14 +3,18 @@ package com.example.library.lending.infrastructure.in.web;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.library.lending.application.command.JoinWaitingQueue;
 import com.example.library.lending.application.command.ReserveBook;
+import com.example.library.lending.application.port.in.IJoinWaitingQueue;
 import com.example.library.lending.application.port.in.IReserveBook;
+import com.example.library.lending.domain.exception.BookAlreadyInReaderWaitingQueueException;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.NoAvailableBookCopyException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;
@@ -34,12 +38,15 @@ class ReservationControllerTest {
 
   @Mock private IReserveBook reserveBookService;
 
+  @Mock private IJoinWaitingQueue joinWaitingQueueService;
+
   private MockMvc mockMvc;
 
   @BeforeEach
   void setUp() {
     mockMvc =
-        MockMvcBuilders.standaloneSetup(new ReservationController(reserveBookService))
+        MockMvcBuilders.standaloneSetup(
+                new ReservationController(reserveBookService, joinWaitingQueueService))
             .setMessageConverters(new MappingJackson2HttpMessageConverter())
             .build();
   }
@@ -49,7 +56,7 @@ class ReservationControllerTest {
     var readerId = ReaderId.create();
     var bookId = BookId.of(UUID.randomUUID().toString());
     var reservationId = ReservationId.create();
-    when(reserveBookService.reserve(any())).thenReturn(reservationId);
+    when(reserveBookService.reserveBook(any())).thenReturn(reservationId);
 
     mockMvc
         .perform(
@@ -60,7 +67,7 @@ class ReservationControllerTest {
         .andExpect(jsonPath("$.reservationId").value(reservationId.value().toString()));
 
     var commandCaptor = ArgumentCaptor.forClass(ReserveBook.class);
-    verify(reserveBookService).reserve(commandCaptor.capture());
+    verify(reserveBookService).reserveBook(commandCaptor.capture());
     assertThat(commandCaptor.getValue().readerId()).isEqualTo(readerId);
     assertThat(commandCaptor.getValue().bookId()).isEqualTo(bookId);
   }
@@ -69,7 +76,7 @@ class ReservationControllerTest {
   void should_return_unprocessable_entity_when_reader_is_blocked() throws Exception {
     var readerId = ReaderId.create();
     var bookId = BookId.of(UUID.randomUUID().toString());
-    when(reserveBookService.reserve(any())).thenThrow(new ReaderBlockedException(readerId));
+    when(reserveBookService.reserveBook(any())).thenThrow(new ReaderBlockedException(readerId));
 
     mockMvc
         .perform(
@@ -84,7 +91,7 @@ class ReservationControllerTest {
   void should_return_unprocessable_entity_when_loan_limit_is_exceeded() throws Exception {
     var readerId = ReaderId.create();
     var bookId = BookId.of(UUID.randomUUID().toString());
-    when(reserveBookService.reserve(any())).thenThrow(new LoanLimitExceededException(readerId));
+    when(reserveBookService.reserveBook(any())).thenThrow(new LoanLimitExceededException(readerId));
 
     mockMvc
         .perform(
@@ -99,7 +106,7 @@ class ReservationControllerTest {
   void should_return_message_when_no_available_copy_exists() throws Exception {
     var readerId = ReaderId.create();
     var bookId = BookId.of(UUID.randomUUID().toString());
-    when(reserveBookService.reserve(any())).thenThrow(new NoAvailableBookCopyException(bookId));
+    when(reserveBookService.reserveBook(any())).thenThrow(new NoAvailableBookCopyException(bookId));
 
     mockMvc
         .perform(
@@ -117,6 +124,42 @@ class ReservationControllerTest {
             post("/reservations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson("not-a-uuid", UUID.randomUUID().toString())))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error", notNullValue()));
+  }
+
+  @Test
+  void should_return_success_when_reader_joins_waiting_queue() throws Exception {
+    var readerId = ReaderId.create();
+    var bookId = BookId.of(UUID.randomUUID().toString());
+
+    mockMvc
+        .perform(
+            post("/reservations/queue")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson(readerId.value().toString(), bookId.value().toString())))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.message").value("Successfully added to waiting queue"));
+
+    var commandCaptor = ArgumentCaptor.forClass(JoinWaitingQueue.class);
+    verify(joinWaitingQueueService).joinWaitingQueue(commandCaptor.capture());
+    assertThat(commandCaptor.getValue().readerId()).isEqualTo(readerId);
+    assertThat(commandCaptor.getValue().bookId()).isEqualTo(bookId);
+  }
+
+  @Test
+  void should_return_bad_request_when_reader_is_already_in_waiting_queue() throws Exception {
+    var readerId = ReaderId.create();
+    var bookId = BookId.of(UUID.randomUUID().toString());
+    doThrow(new BookAlreadyInReaderWaitingQueueException(readerId, bookId))
+        .when(joinWaitingQueueService)
+        .joinWaitingQueue(any());
+
+    mockMvc
+        .perform(
+            post("/reservations/queue")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson(readerId.value().toString(), bookId.value().toString())))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.error", notNullValue()));
   }

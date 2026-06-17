@@ -69,7 +69,7 @@ class LoanControllerTest {
     var copyId = BookCopyId.create();
     var readerId = ReaderId.create();
     var loanId = LoanId.create();
-    when(lendBookCopyService.lend(any())).thenReturn(loanId);
+    when(lendBookCopyService.lendBookCopy(any())).thenReturn(loanId);
 
     mockMvc
         .perform(
@@ -80,7 +80,7 @@ class LoanControllerTest {
         .andExpect(jsonPath("$.loanId").value(loanId.value().toString()));
 
     var commandCaptor = ArgumentCaptor.forClass(LendBookCopy.class);
-    verify(lendBookCopyService).lend(commandCaptor.capture());
+    verify(lendBookCopyService).lendBookCopy(commandCaptor.capture());
     assertThat(commandCaptor.getValue().bookCopyId()).isEqualTo(copyId);
     assertThat(commandCaptor.getValue().readerId()).isEqualTo(readerId);
   }
@@ -89,7 +89,7 @@ class LoanControllerTest {
   void should_return_unprocessable_entity_when_reader_is_blocked() throws Exception {
     var copyId = BookCopyId.create();
     var readerId = ReaderId.create();
-    when(lendBookCopyService.lend(any())).thenThrow(new ReaderBlockedException(readerId));
+    when(lendBookCopyService.lendBookCopy(any())).thenThrow(new ReaderBlockedException(readerId));
 
     mockMvc
         .perform(
@@ -104,7 +104,8 @@ class LoanControllerTest {
   void should_return_unprocessable_entity_when_loan_limit_is_exceeded() throws Exception {
     var copyId = BookCopyId.create();
     var readerId = ReaderId.create();
-    when(lendBookCopyService.lend(any())).thenThrow(new LoanLimitExceededException(readerId));
+    when(lendBookCopyService.lendBookCopy(any()))
+        .thenThrow(new LoanLimitExceededException(readerId));
 
     mockMvc
         .perform(
@@ -119,7 +120,8 @@ class LoanControllerTest {
   void should_return_conflict_when_copy_is_not_available() throws Exception {
     var copyId = BookCopyId.create();
     var readerId = ReaderId.create();
-    when(lendBookCopyService.lend(any())).thenThrow(new BookCopyNotAvailableException(copyId));
+    when(lendBookCopyService.lendBookCopy(any()))
+        .thenThrow(new BookCopyNotAvailableException(copyId));
 
     mockMvc
         .perform(
@@ -151,7 +153,7 @@ class LoanControllerTest {
         .andExpect(jsonPath("$.message").value("Book copy returned successfully"));
 
     var commandCaptor = ArgumentCaptor.forClass(ReturnBookCopy.class);
-    verify(returnBookCopyService).returnCopy(commandCaptor.capture());
+    verify(returnBookCopyService).returnBookCopy(commandCaptor.capture());
     assertThat(commandCaptor.getValue().bookCopyId()).isEqualTo(copyId);
   }
 
@@ -169,7 +171,7 @@ class LoanControllerTest {
         .andExpect(jsonPath("$.message").value("Loan extended successfully"));
 
     var commandCaptor = ArgumentCaptor.forClass(ExtendLoanCommand.class);
-    verify(extendLoanService).extend(commandCaptor.capture());
+    verify(extendLoanService).extendLoan(commandCaptor.capture());
     assertThat(commandCaptor.getValue().loanId()).isEqualTo(loanId);
     assertThat(commandCaptor.getValue().readerId()).isEqualTo(readerId);
   }
@@ -186,7 +188,7 @@ class LoanControllerTest {
                 "Eric Evans",
                 LocalDate.of(2026, 1, 1),
                 LoanStatus.ACTIVE));
-    when(showLoansService.show(any())).thenReturn(loans);
+    when(showLoansService.showLoans(any())).thenReturn(loans);
 
     mockMvc
         .perform(post("/loans/list").param("readerId", readerId.value().toString()))

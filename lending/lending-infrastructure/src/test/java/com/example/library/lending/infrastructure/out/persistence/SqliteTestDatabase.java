@@ -28,8 +28,16 @@ final class SqliteTestDatabase {
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
                 author TEXT NOT NULL,
-                isbn TEXT NOT NULL UNIQUE,
-                queued_reader_id TEXT NULL
+                isbn TEXT NOT NULL UNIQUE
+            )
+            """);
+    jdbc.execute(
+        """
+            CREATE TABLE book_waiting_queue (
+                id TEXT PRIMARY KEY,
+                book_id TEXT NOT NULL,
+                reader_id TEXT NOT NULL,
+                queue_position INTEGER NOT NULL
             )
             """);
     jdbc.execute(
@@ -56,7 +64,8 @@ final class SqliteTestDatabase {
             CREATE TABLE reservations (
                 id TEXT PRIMARY KEY,
                 reader_id TEXT NOT NULL,
-                book_copy_id TEXT NOT NULL
+                book_copy_id TEXT NOT NULL,
+                expires_at TEXT NOT NULL
             )
             """);
   }

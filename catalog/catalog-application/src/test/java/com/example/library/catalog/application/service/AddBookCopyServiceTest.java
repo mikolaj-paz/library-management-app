@@ -47,14 +47,13 @@ class AddBookCopyServiceTest {
                 "Robert C. Martin",
                 new ISBN("978-0134494166"),
                 "Prentice Hall",
-                LocalDate.of(2017, 9, 20),
-                null);
+                LocalDate.of(2017, 9, 20));
     when(bookRepository.find(bookId)).thenReturn(Optional.of(book));
     var service =
-        new AddBookCopyService(
+        new AddingBookCopy(
             new BookCopyFactoryImpl(), bookCopyRepository, bookRepository, eventPublisher);
 
-    var copyId = service.add(new AddBookCopy(bookId));
+    var copyId = service.addBookCopy(new AddBookCopy(bookId));
 
     assertThat(copyId).isNotNull();
     var copyCaptor = ArgumentCaptor.forClass(BookCopy.class);
@@ -77,10 +76,10 @@ class AddBookCopyServiceTest {
     var bookId = BookId.of(UUID.randomUUID().toString());
     when(bookRepository.find(bookId)).thenReturn(Optional.empty());
     var service =
-        new AddBookCopyService(
+        new AddingBookCopy(
             new BookCopyFactoryImpl(), bookCopyRepository, bookRepository, eventPublisher);
 
-    assertThatThrownBy(() -> service.add(new AddBookCopy(bookId)))
+    assertThatThrownBy(() -> service.addBookCopy(new AddBookCopy(bookId)))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("not found");
 

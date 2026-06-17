@@ -8,10 +8,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.library.sharedkernel.event.DomainEvent;
-import com.example.library.sharedkernel.event.ReaderAccountRegisteredEvent;
+import com.example.library.sharedkernel.event.ReaderAccountRegistered;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 import com.example.library.users.application.command.RegisterReaderAccount;
-import com.example.library.users.application.repository.ReaderAcountRepository;
+import com.example.library.users.application.repository.ReaderAccountRepository;
 import com.example.library.users.domain.reader.ReaderAccount;
 import com.example.library.users.domain.reader.ReaderAccountFactoryImpl;
 import java.util.Optional;
@@ -24,7 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class RegisteringReaderAccountTest {
 
-  @Mock private ReaderAcountRepository readerAccountRepository;
+  @Mock private ReaderAccountRepository readerAccountRepository;
 
   @Mock private DomainEventPublisher eventPublisher;
 
@@ -47,7 +47,7 @@ class RegisteringReaderAccountTest {
     verify(eventPublisher).publish(eventCaptor.capture());
     assertThat(eventCaptor.getValue())
         .isInstanceOfSatisfying(
-            ReaderAccountRegisteredEvent.class,
+            ReaderAccountRegistered.class,
             event -> assertThat(event.getEmail()).isEqualTo(command.email()));
   }
 

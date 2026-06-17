@@ -50,9 +50,9 @@ class ReturnBookCopyServiceTest {
             .reconstitute(bookCopyId, BookCopyStatus.LOANED, null, BookId.create());
     when(loanRepository.findActiveLoan(bookCopyId)).thenReturn(Optional.of(loan));
     when(bookCopyRepository.find(bookCopyId)).thenReturn(Optional.of(copy));
-    var service = new ReturnBookCopyService(loanRepository, bookCopyRepository, eventPublisher);
+    var service = new ReturningBookCopy(loanRepository, bookCopyRepository, eventPublisher);
 
-    service.returnCopy(new ReturnBookCopy(bookCopyId));
+    service.returnBookCopy(new ReturnBookCopy(bookCopyId));
 
     assertThat(loan.status()).isEqualTo(LoanStatus.CLOSED);
     assertThat(copy.status()).isEqualTo(BookCopyStatus.AVAILABLE);
@@ -74,9 +74,9 @@ class ReturnBookCopyServiceTest {
   void should_throw_when_active_loan_does_not_exist() {
     var bookCopyId = BookCopyId.create();
     when(loanRepository.findActiveLoan(bookCopyId)).thenReturn(Optional.empty());
-    var service = new ReturnBookCopyService(loanRepository, bookCopyRepository, eventPublisher);
+    var service = new ReturningBookCopy(loanRepository, bookCopyRepository, eventPublisher);
 
-    assertThatThrownBy(() -> service.returnCopy(new ReturnBookCopy(bookCopyId)))
+    assertThatThrownBy(() -> service.returnBookCopy(new ReturnBookCopy(bookCopyId)))
         .isInstanceOf(LoanNotFoundException.class);
 
     verify(bookCopyRepository, never()).update(any());

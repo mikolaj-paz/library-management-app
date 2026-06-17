@@ -7,15 +7,15 @@ bootstrap acceptance paths, and architecture rules.
 
 Layer / type             Classes   Tests run             Tooling
 --------------------------------------------------------------------------------
-Domain + shared unit     8         24 active + 3 skipped JUnit 5, AssertJ
-Application unit         12        28 active + 1 skipped JUnit 5, AssertJ, Mockito
-JDBC integration         9         20 active + 2 skipped JUnit 5, SQLite
-Controller slice         6         22 active + 2 skipped JUnit 5, MockMvc/direct calls
+Domain + shared unit     9         26 active + 3 skipped JUnit 5, AssertJ
+Application unit         17        34 active + 2 skipped JUnit 5, AssertJ, Mockito
+JDBC integration         9         23 active + 1 skipped JUnit 5, SQLite
+Controller slice         6         26 active + 2 skipped JUnit 5, MockMvc/direct calls
 Event adapter            1         2 active             JUnit 5, Mockito
-System / acceptance      1         7 active + 2 skipped SpringBootTest, Flyway
+System / acceptance      1         6 active + 3 skipped SpringBootTest, Flyway
 Architecture             1         4 active             ArchUnit
 --------------------------------------------------------------------------------
-TOTAL                    38        107 active + 10 skipped = 117 tests
+TOTAL                    44        121 active + 11 skipped = 132 tests
 
 Last verification:
   .\mvnw.cmd clean test
@@ -61,8 +61,8 @@ SHARED-KERNEL
 CATALOG-DOMAIN
   BookTest (3, 1 skipped)
     - stores metadata on create.
-    - registers BookAddedEvent on create.
-    - SKIPPED: reconstituting Book should not register BookAddedEvent.
+    - registers BookAdded on create.
+    - SKIPPED: reconstituting Book should not register BookAdded.
 
   BookCopyTest (5, 1 skipped)
     - creates AVAILABLE book copy.
@@ -117,6 +117,10 @@ CATALOG-INFRASTRUCTURE
     - not found details path.
 
 LENDING-DOMAIN
+  BookTest (2)
+    - adds reader to waiting queue and emits ReaderQueued.
+    - removes next queued reader and emits ReaderDequeued.
+
   BookCopyTest (7)
     - loan, reserve, return status transitions.
     - rejects unavailable/invalid loan/reservation cases.
@@ -137,11 +141,29 @@ LENDING-DOMAIN
     - creates reservation with reader and book copy identifiers.
 
 LENDING-APPLICATION
-  LendBookCopyServiceTest (7)
+  ExpiringReservationsTest (1)
+    - publishes ReservationExpired events for expired reservations.
+
+  ExtendLoanServiceTest (2)
+    - extends loan when book has no queued reader.
+    - rejects extension when book has queued reader.
+
+  HandlingOverdueBookReturnTest (1)
+    - blocks reader after overdue return.
+
+  HandlingReservationExpiredTest (1)
+    - marks reserved copy AVAILABLE when reservation expires.
+
+  JoiningWaitingQueueTest (2)
+    - adds reader to book waiting queue and publishes event.
+    - rejects duplicate waiting queue entry.
+
+  LendBookCopyServiceTest (7, 1 skipped)
     - happy path.
     - reader not found, blocked reader, loan limit.
-    - copy not found, unavailable copy, reserved-for-same-reader path.
+    - copy not found, reserved-for-same-reader path.
     - verifies copy loan event publication.
+    - SKIPPED: unavailable copy should not create a loan before rejection.
 
   ReserveBookServiceTest (5)
     - happy path.
@@ -151,10 +173,6 @@ LENDING-APPLICATION
   ReturnBookCopyServiceTest (2)
     - closes active loan, marks copy available, publishes return event.
     - rejects missing active loan.
-
-  ExtendLoanServiceTest (2)
-    - extends loan when book has no queued reader.
-    - rejects extension when book has queued reader.
 
   ShowLoansServiceTest (1)
     - delegates reader loan listing to repository.
@@ -166,26 +184,29 @@ LENDING-INFRASTRUCTURE
     - extend loan endpoint.
     - list loans endpoint.
 
-  ReservationControllerTest (5)
+  ReservationControllerTest (7)
     - reservation success.
     - blocked reader, no-copy message, bad request.
+    - waiting queue success and duplicate-entry bad request.
 
   JdbcBookCopyRepositoryTest (3)
     - find, findAvailable, update status/reservation state.
 
-  JdbcBookRepositoryTest (2, 1 skipped)
+  JdbcBookRepositoryTest (2)
+    - finds book without queued reader.
     - finds book with queued reader.
-    - SKIPPED: finds book without queued reader.
 
-  JdbcLoanRepositoryTest (2, 1 skipped)
+  JdbcLoanRepositoryTest (2)
     - inserts loan with ACTIVE status.
-    - SKIPPED: countActiveLoansForReader excludes CLOSED loans.
+    - finds loan summaries for a reader.
 
-  JdbcReaderRepositoryTest (2)
+  JdbcReaderRepositoryTest (3, 1 skipped)
     - find reader, empty result.
+    - SKIPPED: closed loans should not count against reader active loan limit.
 
-  JdbcReservationRepositoryTest (1)
+  JdbcReservationRepositoryTest (2)
     - inserts reservation.
+    - finds expired reservations.
 
 NOTIFICATIONS
   InformServiceTest (1)
@@ -199,14 +220,19 @@ USERS
   ReaderAccountTest (3, 1 skipped)
     - creates ACTIVE reader account with generated password.
     - reconstitutes reader account.
-    - SKIPPED: ReaderAccountRegisteredEvent should expose raw UUID id.
+    - SKIPPED: ReaderAccountRegistered should expose raw UUID id.
 
   RegisteringReaderAccountTest (2)
     - creates reader account for unique email.
     - rejects duplicate email.
 
-  UsersControllerTest (2, 1 skipped)
+  UnblockingUserAccountTest (2)
+    - unblocks reader account and publishes event.
+    - rejects missing reader account.
+
+  UsersControllerTest (4, 1 skipped)
     - maps duplicate email to 400.
+    - unblocks reader account success and bad request paths.
     - SKIPPED: success response should expose raw UUID id.
 
   JdbcReaderAccountRepositoryTest (3)
@@ -215,14 +241,14 @@ USERS
     - empty result for unknown email.
 
 BOOTSTRAP ACCEPTANCE
-  LendingAcceptanceTest (9, 2 skipped)
+  LendingAcceptanceTest (9, 3 skipped)
     - POST /loans success.
-    - POST /loans conflict for unavailable copy.
     - POST /loans blocked reader response.
     - POST /reservations success.
     - POST /reservations no-copy message.
     - POST /book-copies/remove marks copy WITHDRAWN.
     - POST /loans/return closes loan and marks copy AVAILABLE.
+    - SKIPPED: POST /loans conflict must not persist unavailable-copy loan.
     - SKIPPED: POST /books persists metadata.
     - SKIPPED: POST /loans/extend plus POST /loans/list.
 
@@ -239,7 +265,7 @@ ARCHITECTURE-TESTS
 
 Catalog
   - BookTest.should_not_register_book_added_event_when_book_is_reconstituted
-    TODO: Reconstituting a Book currently registers BookAddedEvent.
+    TODO: Reconstituting a Book currently registers BookAdded.
 
   - BookCopyTest.should_not_register_book_copy_added_event_when_copy_is_reconstituted
     TODO: Reconstituting a BookCopy currently registers BookCopyAdded.
@@ -253,21 +279,26 @@ Catalog
     of 404.
 
 Lending
-  - JdbcBookRepositoryTest.should_find_book_without_queued_reader
-    TODO: JdbcBookRepository currently does not handle null queued_reader_id.
+  - LendBookCopyServiceTest.should_throw_when_copy_is_not_available_for_reader
+    TODO: LendingBookCopy currently creates the loan before validating book
+    copy availability.
 
-  - JdbcLoanRepositoryTest.should_count_active_loans_for_reader
-    TODO: JdbcLoanRepository currently counts closed loans as active.
+  - JdbcReaderRepositoryTest.should_ignore_closed_loans_when_reconstituting_reader_loan_count
+    TODO: JdbcReaderRepository currently counts closed loans as active loans.
 
 Users
   - ReaderAccountTest.should_register_reader_account_registered_event
-    TODO: ReaderAccountRegisteredEvent currently serializes ReaderAccountId via
+    TODO: ReaderAccountRegistered currently serializes ReaderAccountId via
     record toString.
 
   - UsersControllerTest.should_return_reader_account_id_when_registration_succeeds
     TODO: UsersController currently returns ReaderAccountId via record toString.
 
 Bootstrap
+  - LendingAcceptanceTest.should_return_conflict_when_lending_unavailable_copy
+    TODO: LendingBookCopy currently creates the loan before validating book
+    copy availability.
+
   - LendingAcceptanceTest.should_add_book_and_persist_metadata
     TODO: Bootstrap Flyway schema does not yet include book
     publisher/publication_date columns.
@@ -321,9 +352,9 @@ CONFIRM TESTS RAN:
                     Architecture (4)      ArchUnit
                     Acceptance (9)        bootstrap / SpringBootTest
                     Event adapter (2)     Spring event listener adapter
-                    Controller (24)       MockMvc / direct controller calls
-                    Integration (22)      SQLite + JDBC
-                    Application (29)      Mockito
-                    Domain/shared (27)    Pure JUnit
+                    Controller (28)       MockMvc / direct controller calls
+                    Integration (24)      SQLite + JDBC
+                    Application (36)      Mockito
+                    Domain/shared (29)    Pure JUnit
 
 ================================================================================

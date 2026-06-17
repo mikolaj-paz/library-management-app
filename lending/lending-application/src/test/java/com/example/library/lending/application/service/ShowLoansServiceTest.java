@@ -36,9 +36,9 @@ class ShowLoansServiceTest {
                 LocalDate.of(2026, 1, 1),
                 LoanStatus.ACTIVE));
     when(loanRepository.findFor(readerId)).thenReturn(loans);
-    var service = new ShowLoansService(loanRepository);
+    var service = new ShowingLoans(loanRepository);
 
-    var result = service.show(new ShowLoans(readerId));
+    var result = service.showLoans(new ShowLoans(readerId));
 
     assertThat(result).containsExactlyElementsOf(loans);
     verify(loanRepository).findFor(readerId);

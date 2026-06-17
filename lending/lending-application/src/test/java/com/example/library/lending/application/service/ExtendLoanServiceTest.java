@@ -25,6 +25,7 @@ import com.example.library.sharedkernel.identifier.ReaderId;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,14 +55,14 @@ class ExtendLoanServiceTest {
                 LoanId.create(), readerId, bookCopyId, LocalDate.of(2026, 1, 1), LoanStatus.ACTIVE);
     var bookCopy =
         new BookCopyFactoryImpl().reconstitute(bookCopyId, BookCopyStatus.LOANED, null, bookId);
-    var book = new BookFactoryImpl().reconstitute(bookId, null);
+    var book = new BookFactoryImpl().reconstitute(bookId, List.of());
     when(loanRepository.find(loan.id())).thenReturn(Optional.of(loan));
     when(bookCopyRepository.find(bookCopyId)).thenReturn(Optional.of(bookCopy));
     when(bookRepository.find(bookId)).thenReturn(Optional.of(book));
     var service =
-        new ExtendLoanService(loanRepository, bookRepository, bookCopyRepository, eventPublisher);
+        new ExtendingLoan(loanRepository, bookRepository, bookCopyRepository, eventPublisher);
 
-    service.extend(new ExtendLoanCommand(loan.id(), readerId));
+    service.extendLoan(new ExtendLoanCommand(loan.id(), readerId));
 
     assertThat(loan.status()).isEqualTo(LoanStatus.EXTENDED);
     assertThat(loan.dueDate()).isEqualTo(LocalDate.of(2026, 1, 15));
@@ -91,14 +92,14 @@ class ExtendLoanServiceTest {
                 LoanId.create(), readerId, bookCopyId, LocalDate.of(2026, 1, 1), LoanStatus.ACTIVE);
     var bookCopy =
         new BookCopyFactoryImpl().reconstitute(bookCopyId, BookCopyStatus.LOANED, null, bookId);
-    var book = new BookFactoryImpl().reconstitute(bookId, queuedReaderId);
+    var book = new BookFactoryImpl().reconstitute(bookId, List.of(queuedReaderId));
     when(loanRepository.find(loan.id())).thenReturn(Optional.of(loan));
     when(bookCopyRepository.find(bookCopyId)).thenReturn(Optional.of(bookCopy));
     when(bookRepository.find(bookId)).thenReturn(Optional.of(book));
     var service =
-        new ExtendLoanService(loanRepository, bookRepository, bookCopyRepository, eventPublisher);
+        new ExtendingLoan(loanRepository, bookRepository, bookCopyRepository, eventPublisher);
 
-    assertThatThrownBy(() -> service.extend(new ExtendLoanCommand(loan.id(), readerId)))
+    assertThatThrownBy(() -> service.extendLoan(new ExtendLoanCommand(loan.id(), readerId)))
         .isInstanceOf(ExtensionNotAllowedException.class);
 
     verify(loanRepository, never()).update(any());

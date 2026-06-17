@@ -2,9 +2,8 @@ package com.example.library.catalog.domain.book;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.library.sharedkernel.event.BookAddedEvent;
+import com.example.library.sharedkernel.event.BookAdded;
 import com.example.library.sharedkernel.identifier.BookId;
-import com.example.library.sharedkernel.identifier.ReaderId;
 import com.example.library.sharedkernel.valueobject.ISBN;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Disabled;
@@ -27,7 +26,6 @@ class BookTest {
     assertThat(book.isbn()).isEqualTo(isbn);
     assertThat(book.publisher()).isEqualTo("Prentice Hall");
     assertThat(book.publicationDate()).isEqualTo(publicationDate);
-    assertThat(book.queuedReaderId()).isNull();
   }
 
   @Test
@@ -42,7 +40,7 @@ class BookTest {
     assertThat(book.pullDomainEvents())
         .singleElement()
         .isInstanceOfSatisfying(
-            BookAddedEvent.class,
+            BookAdded.class,
             event -> {
               assertThat(event.bookId()).isEqualTo(book.id());
               assertThat(event.title()).isEqualTo("Clean Code");
@@ -54,7 +52,7 @@ class BookTest {
   }
 
   @Test
-  @Disabled("TODO: Reconstituting a Book currently registers BookAddedEvent")
+  @Disabled("TODO: Reconstituting a Book currently registers BookAdded")
   void should_not_register_book_added_event_when_book_is_reconstituted() {
     var isbn = new ISBN("978-0132350884");
     var publicationDate = LocalDate.of(2008, 8, 1);
@@ -67,8 +65,7 @@ class BookTest {
                 "Robert C. Martin",
                 isbn,
                 "Prentice Hall",
-                publicationDate,
-                ReaderId.create());
+                publicationDate);
 
     assertThat(book.pullDomainEvents()).isEmpty();
   }

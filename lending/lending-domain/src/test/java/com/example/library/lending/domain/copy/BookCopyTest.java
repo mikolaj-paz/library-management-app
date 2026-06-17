@@ -27,14 +27,14 @@ class BookCopyTest {
   void should_allow_loan_when_copy_is_available() {
     var copy = factory.reconstitute(copyId, BookCopyStatus.AVAILABLE, null, bookId);
 
-    assertThatCode(() -> copy.verifyCanBeLoanedBy(readerId)).doesNotThrowAnyException();
+    assertThatCode(() -> copy.lend(readerId, LoanId.create())).doesNotThrowAnyException();
   }
 
   @Test
   void should_reject_loan_when_copy_is_already_loaned() {
     var copy = factory.reconstitute(copyId, BookCopyStatus.LOANED, null, bookId);
 
-    assertThatThrownBy(() -> copy.verifyCanBeLoanedBy(readerId))
+    assertThatThrownBy(() -> copy.lend(readerId, LoanId.create()))
         .isInstanceOf(BookCopyNotAvailableException.class);
   }
 
@@ -42,14 +42,14 @@ class BookCopyTest {
   void should_allow_loan_when_copy_is_reserved_by_same_reader() {
     var copy = factory.reconstitute(copyId, BookCopyStatus.RESERVED, readerId, bookId);
 
-    assertThatCode(() -> copy.verifyCanBeLoanedBy(readerId)).doesNotThrowAnyException();
+    assertThatCode(() -> copy.lend(readerId, LoanId.create())).doesNotThrowAnyException();
   }
 
   @Test
   void should_reject_loan_when_copy_is_reserved_by_another_reader() {
     var copy = factory.reconstitute(copyId, BookCopyStatus.RESERVED, ReaderId.create(), bookId);
 
-    assertThatThrownBy(() -> copy.verifyCanBeLoanedBy(readerId))
+    assertThatThrownBy(() -> copy.lend(readerId, LoanId.create()))
         .isInstanceOf(BookCopyNotAvailableException.class);
   }
 

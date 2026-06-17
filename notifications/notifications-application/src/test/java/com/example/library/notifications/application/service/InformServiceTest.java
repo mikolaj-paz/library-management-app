@@ -8,6 +8,7 @@ import com.example.library.notifications.application.port.out.NotificationSender
 import com.example.library.notifications.domain.notification.Notification;
 import com.example.library.notifications.domain.notification.NotificationType;
 import com.example.library.sharedkernel.identifier.ReaderId;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -22,9 +23,11 @@ class InformServiceTest {
   @Test
   void should_send_notification_from_inform_command() {
     var readerId = ReaderId.create();
+    var occurredOn = LocalDateTime.of(2026, 1, 1, 12, 0);
     var command =
-        new InformCommand(readerId, NotificationType.BOOK_COPY_RETURNED, "Thanks for returning");
-    var service = new InformService(notificationSender);
+        new InformCommand(
+            readerId, NotificationType.BOOK_COPY_RETURNED, "Thanks for returning", occurredOn);
+    var service = new Informing(notificationSender);
 
     service.inform(command);
 
@@ -33,5 +36,6 @@ class InformServiceTest {
     assertThat(notificationCaptor.getValue().readerId()).isEqualTo(readerId);
     assertThat(notificationCaptor.getValue().type()).isEqualTo(NotificationType.BOOK_COPY_RETURNED);
     assertThat(notificationCaptor.getValue().message()).isEqualTo("Thanks for returning");
+    assertThat(notificationCaptor.getValue().occurredOn()).isEqualTo(occurredOn);
   }
 }
