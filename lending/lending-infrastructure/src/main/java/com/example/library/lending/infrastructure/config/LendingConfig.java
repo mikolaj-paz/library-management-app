@@ -152,14 +152,12 @@ public class LendingConfig {
   @Bean
   IReserveBook reserveBook(
       ReaderRepository lendingReaderRepository,
-      LoanRepository lendingLoanRepository,
       BookCopyRepository lendingBookCopyRepository,
       ReservationRepository lendingReservationRepository,
       ReservationFactory lendingReservationFactory,
       @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
     return new ReserveBookService(
         lendingReaderRepository,
-        lendingLoanRepository,
         lendingBookCopyRepository,
         lendingReservationFactory,
         lendingReservationRepository,

@@ -4,5 +4,5 @@ import com.example.library.sharedkernel.identifier.ReaderId;
 
 public interface ReaderFactory {
 
-  Reader reconstitute(ReaderId id, ReaderStatus status);
+  Reader reconstitute(ReaderId id, ReaderStatus status, int activeLoansCount);
 }

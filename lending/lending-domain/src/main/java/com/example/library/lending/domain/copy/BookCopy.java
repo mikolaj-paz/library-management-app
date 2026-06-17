@@ -41,7 +41,7 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
     return bookId;
   }
 
-  public void verifyCanBeLoanedBy(ReaderId readerId) {
+  public void canBeLoanedBy(ReaderId readerId) {
     if (status == BookCopyStatus.AVAILABLE) {
       return;
     }

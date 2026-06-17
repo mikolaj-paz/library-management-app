@@ -22,10 +22,20 @@ public class JdbcReaderRepository implements ReaderPersistencePort {
   public Optional<Reader> find(ReaderId id) {
     var results =
         jdbc.query(
-            "SELECT id, status FROM readers WHERE id = ?",
+            """
+            SELECT r.id, r.status, (
+              SELECT COUNT(*)
+              FROM loans l
+              WHERE l.reader_id = r.id
+            ) AS active_loans_count
+            FROM readers r
+            WHERE r.id = ?
+            """,
             (rs, rowNum) ->
                 readerFactory.reconstitute(
-                    ReaderId.of(rs.getString("id")), ReaderStatus.valueOf(rs.getString("status"))),
+                    ReaderId.of(rs.getString("id")),
+                    ReaderStatus.valueOf(rs.getString("status")),
+                    rs.getInt("active_loans_count")),
             id.value().toString());
     return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
   }

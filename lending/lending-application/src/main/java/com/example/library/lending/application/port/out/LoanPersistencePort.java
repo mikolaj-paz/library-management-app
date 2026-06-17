@@ -14,8 +14,6 @@ public interface LoanPersistencePort {
 
   void update(Loan loan);
 
-  int countActiveLoansForReader(ReaderId readerId);
-
   Optional<Loan> findActiveLoan(BookCopyId bookCopyId);
 
   Optional<Loan> find(LoanId loanId);

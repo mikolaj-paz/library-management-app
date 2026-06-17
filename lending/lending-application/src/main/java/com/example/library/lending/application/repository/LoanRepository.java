@@ -25,10 +25,6 @@ public class LoanRepository {
     persistencePort.update(loan);
   }
 
-  public int countActiveLoansForReader(ReaderId readerId) {
-    return persistencePort.countActiveLoansForReader(readerId);
-  }
-
   public Optional<Loan> findActiveLoan(BookCopyId bookCopyId) {
     return persistencePort.findActiveLoan(bookCopyId);
   }

@@ -55,16 +55,6 @@ public class JdbcLoanRepository implements LoanPersistencePort {
   }
 
   @Override
-  public int countActiveLoansForReader(ReaderId readerId) {
-    var count =
-        jdbc.queryForObject(
-            "SELECT COUNT(*) FROM loans WHERE reader_id = ?",
-            Integer.class,
-            readerId.value().toString());
-    return count != null ? count : 0;
-  }
-
-  @Override
   public Optional<Loan> findActiveLoan(BookCopyId bookCopyId) {
     var results =
         jdbc.query(
