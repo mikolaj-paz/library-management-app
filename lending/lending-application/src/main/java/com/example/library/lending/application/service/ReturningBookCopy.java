@@ -23,10 +23,6 @@ public class ReturningBookCopy implements IReturnBookCopy {
     this.eventPublisher = eventPublisher;
   }
 
-  // ============================ NOTE =============================
-  // There is no account blocking currently implemented. If we still
-  // want to keep penalties, this use case needs alignment.
-  // ===============================================================
   @Override
   public void returnBookCopy(ReturnBookCopy command) {
     var bookCopyId = command.bookCopyId();
