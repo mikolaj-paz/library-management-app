@@ -28,7 +28,8 @@ final class SqliteTestDatabase {
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
                 author TEXT NOT NULL,
-                isbn TEXT NOT NULL UNIQUE
+                isbn TEXT NOT NULL UNIQUE,
+                queued_reader_id TEXT NULL
             )
             """);
     jdbc.execute(
@@ -46,7 +47,8 @@ final class SqliteTestDatabase {
                 id TEXT PRIMARY KEY,
                 reader_id TEXT NOT NULL,
                 book_copy_id TEXT NOT NULL,
-                due_date TEXT NOT NULL
+                due_date TEXT NOT NULL,
+                status TEXT NOT NULL
             )
             """);
     jdbc.execute(

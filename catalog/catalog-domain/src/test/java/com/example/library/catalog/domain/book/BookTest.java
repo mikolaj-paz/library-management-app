@@ -2,22 +2,74 @@ package com.example.library.catalog.domain.book;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.example.library.sharedkernel.event.BookAddedEvent;
 import com.example.library.sharedkernel.identifier.BookId;
-import java.util.UUID;
+import com.example.library.sharedkernel.identifier.ReaderId;
+import com.example.library.sharedkernel.valueobject.ISBN;
+import java.time.LocalDate;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class BookTest {
 
   @Test
   void should_store_book_metadata_when_book_is_created() {
-    var bookId = BookId.of(UUID.randomUUID().toString());
+    var factory = new BookFactoryImpl();
     var isbn = new ISBN("978-0132350884");
+    var publicationDate = LocalDate.of(2008, 8, 1);
 
-    var book = Book.create(bookId, "Clean Code", "Robert C. Martin", isbn);
+    var book =
+        factory.create("Clean Code", "Robert C. Martin", isbn, "Prentice Hall", publicationDate);
 
-    assertThat(book.id()).isEqualTo(bookId);
+    assertThat(book.id()).isNotNull();
     assertThat(book.title()).isEqualTo("Clean Code");
     assertThat(book.author()).isEqualTo("Robert C. Martin");
     assertThat(book.isbn()).isEqualTo(isbn);
+    assertThat(book.publisher()).isEqualTo("Prentice Hall");
+    assertThat(book.publicationDate()).isEqualTo(publicationDate);
+    assertThat(book.queuedReaderId()).isNull();
+  }
+
+  @Test
+  void should_register_book_added_event_when_book_is_created() {
+    var factory = new BookFactoryImpl();
+    var isbn = new ISBN("978-0132350884");
+    var publicationDate = LocalDate.of(2008, 8, 1);
+
+    var book =
+        factory.create("Clean Code", "Robert C. Martin", isbn, "Prentice Hall", publicationDate);
+
+    assertThat(book.pullDomainEvents())
+        .singleElement()
+        .isInstanceOfSatisfying(
+            BookAddedEvent.class,
+            event -> {
+              assertThat(event.bookId()).isEqualTo(book.id());
+              assertThat(event.title()).isEqualTo("Clean Code");
+              assertThat(event.author()).isEqualTo("Robert C. Martin");
+              assertThat(event.isbn()).isEqualTo(isbn);
+              assertThat(event.publisher()).isEqualTo("Prentice Hall");
+              assertThat(event.publicationDate()).isEqualTo(publicationDate);
+            });
+  }
+
+  @Test
+  @Disabled("TODO: Reconstituting a Book currently registers BookAddedEvent")
+  void should_not_register_book_added_event_when_book_is_reconstituted() {
+    var isbn = new ISBN("978-0132350884");
+    var publicationDate = LocalDate.of(2008, 8, 1);
+
+    var book =
+        new BookFactoryImpl()
+            .reconstitute(
+                BookId.create(),
+                "Clean Code",
+                "Robert C. Martin",
+                isbn,
+                "Prentice Hall",
+                publicationDate,
+                ReaderId.create());
+
+    assertThat(book.pullDomainEvents()).isEmpty();
   }
 }

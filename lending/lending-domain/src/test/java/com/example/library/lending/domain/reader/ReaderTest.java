@@ -9,14 +9,14 @@ class ReaderTest {
 
   @Test
   void should_not_be_blocked_when_reader_is_active() {
-    var reader = Reader.create(ReaderId.create(), ReaderStatus.ACTIVE);
+    var reader = new ReaderFactoryImpl().reconstitute(ReaderId.create(), ReaderStatus.ACTIVE);
 
     assertThat(reader.isBlocked()).isFalse();
   }
 
   @Test
   void should_be_blocked_when_reader_status_is_blocked() {
-    var reader = Reader.create(ReaderId.create(), ReaderStatus.BLOCKED);
+    var reader = new ReaderFactoryImpl().reconstitute(ReaderId.create(), ReaderStatus.BLOCKED);
 
     assertThat(reader.isBlocked()).isTrue();
   }

@@ -9,14 +9,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.library.lending.application.command.ExtendLoanCommand;
 import com.example.library.lending.application.command.LendBookCopy;
+import com.example.library.lending.application.command.ReturnBookCopy;
+import com.example.library.lending.application.port.in.IExtendLoan;
 import com.example.library.lending.application.port.in.ILendBookCopy;
+import com.example.library.lending.application.port.in.IReturnBookCopy;
+import com.example.library.lending.application.port.in.IShowLoans;
+import com.example.library.lending.application.query.LoanSummary;
 import com.example.library.lending.domain.exception.BookCopyNotAvailableException;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;
-import com.example.library.lending.domain.loan.LoanId;
+import com.example.library.lending.domain.loan.LoanStatus;
 import com.example.library.sharedkernel.identifier.BookCopyId;
+import com.example.library.sharedkernel.identifier.LoanId;
 import com.example.library.sharedkernel.identifier.ReaderId;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,12 +43,23 @@ class LoanControllerTest {
 
   @Mock private ILendBookCopy lendBookCopyService;
 
+  @Mock private IReturnBookCopy returnBookCopyService;
+
+  @Mock private IExtendLoan extendLoanService;
+
+  @Mock private IShowLoans showLoansService;
+
   private MockMvc mockMvc;
 
   @BeforeEach
   void setUp() {
     mockMvc =
-        MockMvcBuilders.standaloneSetup(new LoanController(lendBookCopyService))
+        MockMvcBuilders.standaloneSetup(
+                new LoanController(
+                    lendBookCopyService,
+                    returnBookCopyService,
+                    extendLoanService,
+                    showLoansService))
             .setMessageConverters(new MappingJackson2HttpMessageConverter())
             .build();
   }
@@ -121,6 +141,59 @@ class LoanControllerTest {
         .andExpect(jsonPath("$.error", notNullValue()));
   }
 
+  @Test
+  void should_return_success_when_copy_is_returned() throws Exception {
+    var copyId = BookCopyId.create();
+
+    mockMvc
+        .perform(post("/loans/return/{bookCopyId}", copyId.value().toString()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.message").value("Book copy returned successfully"));
+
+    var commandCaptor = ArgumentCaptor.forClass(ReturnBookCopy.class);
+    verify(returnBookCopyService).returnCopy(commandCaptor.capture());
+    assertThat(commandCaptor.getValue().bookCopyId()).isEqualTo(copyId);
+  }
+
+  @Test
+  void should_return_success_when_loan_is_extended() throws Exception {
+    var loanId = LoanId.create();
+    var readerId = ReaderId.create();
+
+    mockMvc
+        .perform(
+            post("/loans/extend/{loanId}", loanId.value().toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(extendRequestJson(readerId.value().toString())))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.message").value("Loan extended successfully"));
+
+    var commandCaptor = ArgumentCaptor.forClass(ExtendLoanCommand.class);
+    verify(extendLoanService).extend(commandCaptor.capture());
+    assertThat(commandCaptor.getValue().loanId()).isEqualTo(loanId);
+    assertThat(commandCaptor.getValue().readerId()).isEqualTo(readerId);
+  }
+
+  @Test
+  void should_return_loans_for_reader() throws Exception {
+    var readerId = ReaderId.create();
+    var loans =
+        List.of(
+            new LoanSummary(
+                LoanId.create(),
+                BookCopyId.create(),
+                "Domain-Driven Design",
+                "Eric Evans",
+                LocalDate.of(2026, 1, 1),
+                LoanStatus.ACTIVE));
+    when(showLoansService.show(any())).thenReturn(loans);
+
+    mockMvc
+        .perform(post("/loans/list").param("readerId", readerId.value().toString()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].bookTitle").value("Domain-Driven Design"));
+  }
+
   private String requestJson(String copyId, String readerId) {
     return """
         {
@@ -130,5 +203,14 @@ class LoanControllerTest {
         }
         """
         .formatted(copyId, readerId);
+  }
+
+  private String extendRequestJson(String readerId) {
+    return """
+        {
+          "readerId": "%s"
+        }
+        """
+        .formatted(readerId);
   }
 }

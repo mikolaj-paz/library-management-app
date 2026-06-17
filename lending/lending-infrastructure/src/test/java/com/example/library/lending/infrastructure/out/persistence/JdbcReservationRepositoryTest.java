@@ -2,7 +2,7 @@ package com.example.library.lending.infrastructure.out.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.library.lending.domain.reservation.Reservation;
+import com.example.library.lending.domain.reservation.ReservationFactoryImpl;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ class JdbcReservationRepositoryTest {
   void should_insert_reservation() {
     var readerId = ReaderId.create();
     var copyId = BookCopyId.create();
-    var reservation = Reservation.create(readerId, copyId);
+    var reservation = new ReservationFactoryImpl().create(readerId, copyId);
 
     repository.create(reservation);
 

@@ -8,17 +8,22 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.library.lending.application.command.ReserveBook;
-import com.example.library.lending.application.port.out.BookCopyRepository;
-import com.example.library.lending.application.port.out.LoanRepository;
-import com.example.library.lending.application.port.out.ReaderRepository;
-import com.example.library.lending.application.port.out.ReservationRepository;
+import com.example.library.lending.application.repository.BookCopyRepository;
+import com.example.library.lending.application.repository.LoanRepository;
+import com.example.library.lending.application.repository.ReaderRepository;
+import com.example.library.lending.application.repository.ReservationRepository;
 import com.example.library.lending.domain.copy.BookCopy;
+import com.example.library.lending.domain.copy.BookCopyFactory;
+import com.example.library.lending.domain.copy.BookCopyFactoryImpl;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.NoAvailableBookCopyException;
 import com.example.library.lending.domain.exception.ReaderBlockedException;
-import com.example.library.lending.domain.reader.Reader;
+import com.example.library.lending.domain.reader.ReaderFactoryImpl;
 import com.example.library.lending.domain.reader.ReaderStatus;
 import com.example.library.lending.domain.reservation.Reservation;
+import com.example.library.lending.domain.reservation.ReservationFactoryImpl;
+import com.example.library.sharedkernel.event.BookCopyReserved;
+import com.example.library.sharedkernel.event.DomainEvent;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;
@@ -27,7 +32,6 @@ import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -50,6 +54,7 @@ class ReserveBookServiceTest {
   private ReserveBookService service;
   private ReaderId readerId;
   private BookId bookId;
+  private BookCopyFactory bookCopyFactory;
 
   @BeforeEach
   void setUp() {
@@ -58,15 +63,17 @@ class ReserveBookServiceTest {
             readerRepository,
             loanRepository,
             bookCopyRepository,
+            new ReservationFactoryImpl(),
             reservationRepository,
             eventPublisher);
     readerId = ReaderId.create();
     bookId = BookId.of(UUID.randomUUID().toString());
+    bookCopyFactory = new BookCopyFactoryImpl();
   }
 
   @Test
   void should_create_reservation_when_reader_is_eligible_and_copy_is_available() {
-    var copy = BookCopy.create(BookCopyId.create(), BookCopyStatus.AVAILABLE, null);
+    var copy = copy(BookCopyStatus.AVAILABLE, null);
     givenActiveReader();
     givenActiveLoanCount(0);
     when(bookCopyRepository.findAvailableBookCopy(bookId)).thenReturn(Optional.of(copy));
@@ -80,12 +87,23 @@ class ReserveBookServiceTest {
     assertThat(reservationCaptor.getValue().readerId()).isEqualTo(readerId);
     assertThat(reservationCaptor.getValue().bookCopyId()).isEqualTo(copy.id());
     verify(bookCopyRepository).update(copy);
+    var eventCaptor = ArgumentCaptor.forClass(DomainEvent.class);
+    verify(eventPublisher).publish(eventCaptor.capture());
+    assertThat(eventCaptor.getValue())
+        .isInstanceOfSatisfying(
+            BookCopyReserved.class,
+            event -> {
+              assertThat(event.reservationId()).isEqualTo(reservationId);
+              assertThat(event.readerId()).isEqualTo(readerId);
+              assertThat(event.bookCopyId()).isEqualTo(copy.id());
+            });
   }
 
   @Test
   void should_throw_when_reader_is_blocked() {
     when(readerRepository.find(readerId))
-        .thenReturn(Optional.of(Reader.create(readerId, ReaderStatus.BLOCKED)));
+        .thenReturn(
+            Optional.of(new ReaderFactoryImpl().reconstitute(readerId, ReaderStatus.BLOCKED)));
 
     assertThatThrownBy(() -> service.reserve(new ReserveBook(readerId, bookId)))
         .isInstanceOf(ReaderBlockedException.class);
@@ -117,11 +135,9 @@ class ReserveBookServiceTest {
     verify(reservationRepository, never()).create(any());
   }
 
-  @Disabled(
-      "Documents known defect: ReserveBookService updates repository without marking copy as RESERVED.")
   @Test
   void should_mark_copy_as_reserved_when_reservation_succeeds() {
-    var copy = BookCopy.create(BookCopyId.create(), BookCopyStatus.AVAILABLE, null);
+    var copy = copy(BookCopyStatus.AVAILABLE, null);
     givenActiveReader();
     givenActiveLoanCount(0);
     when(bookCopyRepository.findAvailableBookCopy(bookId)).thenReturn(Optional.of(copy));
@@ -134,10 +150,15 @@ class ReserveBookServiceTest {
 
   private void givenActiveReader() {
     when(readerRepository.find(readerId))
-        .thenReturn(Optional.of(Reader.create(readerId, ReaderStatus.ACTIVE)));
+        .thenReturn(
+            Optional.of(new ReaderFactoryImpl().reconstitute(readerId, ReaderStatus.ACTIVE)));
   }
 
   private void givenActiveLoanCount(int count) {
     when(loanRepository.countActiveLoansForReader(readerId)).thenReturn(count);
+  }
+
+  private BookCopy copy(BookCopyStatus status, ReaderId reservedBy) {
+    return bookCopyFactory.reconstitute(BookCopyId.create(), status, reservedBy, bookId);
   }
 }

@@ -30,11 +30,5 @@ class AggregateRootTest {
     }
   }
 
-  private static final class TestEvent extends DomainEvent {
-
-    @Override
-    public String eventName() {
-      return "TestEvent";
-    }
-  }
+  private static final class TestEvent extends DomainEvent {}
 }

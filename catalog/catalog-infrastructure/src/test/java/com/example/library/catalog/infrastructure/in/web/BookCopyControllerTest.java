@@ -2,12 +2,15 @@ package com.example.library.catalog.infrastructure.in.web;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.library.catalog.application.port.in.IAddBookCopy;
+import com.example.library.catalog.application.port.in.IRemoveBookCopy;
+import com.example.library.catalog.domain.exception.BookCopyCantBeRemovedException;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,12 +28,15 @@ class BookCopyControllerTest {
 
   @Mock private IAddBookCopy addBookCopyService;
 
+  @Mock private IRemoveBookCopy removeBookCopyService;
+
   private MockMvc mockMvc;
 
   @BeforeEach
   void setUp() {
     mockMvc =
-        MockMvcBuilders.standaloneSetup(new BookCopyController(addBookCopyService))
+        MockMvcBuilders.standaloneSetup(
+                new BookCopyController(addBookCopyService, removeBookCopyService))
             .setMessageConverters(new MappingJackson2HttpMessageConverter())
             .build();
   }
@@ -65,6 +71,35 @@ class BookCopyControllerTest {
   }
 
   @Test
+  void should_return_success_when_copy_is_removed() throws Exception {
+    var bookCopyId = UUID.randomUUID().toString();
+
+    mockMvc
+        .perform(
+            post("/book-copies/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(removeRequestJson(bookCopyId)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.message").value("Book copy removed successfully."));
+  }
+
+  @Test
+  void should_return_conflict_when_copy_cannot_be_removed() throws Exception {
+    var bookCopyId = BookCopyId.create();
+    doThrow(new BookCopyCantBeRemovedException(bookCopyId))
+        .when(removeBookCopyService)
+        .remove(any());
+
+    mockMvc
+        .perform(
+            post("/book-copies/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(removeRequestJson(bookCopyId.value().toString())))
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.error", notNullValue()));
+  }
+
+  @Test
   void should_return_bad_request_when_book_id_is_invalid() throws Exception {
     mockMvc
         .perform(
@@ -82,5 +117,14 @@ class BookCopyControllerTest {
         }
         """
         .formatted(bookId);
+  }
+
+  private String removeRequestJson(String bookCopyId) {
+    return """
+        {
+          "bookCopyId": "%s"
+        }
+        """
+        .formatted(bookCopyId);
   }
 }

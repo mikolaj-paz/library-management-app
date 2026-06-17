@@ -13,7 +13,7 @@ class ReservationTest {
     var readerId = ReaderId.create();
     var copyId = BookCopyId.create();
 
-    var reservation = Reservation.create(readerId, copyId);
+    var reservation = new ReservationFactoryImpl().create(readerId, copyId);
 
     assertThat(reservation.id()).isNotNull();
     assertThat(reservation.readerId()).isEqualTo(readerId);

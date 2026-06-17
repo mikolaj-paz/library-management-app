@@ -2,7 +2,7 @@ package com.example.library.lending.infrastructure.out.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.library.lending.domain.copy.BookCopy;
+import com.example.library.lending.domain.copy.BookCopyFactoryImpl;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;
@@ -21,7 +21,7 @@ class JdbcBookCopyRepositoryTest {
   @BeforeEach
   void setUp() {
     jdbc = SqliteTestDatabase.createJdbcTemplate();
-    repository = new JdbcBookCopyRepository(jdbc);
+    repository = new JdbcBookCopyRepository(jdbc, new BookCopyFactoryImpl());
     bookId = BookId.of(UUID.randomUUID().toString());
     jdbc.update(
         "INSERT INTO books (id, title, author, isbn) VALUES (?, ?, ?, ?)",
@@ -61,7 +61,8 @@ class JdbcBookCopyRepositoryTest {
     var copyId = BookCopyId.create();
     var readerId = ReaderId.create();
     insertCopy(copyId, BookCopyStatus.AVAILABLE, null, bookId);
-    var copy = BookCopy.create(copyId, BookCopyStatus.RESERVED, readerId);
+    var copy =
+        new BookCopyFactoryImpl().reconstitute(copyId, BookCopyStatus.RESERVED, readerId, bookId);
 
     repository.update(copy);
 

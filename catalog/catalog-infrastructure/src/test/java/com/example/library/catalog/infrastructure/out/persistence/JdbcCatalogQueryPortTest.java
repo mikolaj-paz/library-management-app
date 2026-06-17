@@ -64,11 +64,13 @@ class JdbcCatalogQueryPortTest {
 
   private void insertBook(BookId bookId, String title, String author, String isbn) {
     jdbc.update(
-        "INSERT INTO books (id, title, author, isbn) VALUES (?, ?, ?, ?)",
+        "INSERT INTO books (id, title, author, isbn, publisher, publication_date) VALUES (?, ?, ?, ?, ?, ?)",
         bookId.value().toString(),
         title,
         author,
-        isbn);
+        isbn,
+        "Addison-Wesley",
+        "2003-08-30");
   }
 
   private void insertCopy(BookCopyId copyId, BookId bookId, String status) {

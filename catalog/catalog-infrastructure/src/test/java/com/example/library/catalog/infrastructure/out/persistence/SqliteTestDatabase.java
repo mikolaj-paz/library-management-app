@@ -21,7 +21,10 @@ final class SqliteTestDatabase {
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
                 author TEXT NOT NULL,
-                isbn TEXT NOT NULL UNIQUE
+                isbn TEXT NOT NULL UNIQUE,
+                publisher TEXT NOT NULL,
+                publication_date TEXT NOT NULL,
+                queued_reader_id TEXT NULL
             )
             """);
     jdbc.execute(

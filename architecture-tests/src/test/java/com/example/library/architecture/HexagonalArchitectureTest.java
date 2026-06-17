@@ -8,6 +8,7 @@ import com.example.library.lending.domain.loan.Loan;
 import com.example.library.lending.domain.reader.Reader;
 import com.example.library.lending.domain.reservation.Reservation;
 import com.example.library.sharedkernel.entity.AggregateRoot;
+import com.example.library.users.domain.reader.ReaderAccount;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import org.junit.jupiter.api.Test;
@@ -68,5 +69,6 @@ class HexagonalArchitectureTest {
     assertThat(Loan.class).isAssignableTo(AggregateRoot.class);
     assertThat(Reader.class).isAssignableTo(AggregateRoot.class);
     assertThat(Reservation.class).isAssignableTo(AggregateRoot.class);
+    assertThat(ReaderAccount.class).isAssignableTo(AggregateRoot.class);
   }
 }

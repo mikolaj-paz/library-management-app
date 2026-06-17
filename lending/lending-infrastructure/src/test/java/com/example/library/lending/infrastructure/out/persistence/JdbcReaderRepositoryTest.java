@@ -2,6 +2,7 @@ package com.example.library.lending.infrastructure.out.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.example.library.lending.domain.reader.ReaderFactoryImpl;
 import com.example.library.lending.domain.reader.ReaderStatus;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +17,7 @@ class JdbcReaderRepositoryTest {
   @BeforeEach
   void setUp() {
     jdbc = SqliteTestDatabase.createJdbcTemplate();
-    repository = new JdbcReaderRepository(jdbc);
+    repository = new JdbcReaderRepository(jdbc, new ReaderFactoryImpl());
   }
 
   @Test
