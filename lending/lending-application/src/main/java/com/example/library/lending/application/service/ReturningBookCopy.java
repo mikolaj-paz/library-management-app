@@ -8,13 +8,13 @@ import com.example.library.lending.domain.exception.LoanNotFoundException;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 import java.time.LocalDate;
 
-public class ReturnBookCopyService implements IReturnBookCopy {
+public class ReturningBookCopy implements IReturnBookCopy {
 
   private final LoanRepository loanRepository;
   private final BookCopyRepository bookCopyRepository;
   private final DomainEventPublisher eventPublisher;
 
-  public ReturnBookCopyService(
+  public ReturningBookCopy(
       LoanRepository loanRepository,
       BookCopyRepository bookCopyRepository,
       DomainEventPublisher eventPublisher) {
@@ -28,7 +28,7 @@ public class ReturnBookCopyService implements IReturnBookCopy {
   // want to keep penalties, this use case needs alignment.
   // ===============================================================
   @Override
-  public void returnCopy(ReturnBookCopy command) {
+  public void returnBookCopy(ReturnBookCopy command) {
     var bookCopyId = command.bookCopyId();
     var today = LocalDate.now();
 

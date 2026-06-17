@@ -18,12 +18,12 @@ import com.example.library.lending.application.repository.LoanRepository;
 import com.example.library.lending.application.repository.ReaderRepository;
 import com.example.library.lending.application.repository.ReservationRepository;
 import com.example.library.lending.application.service.ExpiringReservations;
-import com.example.library.lending.application.service.ExtendLoanService;
+import com.example.library.lending.application.service.ExtendingLoan;
 import com.example.library.lending.application.service.JoiningWaitingQueue;
-import com.example.library.lending.application.service.LendBookCopyService;
-import com.example.library.lending.application.service.ReserveBookService;
-import com.example.library.lending.application.service.ReturnBookCopyService;
-import com.example.library.lending.application.service.ShowLoansService;
+import com.example.library.lending.application.service.LendingBookCopy;
+import com.example.library.lending.application.service.ReservingBook;
+import com.example.library.lending.application.service.ReturningBookCopy;
+import com.example.library.lending.application.service.ShowingLoans;
 import com.example.library.lending.domain.book.BookFactory;
 import com.example.library.lending.domain.book.BookFactoryImpl;
 import com.example.library.lending.domain.copy.BookCopyFactory;
@@ -140,13 +140,13 @@ public class LendingConfig {
   }
 
   @Bean
-  ILendBookCopy lendBookCopy(
+  ILendBookCopy lendingBookCopy(
       LoanRepository lendingLoanRepository,
       BookCopyRepository lendingBookCopyRepository,
       ReaderRepository lendingReaderRepository,
       LoanFactory lendingLoanFactory,
       @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
-    return new LendBookCopyService(
+    return new LendingBookCopy(
         lendingLoanRepository,
         lendingBookCopyRepository,
         lendingReaderRepository,
@@ -160,13 +160,13 @@ public class LendingConfig {
   }
 
   @Bean
-  IReserveBook reserveBook(
+  IReserveBook reservingBook(
       ReaderRepository lendingReaderRepository,
       BookCopyRepository lendingBookCopyRepository,
       ReservationRepository lendingReservationRepository,
       ReservationFactory lendingReservationFactory,
       @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
-    return new ReserveBookService(
+    return new ReservingBook(
         lendingReaderRepository,
         lendingBookCopyRepository,
         lendingReservationFactory,
@@ -175,21 +175,21 @@ public class LendingConfig {
   }
 
   @Bean
-  IReturnBookCopy returnBookCopy(
+  IReturnBookCopy returningBookCopy(
       LoanRepository lendingLoanRepository,
       BookCopyRepository lendingBookCopyRepository,
       @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
-    return new ReturnBookCopyService(
+    return new ReturningBookCopy(
         lendingLoanRepository, lendingBookCopyRepository, lendingDomainEventPublisher);
   }
 
   @Bean
-  IExtendLoan extendLoan(
+  IExtendLoan extendingLoan(
       LoanRepository lendingLoanRepository,
       BookRepository lendingBookRepository,
       BookCopyRepository lendingBookCopyRepository,
       @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
-    return new ExtendLoanService(
+    return new ExtendingLoan(
         lendingLoanRepository,
         lendingBookRepository,
         lendingBookCopyRepository,
@@ -197,19 +197,19 @@ public class LendingConfig {
   }
 
   @Bean
-  IShowLoans showLoans(LoanRepository lendingLoanRepository) {
-    return new ShowLoansService(lendingLoanRepository);
+  IShowLoans showingLoans(LoanRepository lendingLoanRepository) {
+    return new ShowingLoans(lendingLoanRepository);
   }
 
   @Bean
-  IJoinWaitingQueue joinWaitingQueue(
+  IJoinWaitingQueue joiningWaitingQueue(
       BookRepository lendingBookRepository,
       @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
     return new JoiningWaitingQueue(lendingBookRepository, lendingDomainEventPublisher);
   }
 
   @Bean
-  IExpireReservations expireReservations(
+  IExpireReservations expiringReservations(
       ReservationRepository lendingReservationRepository,
       @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
     return new ExpiringReservations(lendingReservationRepository, lendingDomainEventPublisher);

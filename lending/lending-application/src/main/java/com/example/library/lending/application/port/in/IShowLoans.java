@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface IShowLoans {
 
-  List<LoanSummary> show(ShowLoans query);
+  List<LoanSummary> showLoans(ShowLoans query);
 }

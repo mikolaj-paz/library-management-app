@@ -4,5 +4,5 @@ import com.example.library.catalog.application.query.BookDetails;
 import com.example.library.catalog.application.query.GetBookDetails;
 
 public interface IGetBookDetails {
-  BookDetails bookDetails(GetBookDetails query);
+  BookDetails getBookDetails(GetBookDetails query);
 }

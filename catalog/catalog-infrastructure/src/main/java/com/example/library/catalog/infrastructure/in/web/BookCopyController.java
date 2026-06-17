@@ -31,7 +31,7 @@ public class BookCopyController {
   public ResponseEntity<?> addBookCopy(@RequestBody AddBookCopyRequest request) {
     try {
       var bookId = BookId.of(request.bookId());
-      var result = addBookCopyService.add(new AddBookCopy(bookId));
+      var result = addBookCopyService.addBookCopy(new AddBookCopy(bookId));
 
       return ResponseEntity.ok(Map.of("bookCopyId", result.value().toString()));
     } catch (IllegalArgumentException e) {
@@ -45,7 +45,7 @@ public class BookCopyController {
   public ResponseEntity<?> removeBookCopy(@RequestBody RemoveBookCopyRequest request) {
     try {
       var bookCopyId = BookCopyId.of(request.bookCopyId());
-      removeBookCopyService.remove(new RemoveBookCopy(bookCopyId));
+      removeBookCopyService.removeBookCopy(new RemoveBookCopy(bookCopyId));
       return ResponseEntity.ok(Map.of("message", "Book copy removed successfully."));
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

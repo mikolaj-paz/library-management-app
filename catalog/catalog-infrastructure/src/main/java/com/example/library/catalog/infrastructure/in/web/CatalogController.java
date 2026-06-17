@@ -29,7 +29,7 @@ public class CatalogController {
 
   @GetMapping("/search")
   public ResponseEntity<?> searchCatalog(@RequestParam("phrase") String phrase) {
-    var results = searchCatalogService.search(new SearchCatalog(phrase));
+    var results = searchCatalogService.searchCatalog(new SearchCatalog(phrase));
     try {
       if (results.isEmpty()) {
         return ResponseEntity.ok(Map.of("message", "No books found.", "results", List.of()));
@@ -45,7 +45,7 @@ public class CatalogController {
   @GetMapping("/{bookId}")
   public ResponseEntity<?> getBookDetails(@PathVariable("bookId") String bookId) {
     try {
-      var details = getBookDetailsService.bookDetails(new GetBookDetails(BookId.of(bookId)));
+      var details = getBookDetailsService.getBookDetails(new GetBookDetails(BookId.of(bookId)));
       return ResponseEntity.ok(details);
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

@@ -2,7 +2,7 @@ package com.example.library.notifications.infrastructure.config;
 
 import com.example.library.notifications.application.port.in.IInform;
 import com.example.library.notifications.application.port.out.NotificationSender;
-import com.example.library.notifications.application.service.InformService;
+import com.example.library.notifications.application.service.Informing;
 import com.example.library.notifications.infrastructure.in.events.LendingEventListener;
 import com.example.library.notifications.infrastructure.out.ConsoleNotificationSender;
 import org.springframework.context.annotation.Bean;
@@ -17,12 +17,12 @@ public class NotificationsConfig {
   }
 
   @Bean
-  IInform inform(NotificationSender notificationSender) {
-    return new InformService(notificationSender);
+  IInform informing(NotificationSender notificationSender) {
+    return new Informing(notificationSender);
   }
 
   @Bean
-  LendingEventListener loanEventListener(IInform inform) {
-    return new LendingEventListener(inform);
+  LendingEventListener loanEventListener(IInform informing) {
+    return new LendingEventListener(informing);
   }
 }

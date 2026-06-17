@@ -4,5 +4,5 @@ import com.example.library.catalog.application.command.AddBookCopy;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 
 public interface IAddBookCopy {
-  BookCopyId add(AddBookCopy command);
+  BookCopyId addBookCopy(AddBookCopy command);
 }

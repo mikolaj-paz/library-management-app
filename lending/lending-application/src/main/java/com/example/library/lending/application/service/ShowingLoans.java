@@ -6,16 +6,16 @@ import com.example.library.lending.application.query.ShowLoans;
 import com.example.library.lending.application.repository.LoanRepository;
 import java.util.List;
 
-public class ShowLoansService implements IShowLoans {
+public class ShowingLoans implements IShowLoans {
 
   private final LoanRepository loanRepository;
 
-  public ShowLoansService(LoanRepository loanRepository) {
+  public ShowingLoans(LoanRepository loanRepository) {
     this.loanRepository = loanRepository;
   }
 
   @Override
-  public List<LoanSummary> show(ShowLoans query) {
+  public List<LoanSummary> showLoans(ShowLoans query) {
     var readerId = query.readerId();
 
     // 2. Z bazy danych pobierana jest lista wszystkich aktywnych oraz archiwalnych wypożyczeń

@@ -4,5 +4,5 @@ import com.example.library.lending.application.command.ExtendLoanCommand;
 
 public interface IExtendLoan {
 
-  void extend(ExtendLoanCommand command);
+  void extendLoan(ExtendLoanCommand command);
 }

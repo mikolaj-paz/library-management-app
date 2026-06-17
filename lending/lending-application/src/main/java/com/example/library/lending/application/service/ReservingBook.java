@@ -10,7 +10,7 @@ import com.example.library.lending.domain.reservation.ReservationFactory;
 import com.example.library.sharedkernel.identifier.ReservationId;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 
-public class ReserveBookService implements IReserveBook {
+public class ReservingBook implements IReserveBook {
 
   private final ReaderRepository readerRepository;
   private final BookCopyRepository bookCopyRepository;
@@ -18,7 +18,7 @@ public class ReserveBookService implements IReserveBook {
   private final ReservationRepository reservationRepository;
   private final DomainEventPublisher eventPublisher;
 
-  public ReserveBookService(
+  public ReservingBook(
       ReaderRepository readerRepository,
       BookCopyRepository bookCopyRepository,
       ReservationFactory reservationFactory,
@@ -32,7 +32,7 @@ public class ReserveBookService implements IReserveBook {
   }
 
   @Override
-  public ReservationId reserve(ReserveBook command) {
+  public ReservationId reserveBook(ReserveBook command) {
     // 2. Weryfikacja reguł Konta Czytelnika.
     var readerId = command.readerId();
     var reader =

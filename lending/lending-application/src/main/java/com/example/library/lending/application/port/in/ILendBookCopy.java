@@ -5,5 +5,5 @@ import com.example.library.sharedkernel.identifier.LoanId;
 
 public interface ILendBookCopy {
 
-  LoanId lend(LendBookCopy command);
+  LoanId lendBookCopy(LendBookCopy command);
 }

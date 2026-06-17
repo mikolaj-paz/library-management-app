@@ -6,16 +6,16 @@ import com.example.library.catalog.application.query.BookSearchResult;
 import com.example.library.catalog.application.query.SearchCatalog;
 import java.util.List;
 
-public class SearchCatalogService implements ISearchCatalog {
+public class SearchingCatalog implements ISearchCatalog {
 
   private final CatalogQueryPort catalogQueryPort;
 
-  public SearchCatalogService(CatalogQueryPort catalogQueryPort) {
+  public SearchingCatalog(CatalogQueryPort catalogQueryPort) {
     this.catalogQueryPort = catalogQueryPort;
   }
 
   @Override
-  public List<BookSearchResult> search(SearchCatalog query) {
+  public List<BookSearchResult> searchCatalog(SearchCatalog query) {
     return catalogQueryPort.searchBooks(query.phrase());
   }
 }

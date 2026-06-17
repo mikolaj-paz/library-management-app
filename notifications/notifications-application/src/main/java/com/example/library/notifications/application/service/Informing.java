@@ -5,11 +5,11 @@ import com.example.library.notifications.application.port.in.IInform;
 import com.example.library.notifications.application.port.out.NotificationSender;
 import com.example.library.notifications.domain.notification.Notification;
 
-public class InformService implements IInform {
+public class Informing implements IInform {
 
   private final NotificationSender notificationSender;
 
-  public InformService(NotificationSender notificationSender) {
+  public Informing(NotificationSender notificationSender) {
     this.notificationSender = notificationSender;
   }
 

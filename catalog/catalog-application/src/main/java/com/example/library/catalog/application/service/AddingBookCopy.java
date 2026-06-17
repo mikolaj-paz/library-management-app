@@ -9,14 +9,14 @@ import com.example.library.catalog.domain.copy.BookCopyFactory;
 import com.example.library.sharedkernel.identifier.BookCopyId;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 
-public class AddBookCopyService implements IAddBookCopy {
+public class AddingBookCopy implements IAddBookCopy {
 
   private final BookCopyFactory bookCopyFactory;
   private final BookCopyRepository bookCopyRepository;
   private final BookRepository bookRepository;
   private final DomainEventPublisher eventPublisher;
 
-  public AddBookCopyService(
+  public AddingBookCopy(
       BookCopyFactory bookCopyFactory,
       BookCopyRepository bookCopyRepository,
       BookRepository bookRepository,
@@ -28,7 +28,7 @@ public class AddBookCopyService implements IAddBookCopy {
   }
 
   @Override
-  public BookCopyId add(AddBookCopy command) {
+  public BookCopyId addBookCopy(AddBookCopy command) {
     var bookId = command.bookId();
     bookRepository
         .find(bookId)

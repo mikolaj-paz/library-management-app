@@ -29,7 +29,7 @@ public class ReservationController {
     try {
       var readerId = ReaderId.of(request.readerId());
       var bookId = BookId.of(request.bookId());
-      var result = reserveBookService.reserve(new ReserveBook(readerId, bookId));
+      var result = reserveBookService.reserveBook(new ReserveBook(readerId, bookId));
 
       return ResponseEntity.ok(Map.of("reservationId", result.value().toString()));
     } catch (ReaderBlockedException | LoanLimitExceededException e) {

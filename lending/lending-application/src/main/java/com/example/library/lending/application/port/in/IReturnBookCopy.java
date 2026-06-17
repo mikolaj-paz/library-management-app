@@ -4,5 +4,5 @@ import com.example.library.lending.application.command.ReturnBookCopy;
 
 public interface IReturnBookCopy {
 
-  void returnCopy(ReturnBookCopy command);
+  void returnBookCopy(ReturnBookCopy command);
 }

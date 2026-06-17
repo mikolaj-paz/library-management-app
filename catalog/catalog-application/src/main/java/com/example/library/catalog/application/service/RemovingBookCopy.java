@@ -5,19 +5,19 @@ import com.example.library.catalog.application.port.in.IRemoveBookCopy;
 import com.example.library.catalog.application.repository.BookCopyRepository;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 
-public class RemoveBookCopyService implements IRemoveBookCopy {
+public class RemovingBookCopy implements IRemoveBookCopy {
 
   private final BookCopyRepository bookCopyRepository;
   private final DomainEventPublisher eventPublisher;
 
-  public RemoveBookCopyService(
+  public RemovingBookCopy(
       BookCopyRepository bookCopyRepository, DomainEventPublisher eventPublisher) {
     this.bookCopyRepository = bookCopyRepository;
     this.eventPublisher = eventPublisher;
   }
 
   @Override
-  public void remove(RemoveBookCopy command) {
+  public void removeBookCopy(RemoveBookCopy command) {
     var bookCopyId = command.bookCopyId();
     var bookCopy =
         bookCopyRepository

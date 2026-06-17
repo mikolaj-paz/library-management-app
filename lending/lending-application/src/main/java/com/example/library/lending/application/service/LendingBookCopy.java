@@ -9,7 +9,7 @@ import com.example.library.lending.domain.loan.LoanFactory;
 import com.example.library.sharedkernel.identifier.LoanId;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 
-public class LendBookCopyService implements ILendBookCopy {
+public class LendingBookCopy implements ILendBookCopy {
 
   private final LoanFactory loanFactory;
   private final LoanRepository loanRepository;
@@ -17,7 +17,7 @@ public class LendBookCopyService implements ILendBookCopy {
   private final ReaderRepository readerRepository;
   private final DomainEventPublisher eventPublisher;
 
-  public LendBookCopyService(
+  public LendingBookCopy(
       LoanRepository loanRepository,
       BookCopyRepository bookCopyRepository,
       ReaderRepository readerRepository,
@@ -31,7 +31,7 @@ public class LendBookCopyService implements ILendBookCopy {
   }
 
   @Override
-  public LoanId lend(LendBookCopy command) {
+  public LoanId lendBookCopy(LendBookCopy command) {
     var readerId = command.readerId();
     var bookCopyId = command.bookCopyId();
 

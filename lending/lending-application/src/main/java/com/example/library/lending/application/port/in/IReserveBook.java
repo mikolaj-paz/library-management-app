@@ -5,5 +5,5 @@ import com.example.library.sharedkernel.identifier.ReservationId;
 
 public interface IReserveBook {
 
-  ReservationId reserve(ReserveBook command);
+  ReservationId reserveBook(ReserveBook command);
 }

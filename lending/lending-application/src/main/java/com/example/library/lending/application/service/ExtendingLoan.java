@@ -8,14 +8,14 @@ import com.example.library.lending.application.repository.LoanRepository;
 import com.example.library.lending.domain.exception.ExtensionNotAllowedException;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 
-public class ExtendLoanService implements IExtendLoan {
+public class ExtendingLoan implements IExtendLoan {
 
   private final LoanRepository loanRepository;
   private final BookRepository bookRepository;
   private final BookCopyRepository bookCopyRepository;
   private final DomainEventPublisher eventPublisher;
 
-  public ExtendLoanService(
+  public ExtendingLoan(
       LoanRepository loanRepository,
       BookRepository bookRepository,
       BookCopyRepository bookCopyRepository,
@@ -27,7 +27,7 @@ public class ExtendLoanService implements IExtendLoan {
   }
 
   @Override
-  public void extend(ExtendLoanCommand command) {
+  public void extendLoan(ExtendLoanCommand command) {
     var loanId = command.loanId();
     var readerId = command.readerId();
 

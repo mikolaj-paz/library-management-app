@@ -10,11 +10,11 @@ import com.example.library.catalog.application.port.out.BookPersistencePort;
 import com.example.library.catalog.application.port.out.CatalogQueryPort;
 import com.example.library.catalog.application.repository.BookCopyRepository;
 import com.example.library.catalog.application.repository.BookRepository;
-import com.example.library.catalog.application.service.AddBookCopyService;
 import com.example.library.catalog.application.service.AddingBook;
-import com.example.library.catalog.application.service.GetBookDetailsService;
-import com.example.library.catalog.application.service.RemoveBookCopyService;
-import com.example.library.catalog.application.service.SearchCatalogService;
+import com.example.library.catalog.application.service.AddingBookCopy;
+import com.example.library.catalog.application.service.GettingBookDetails;
+import com.example.library.catalog.application.service.RemovingBookCopy;
+import com.example.library.catalog.application.service.SearchingCatalog;
 import com.example.library.catalog.domain.book.BookFactory;
 import com.example.library.catalog.domain.book.BookFactoryImpl;
 import com.example.library.catalog.domain.copy.BookCopyFactory;
@@ -77,22 +77,22 @@ public class CatalogConfig {
   }
 
   @Bean
-  ISearchCatalog searchCatalog(CatalogQueryPort catalogQueryPort) {
-    return new SearchCatalogService(catalogQueryPort);
+  ISearchCatalog searchingCatalog(CatalogQueryPort catalogQueryPort) {
+    return new SearchingCatalog(catalogQueryPort);
   }
 
   @Bean
-  IGetBookDetails getBookDetails(CatalogQueryPort catalogQueryPort) {
-    return new GetBookDetailsService(catalogQueryPort);
+  IGetBookDetails gettingBookDetails(CatalogQueryPort catalogQueryPort) {
+    return new GettingBookDetails(catalogQueryPort);
   }
 
   @Bean
-  IAddBookCopy addBookCopy(
+  IAddBookCopy addingBookCopy(
       BookCopyFactory catalogBookCopyFactory,
       BookCopyRepository catalogBookCopyRepository,
       BookRepository catalogBookRepository,
       @Qualifier("catalogDomainEventPublisher") DomainEventPublisher catalogDomainEventPublisher) {
-    return new AddBookCopyService(
+    return new AddingBookCopy(
         catalogBookCopyFactory,
         catalogBookCopyRepository,
         catalogBookRepository,
@@ -100,14 +100,14 @@ public class CatalogConfig {
   }
 
   @Bean
-  IRemoveBookCopy removeBookCopy(
+  IRemoveBookCopy removingBookCopy(
       BookCopyRepository catalogBookCopyRepository,
       @Qualifier("catalogDomainEventPublisher") DomainEventPublisher catalogDomainEventPublisher) {
-    return new RemoveBookCopyService(catalogBookCopyRepository, catalogDomainEventPublisher);
+    return new RemovingBookCopy(catalogBookCopyRepository, catalogDomainEventPublisher);
   }
 
   @Bean
-  IAddBook addBook(
+  IAddBook addingBook(
       BookFactory catalogBookFactory,
       BookRepository catalogBookRepository,
       @Qualifier("catalogDomainEventPublisher") DomainEventPublisher catalogDomainEventPublisher) {

@@ -5,5 +5,5 @@ import com.example.library.catalog.application.query.SearchCatalog;
 import java.util.List;
 
 public interface ISearchCatalog {
-  List<BookSearchResult> search(SearchCatalog query);
+  List<BookSearchResult> searchCatalog(SearchCatalog query);
 }

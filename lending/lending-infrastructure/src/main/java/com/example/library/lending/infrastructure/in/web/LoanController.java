@@ -50,7 +50,7 @@ public class LoanController {
     try {
       var command =
           new LendBookCopy(BookCopyId.of(request.bookCopyId()), ReaderId.of(request.readerId()));
-      var loanId = lendBookCopyService.lend(command);
+      var loanId = lendBookCopyService.lendBookCopy(command);
       return ResponseEntity.ok(Map.of("loanId", loanId.value().toString()));
     } catch (ReaderBlockedException | LoanLimitExceededException e) {
       return ResponseEntity.unprocessableEntity().body(Map.of("error", e.getMessage()));
@@ -66,7 +66,7 @@ public class LoanController {
   @PostMapping("/return/{bookCopyId}")
   public ResponseEntity<?> returnBookCopy(@PathVariable("bookCopyId") String bookCopyId) {
     try {
-      returnBookCopyService.returnCopy(new ReturnBookCopy(BookCopyId.of(bookCopyId)));
+      returnBookCopyService.returnBookCopy(new ReturnBookCopy(BookCopyId.of(bookCopyId)));
       return ResponseEntity.ok(Map.of("message", "Book copy returned successfully"));
     } catch (LoanNotFoundException e) {
       return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
@@ -80,7 +80,7 @@ public class LoanController {
       @PathVariable("loanId") String loanId, @RequestBody ExtendLoanRequest request) {
     try {
       var command = new ExtendLoanCommand(LoanId.of(loanId), ReaderId.of(request.readerId()));
-      extendLoanService.extend(command);
+      extendLoanService.extendLoan(command);
       return ResponseEntity.ok(Map.of("message", "Loan extended successfully"));
     } catch (ExtensionNotAllowedException e) {
       return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
@@ -93,7 +93,7 @@ public class LoanController {
 
   @PostMapping("/list")
   public ResponseEntity<?> showLoans(@RequestParam("readerId") String readerId) {
-    var results = showLoansService.show(new ShowLoans(ReaderId.of(readerId)));
+    var results = showLoansService.showLoans(new ShowLoans(ReaderId.of(readerId)));
     return ResponseEntity.ok(results);
   }
 }
