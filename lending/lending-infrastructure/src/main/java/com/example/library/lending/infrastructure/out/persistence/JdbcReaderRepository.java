@@ -39,4 +39,12 @@ public class JdbcReaderRepository implements ReaderPersistencePort {
             id.value().toString());
     return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
   }
+
+  @Override
+  public void update(Reader reader) {
+    jdbc.update(
+        "UPDATE readers SET status = ? WHERE id = ?",
+        reader.status().toString(),
+        reader.id().value().toString());
+  }
 }

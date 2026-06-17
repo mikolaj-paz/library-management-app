@@ -16,4 +16,8 @@ public class ReaderRepository {
   public Optional<Reader> find(ReaderId id) {
     return persistencePort.find(id);
   }
+
+  public void update(Reader reader) {
+    persistencePort.update(reader);
+  }
 }

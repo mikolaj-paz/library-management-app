@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface ReaderPersistencePort {
 
   Optional<Reader> find(ReaderId id);
+
+  void update(Reader reader);
 }

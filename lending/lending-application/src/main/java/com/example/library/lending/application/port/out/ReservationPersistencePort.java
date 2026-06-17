@@ -1,8 +1,11 @@
 package com.example.library.lending.application.port.out;
 
 import com.example.library.lending.domain.reservation.Reservation;
+import java.util.List;
 
 public interface ReservationPersistencePort {
 
   void create(Reservation reservation);
+
+  List<Reservation> findExpiredReservations();
 }

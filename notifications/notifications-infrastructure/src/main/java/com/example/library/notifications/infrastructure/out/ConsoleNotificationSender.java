@@ -8,7 +8,10 @@ public class ConsoleNotificationSender implements NotificationSender {
   @Override
   public void send(Notification notification) {
     System.out.printf(
-        "[NOTIFICATION] type=%-25s readerId=%s message=%s%n",
-        notification.type(), notification.readerId(), notification.message());
+        "[%s][NOTIFICATION] type=%-25s readerId=%s message=%s%n",
+        notification.occurredOn(),
+        notification.type(),
+        notification.readerId().value().toString(),
+        notification.message());
   }
 }

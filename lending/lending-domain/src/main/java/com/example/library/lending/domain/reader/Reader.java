@@ -7,7 +7,7 @@ import com.example.library.sharedkernel.identifier.ReaderId;
 
 public class Reader extends AggregateRoot<ReaderId> {
 
-  private final ReaderStatus status;
+  private ReaderStatus status;
   private int activeLoansCount;
 
   private Reader(ReaderId id, ReaderStatus status, int activeLoansCount) {
@@ -44,5 +44,9 @@ public class Reader extends AggregateRoot<ReaderId> {
 
   public void verifyReservationEligibility() {
     verifyEligibility();
+  }
+
+  public void block() {
+    this.status = ReaderStatus.BLOCKED;
   }
 }

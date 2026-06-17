@@ -3,6 +3,7 @@ package com.example.library.lending.domain.copy;
 import com.example.library.lending.domain.exception.BookCopyNotAvailableException;
 import com.example.library.sharedkernel.entity.AggregateRoot;
 import com.example.library.sharedkernel.event.BookCopyLoaned;
+import com.example.library.sharedkernel.event.BookCopyReservationExpired;
 import com.example.library.sharedkernel.event.BookCopyReserved;
 import com.example.library.sharedkernel.event.BookCopyReturned;
 import com.example.library.sharedkernel.identifier.BookCopyId;
@@ -67,5 +68,11 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
   public void returnIt(ReaderId readerId, boolean isOverdue) {
     this.status = BookCopyStatus.AVAILABLE;
     this.registerEvent(new BookCopyReturned(readerId, this.id(), isOverdue));
+  }
+
+  public void expireReservation() {
+    this.status = BookCopyStatus.AVAILABLE;
+    this.reservedBy = null;
+    this.registerEvent(new BookCopyReservationExpired(this.id()));
   }
 }

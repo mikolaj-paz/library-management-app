@@ -1,5 +1,6 @@
 package com.example.library.lending.infrastructure.config;
 
+import com.example.library.lending.application.port.in.IExpireReservations;
 import com.example.library.lending.application.port.in.IExtendLoan;
 import com.example.library.lending.application.port.in.IJoinWaitingQueue;
 import com.example.library.lending.application.port.in.ILendBookCopy;
@@ -16,6 +17,7 @@ import com.example.library.lending.application.repository.BookRepository;
 import com.example.library.lending.application.repository.LoanRepository;
 import com.example.library.lending.application.repository.ReaderRepository;
 import com.example.library.lending.application.repository.ReservationRepository;
+import com.example.library.lending.application.service.ExpiringReservations;
 import com.example.library.lending.application.service.ExtendLoanService;
 import com.example.library.lending.application.service.JoiningWaitingQueue;
 import com.example.library.lending.application.service.LendBookCopyService;
@@ -32,6 +34,7 @@ import com.example.library.lending.domain.reader.ReaderFactory;
 import com.example.library.lending.domain.reader.ReaderFactoryImpl;
 import com.example.library.lending.domain.reservation.ReservationFactory;
 import com.example.library.lending.domain.reservation.ReservationFactoryImpl;
+import com.example.library.lending.infrastructure.in.events.FreeBookCopyOnReservationExpirationListener;
 import com.example.library.lending.infrastructure.out.DomainEventPublisherImpl;
 import com.example.library.lending.infrastructure.out.persistence.JdbcBookCopyRepository;
 import com.example.library.lending.infrastructure.out.persistence.JdbcBookRepository;
@@ -98,8 +101,9 @@ public class LendingConfig {
   }
 
   @Bean
-  ReservationPersistencePort lendingReservationPersistencePort(JdbcTemplate jdbc) {
-    return new JdbcReservationRepository(jdbc);
+  ReservationPersistencePort lendingReservationPersistencePort(
+      JdbcTemplate jdbc, ReservationFactory lendingReservationFactory) {
+    return new JdbcReservationRepository(jdbc, lendingReservationFactory);
   }
 
   @Bean
@@ -127,6 +131,12 @@ public class LendingConfig {
   ReservationRepository lendingReservationRepository(
       ReservationPersistencePort lendingReservationPersistencePort) {
     return new ReservationRepository(lendingReservationPersistencePort);
+  }
+
+  @Bean
+  FreeBookCopyOnReservationExpirationListener freeBookCopyOnReservationExpirationListener(
+      BookCopyRepository lendingBookCopyRepository) {
+    return new FreeBookCopyOnReservationExpirationListener(lendingBookCopyRepository);
   }
 
   @Bean
@@ -196,5 +206,12 @@ public class LendingConfig {
       BookRepository lendingBookRepository,
       @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
     return new JoiningWaitingQueue(lendingBookRepository, lendingDomainEventPublisher);
+  }
+
+  @Bean
+  IExpireReservations expireReservations(
+      ReservationRepository lendingReservationRepository,
+      @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
+    return new ExpiringReservations(lendingReservationRepository, lendingDomainEventPublisher);
   }
 }

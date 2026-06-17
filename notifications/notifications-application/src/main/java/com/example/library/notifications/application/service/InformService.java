@@ -16,7 +16,8 @@ public class InformService implements IInform {
   @Override
   public void inform(InformCommand data) {
 
-    var notification = new Notification(data.readerId(), data.type(), data.message());
+    var notification =
+        new Notification(data.readerId(), data.type(), data.message(), data.occurredOn());
 
     notificationSender.send(notification);
   }
