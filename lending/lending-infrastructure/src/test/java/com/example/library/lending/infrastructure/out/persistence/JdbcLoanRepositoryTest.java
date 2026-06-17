@@ -85,8 +85,7 @@ class JdbcLoanRepositoryTest {
   private void insertLoan(ReaderId readerId, BookCopyId copyId, LoanStatus status) {
     var loan =
         new LoanFactoryImpl()
-            .reconstitute(
-                LoanId.create(), readerId, copyId, LocalDate.of(2026, 1, 1), status);
+            .reconstitute(LoanId.create(), readerId, copyId, LocalDate.of(2026, 1, 1), status);
     repository.create(loan);
   }
 }

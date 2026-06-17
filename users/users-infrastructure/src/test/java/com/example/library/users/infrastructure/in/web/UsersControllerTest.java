@@ -62,8 +62,7 @@ class UsersControllerTest {
 
     var response =
         controller.unblockReaderAccount(
-            new UsersController.UnblockReaderAccountRequest(
-                readerAccountId.value().toString()));
+            new UsersController.UnblockReaderAccountRequest(readerAccountId.value().toString()));
 
     assertThat(response.getStatusCode().value()).isEqualTo(200);
     assertThat(response.getBody())
@@ -83,8 +82,7 @@ class UsersControllerTest {
 
     var response =
         controller.unblockReaderAccount(
-            new UsersController.UnblockReaderAccountRequest(
-                readerAccountId.value().toString()));
+            new UsersController.UnblockReaderAccountRequest(readerAccountId.value().toString()));
 
     assertThat(response.getStatusCode().value()).isEqualTo(400);
     assertThat(response.getBody().toString()).contains("error");

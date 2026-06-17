@@ -64,7 +64,8 @@ class UnblockingUserAccountTest {
     when(readerAccountRepository.find(readerAccountId)).thenReturn(Optional.empty());
     var service = new UnblockingUserAccount(readerAccountRepository, eventPublisher);
 
-    assertThatThrownBy(() -> service.unblockReaderAccount(new UnblockReaderAccount(readerAccountId)))
+    assertThatThrownBy(
+            () -> service.unblockReaderAccount(new UnblockReaderAccount(readerAccountId)))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("Reader account not found");
 
