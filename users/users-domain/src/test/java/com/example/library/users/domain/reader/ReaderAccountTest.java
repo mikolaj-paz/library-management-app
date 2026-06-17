@@ -25,7 +25,8 @@ class ReaderAccountTest {
   }
 
   @Test
-  @Disabled("TODO: ReaderAccountRegisteredEvent currently serializes ReaderAccountId via record toString")
+  @Disabled(
+      "TODO: ReaderAccountRegisteredEvent currently serializes ReaderAccountId via record toString")
   void should_register_reader_account_registered_event() {
     var account =
         new ReaderAccountFactoryImpl()

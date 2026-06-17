@@ -32,7 +32,8 @@ class RemoveBookCopyServiceTest {
   @Mock private DomainEventPublisher eventPublisher;
 
   @Test
-  @Disabled("TODO: Reconstituted BookCopy currently carries BookCopyAdded and publishes an extra event")
+  @Disabled(
+      "TODO: Reconstituted BookCopy currently carries BookCopyAdded and publishes an extra event")
   void should_withdraw_available_copy_and_publish_event() {
     var copyId = BookCopyId.create();
     var copy =

@@ -140,7 +140,8 @@ class LendingAcceptanceTest {
   }
 
   @Test
-  @Disabled("TODO: Bootstrap Flyway schema does not yet include book publisher/publication_date columns")
+  @Disabled(
+      "TODO: Bootstrap Flyway schema does not yet include book publisher/publication_date columns")
   void should_add_book_and_persist_metadata() throws Exception {
     mockMvc
         .perform(post("/books").contentType(MediaType.APPLICATION_JSON).content(addBookRequest()))
@@ -199,7 +200,8 @@ class LendingAcceptanceTest {
   }
 
   @Test
-  @Disabled("TODO: JdbcBookRepository currently does not handle null queued_reader_id during extension")
+  @Disabled(
+      "TODO: JdbcBookRepository currently does not handle null queued_reader_id during extension")
   void should_extend_loan_and_show_it_on_reader_loan_list() throws Exception {
     var readerId = ReaderId.create();
     var bookId = BookId.of(UUID.randomUUID().toString());
