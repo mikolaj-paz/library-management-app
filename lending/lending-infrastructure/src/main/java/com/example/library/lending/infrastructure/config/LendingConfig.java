@@ -2,6 +2,8 @@ package com.example.library.lending.infrastructure.config;
 
 import com.example.library.lending.application.port.in.IExpireReservations;
 import com.example.library.lending.application.port.in.IExtendLoan;
+import com.example.library.lending.application.port.in.IHandleOverdueBookReturn;
+import com.example.library.lending.application.port.in.IHandleReservationExpired;
 import com.example.library.lending.application.port.in.IJoinWaitingQueue;
 import com.example.library.lending.application.port.in.ILendBookCopy;
 import com.example.library.lending.application.port.in.IReserveBook;
@@ -19,6 +21,8 @@ import com.example.library.lending.application.repository.ReaderRepository;
 import com.example.library.lending.application.repository.ReservationRepository;
 import com.example.library.lending.application.service.ExpiringReservations;
 import com.example.library.lending.application.service.ExtendingLoan;
+import com.example.library.lending.application.service.HandlingOverdueBookReturn;
+import com.example.library.lending.application.service.HandlingReservationExpired;
 import com.example.library.lending.application.service.JoiningWaitingQueue;
 import com.example.library.lending.application.service.LendingBookCopy;
 import com.example.library.lending.application.service.ReservingBook;
@@ -34,6 +38,7 @@ import com.example.library.lending.domain.reader.ReaderFactory;
 import com.example.library.lending.domain.reader.ReaderFactoryImpl;
 import com.example.library.lending.domain.reservation.ReservationFactory;
 import com.example.library.lending.domain.reservation.ReservationFactoryImpl;
+import com.example.library.lending.infrastructure.in.events.BookCopyReturnOverdueListener;
 import com.example.library.lending.infrastructure.in.events.FreeBookCopyOnReservationExpirationListener;
 import com.example.library.lending.infrastructure.out.DomainEventPublisherImpl;
 import com.example.library.lending.infrastructure.out.persistence.JdbcBookCopyRepository;
@@ -134,9 +139,26 @@ public class LendingConfig {
   }
 
   @Bean
-  FreeBookCopyOnReservationExpirationListener freeBookCopyOnReservationExpirationListener(
+  IHandleOverdueBookReturn handlingOverdueBookReturn(ReaderRepository lendingReaderRepository) {
+    return new HandlingOverdueBookReturn(lendingReaderRepository);
+  }
+
+  @Bean
+  IHandleReservationExpired handlingReservationExpired(
       BookCopyRepository lendingBookCopyRepository) {
-    return new FreeBookCopyOnReservationExpirationListener(lendingBookCopyRepository);
+    return new HandlingReservationExpired(lendingBookCopyRepository);
+  }
+
+  @Bean
+  BookCopyReturnOverdueListener bookCopyReturnOverdueListener(
+      IHandleOverdueBookReturn handlingOverdueBookReturn) {
+    return new BookCopyReturnOverdueListener(handlingOverdueBookReturn);
+  }
+
+  @Bean
+  FreeBookCopyOnReservationExpirationListener freeBookCopyOnReservationExpirationListener(
+      IHandleReservationExpired handlingReservationExpired) {
+    return new FreeBookCopyOnReservationExpirationListener(handlingReservationExpired);
   }
 
   @Bean
