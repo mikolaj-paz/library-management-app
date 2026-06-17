@@ -37,6 +37,11 @@
             <artifactId>notifications-application</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>users-application</artifactId>
+        </dependency>
+
         <!-- Infrastructure pulled in for Spring DI wiring — no direct calls to infra from controllers -->
         <dependency>
             <groupId>com.example</groupId>
@@ -51,6 +56,11 @@
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>notifications-infrastructure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>users-infrastructure</artifactId>
         </dependency>
 
         <!-- Spring Web MVC -->
