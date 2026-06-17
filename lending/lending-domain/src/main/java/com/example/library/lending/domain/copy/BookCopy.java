@@ -25,6 +25,16 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
     this.bookId = bookId;
   }
 
+  private void canBeLoanedBy(ReaderId readerId) {
+    if (status == BookCopyStatus.AVAILABLE) {
+      return;
+    }
+    if (status == BookCopyStatus.RESERVED && readerId.equals(reservedBy)) {
+      return;
+    }
+    throw new BookCopyNotAvailableException(this.id());
+  }
+
   static BookCopy of(BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
     return new BookCopy(id, status, reservedBy, bookId);
   }
@@ -41,17 +51,8 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
     return bookId;
   }
 
-  public void canBeLoanedBy(ReaderId readerId) {
-    if (status == BookCopyStatus.AVAILABLE) {
-      return;
-    }
-    if (status == BookCopyStatus.RESERVED && readerId.equals(reservedBy)) {
-      return;
-    }
-    throw new BookCopyNotAvailableException(this.id());
-  }
-
   public void lend(ReaderId readerId, LoanId loanId) {
+    canBeLoanedBy(readerId);
     this.status = BookCopyStatus.LOANED;
     this.reservedBy = null;
     this.registerEvent(new BookCopyLoaned(loanId, readerId, this.id()));

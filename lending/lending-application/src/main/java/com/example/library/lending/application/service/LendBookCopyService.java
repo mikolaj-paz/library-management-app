@@ -35,17 +35,18 @@ public class LendBookCopyService implements ILendBookCopy {
     var readerId = command.readerId();
     var bookCopyId = command.bookCopyId();
 
-    // 2. System weryfikuje w bazie danych możliwość wypożyczenia książki przez tego czytelnika.
-    var bookCopy =
-        bookCopyRepository
-            .find(bookCopyId)
-            .orElseThrow(() -> new IllegalArgumentException("Book copy not found: " + bookCopyId));
     var reader =
         readerRepository
             .find(readerId)
             .orElseThrow(() -> new IllegalArgumentException("Reader not found: " + readerId));
+
+    var bookCopy =
+        bookCopyRepository
+            .find(bookCopyId)
+            .orElseThrow(() -> new IllegalArgumentException("Book copy not found: " + bookCopyId));
+
+    // 2. System weryfikuje w bazie danych możliwość wypożyczenia książki przez tego czytelnika.
     reader.verifyLoanEligibility();
-    bookCopy.canBeLoanedBy(readerId);
 
     // 3. Utworzenie nowego obiektu wypożyczenia oraz automatyczne wyznaczenie terminu zwrotu.
     var loan = loanFactory.create(command.readerId(), command.bookCopyId());
