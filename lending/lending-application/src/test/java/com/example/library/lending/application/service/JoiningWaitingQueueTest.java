@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import com.example.library.lending.application.command.JoinWaitingQueue;
 import com.example.library.lending.application.repository.BookRepository;
-import com.example.library.lending.domain.book.Book;
 import com.example.library.lending.domain.book.BookFactoryImpl;
 import com.example.library.lending.domain.exception.BookAlreadyInReaderWaitingQueueException;
 import com.example.library.sharedkernel.event.DomainEvent;

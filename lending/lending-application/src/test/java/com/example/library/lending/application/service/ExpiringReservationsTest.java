@@ -34,8 +34,7 @@ class ExpiringReservationsTest {
     var bookCopyId = BookCopyId.create();
     var reservation =
         new ReservationFactoryImpl()
-            .reconstitute(
-                reservationId, readerId, bookCopyId, LocalDateTime.of(2026, 1, 1, 12, 0));
+            .reconstitute(reservationId, readerId, bookCopyId, LocalDateTime.of(2026, 1, 1, 12, 0));
     when(reservationRepository.findExpiredReservations()).thenReturn(List.of(reservation));
     var service = new ExpiringReservations(reservationRepository, eventPublisher);
 
