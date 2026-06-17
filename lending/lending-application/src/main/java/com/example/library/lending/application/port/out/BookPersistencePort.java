@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface BookPersistencePort {
 
   Optional<Book> find(BookId bookId);
+
+  void update(Book book);
 }

@@ -16,4 +16,8 @@ public class BookRepository {
   public Optional<Book> find(BookId bookId) {
     return persistencePort.find(bookId);
   }
+
+  public void update(Book book) {
+    persistencePort.update(book);
+  }
 }

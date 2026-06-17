@@ -3,7 +3,6 @@ package com.example.library.catalog.domain.book;
 import com.example.library.sharedkernel.entity.AggregateRoot;
 import com.example.library.sharedkernel.event.BookAddedEvent;
 import com.example.library.sharedkernel.identifier.BookId;
-import com.example.library.sharedkernel.identifier.ReaderId;
 import com.example.library.sharedkernel.valueobject.ISBN;
 import java.time.LocalDate;
 
@@ -13,7 +12,6 @@ public class Book extends AggregateRoot<BookId> {
   private final ISBN isbn;
   private final String publisher;
   private final LocalDate publicationDate;
-  private ReaderId queuedReaderId;
 
   private Book(
       BookId id,
@@ -21,15 +19,13 @@ public class Book extends AggregateRoot<BookId> {
       String author,
       ISBN isbn,
       String publisher,
-      LocalDate publicationDate,
-      ReaderId queuedReaderId) {
+      LocalDate publicationDate) {
     super(id);
     this.title = title;
     this.author = author;
     this.isbn = isbn;
     this.publisher = publisher;
     this.publicationDate = publicationDate;
-    this.queuedReaderId = queuedReaderId;
     registerEvent(new BookAddedEvent(id, title, author, isbn, publisher, publicationDate));
   }
 
@@ -39,9 +35,8 @@ public class Book extends AggregateRoot<BookId> {
       String author,
       ISBN isbn,
       String publisher,
-      LocalDate publicationDate,
-      ReaderId queuedReaderId) {
-    return new Book(id, title, author, isbn, publisher, publicationDate, queuedReaderId);
+      LocalDate publicationDate) {
+    return new Book(id, title, author, isbn, publisher, publicationDate);
   }
 
   public String title() {
@@ -54,10 +49,6 @@ public class Book extends AggregateRoot<BookId> {
 
   public ISBN isbn() {
     return isbn;
-  }
-
-  public ReaderId queuedReaderId() {
-    return queuedReaderId;
   }
 
   public String publisher() {

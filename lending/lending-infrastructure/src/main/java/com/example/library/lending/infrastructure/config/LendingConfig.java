@@ -1,6 +1,7 @@
 package com.example.library.lending.infrastructure.config;
 
 import com.example.library.lending.application.port.in.IExtendLoan;
+import com.example.library.lending.application.port.in.IJoinWaitingQueue;
 import com.example.library.lending.application.port.in.ILendBookCopy;
 import com.example.library.lending.application.port.in.IReserveBook;
 import com.example.library.lending.application.port.in.IReturnBookCopy;
@@ -16,6 +17,7 @@ import com.example.library.lending.application.repository.LoanRepository;
 import com.example.library.lending.application.repository.ReaderRepository;
 import com.example.library.lending.application.repository.ReservationRepository;
 import com.example.library.lending.application.service.ExtendLoanService;
+import com.example.library.lending.application.service.JoiningWaitingQueue;
 import com.example.library.lending.application.service.LendBookCopyService;
 import com.example.library.lending.application.service.ReserveBookService;
 import com.example.library.lending.application.service.ReturnBookCopyService;
@@ -189,5 +191,12 @@ public class LendingConfig {
   @Bean
   IShowLoans showLoans(LoanRepository lendingLoanRepository) {
     return new ShowLoansService(lendingLoanRepository);
+  }
+
+  @Bean
+  IJoinWaitingQueue joinWaitingQueue(
+      BookRepository lendingBookRepository,
+      @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
+    return new JoiningWaitingQueue(lendingBookRepository, lendingDomainEventPublisher);
   }
 }

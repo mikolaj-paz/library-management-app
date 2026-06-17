@@ -4,7 +4,6 @@ import com.example.library.catalog.application.port.out.BookPersistencePort;
 import com.example.library.catalog.domain.book.Book;
 import com.example.library.catalog.domain.book.BookFactory;
 import com.example.library.sharedkernel.identifier.BookId;
-import com.example.library.sharedkernel.identifier.ReaderId;
 import com.example.library.sharedkernel.valueobject.ISBN;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,23 +28,19 @@ public class JdbcBookRepository implements BookPersistencePort {
         rs.getString("author"),
         new ISBN(rs.getString("isbn")),
         rs.getString("publisher"),
-        LocalDate.parse(rs.getString("publication_date")),
-        rs.getString("queued_reader_id") != null
-            ? ReaderId.of(rs.getString("queued_reader_id"))
-            : null);
+        LocalDate.parse(rs.getString("publication_date")));
   }
 
   @Override
   public void create(Book book) {
     jdbc.update(
-        "INSERT INTO books (id, title, author, isbn, publisher, publication_date, queued_reader_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO books (id, title, author, isbn, publisher, publication_date) VALUES (?, ?, ?, ?, ?, ?)",
         book.id().value().toString(),
         book.title(),
         book.author(),
         book.isbn().value(),
         book.publisher(),
-        book.publicationDate().toString(),
-        book.queuedReaderId() != null ? book.queuedReaderId().value().toString() : null);
+        book.publicationDate().toString());
   }
 
   @Override

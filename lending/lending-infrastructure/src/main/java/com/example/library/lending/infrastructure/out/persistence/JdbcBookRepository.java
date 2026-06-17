@@ -6,6 +6,7 @@ import com.example.library.lending.domain.book.BookFactory;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class JdbcBookRepository implements BookPersistencePort {
@@ -20,13 +21,40 @@ public class JdbcBookRepository implements BookPersistencePort {
 
   @Override
   public Optional<Book> find(BookId bookId) {
-    var result =
+    var books =
         jdbc.query(
-            "SELECT queued_reader_id FROM books WHERE id = ?",
-            (rs, rowNum) ->
-                bookFactory.reconstitute(bookId, ReaderId.of(rs.getString("queued_reader_id"))),
+            "SELECT id FROM books WHERE id = ?",
+            (rs, rowNum) -> BookId.of(rs.getString("id")),
             bookId.value().toString());
 
-    return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+    if (books.isEmpty()) {
+      return Optional.empty();
+    }
+
+    var waitingQueue =
+        jdbc.query(
+            "SELECT reader_id FROM book_waiting_queue WHERE book_id = ? ORDER BY queue_position ASC",
+            (rs, rowNum) -> ReaderId.of(rs.getString("reader_id")),
+            bookId.value().toString());
+
+    return Optional.of(bookFactory.reconstitute(bookId, waitingQueue));
+  }
+
+  @Override
+  public void update(Book book) {
+    var bookId = book.id().value().toString();
+    var waitingQueue = book.waitingQueue();
+
+    jdbc.update("DELETE FROM book_waiting_queue WHERE book_id = ?", bookId);
+
+    for (int index = 0; index < waitingQueue.size(); index++) {
+      var readerId = waitingQueue.get(index);
+      jdbc.update(
+          "INSERT INTO book_waiting_queue (id, book_id, reader_id, queue_position) VALUES (?, ?, ?, ?)",
+          UUID.randomUUID().toString(),
+          bookId,
+          readerId.value().toString(),
+          index + 1);
+    }
   }
 }
