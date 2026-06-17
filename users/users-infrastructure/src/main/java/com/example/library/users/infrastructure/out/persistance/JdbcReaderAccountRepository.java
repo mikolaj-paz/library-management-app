@@ -5,6 +5,8 @@ import com.example.library.users.application.port.out.ReaderAccountPersistancePo
 import com.example.library.users.domain.reader.ReaderAccount;
 import com.example.library.users.domain.reader.ReaderAccountFactory;
 import com.example.library.users.domain.reader.ReaderAccountStatus;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -16,6 +18,17 @@ public class JdbcReaderAccountRepository implements ReaderAccountPersistancePort
   public JdbcReaderAccountRepository(JdbcTemplate jdbc, ReaderAccountFactory readerAccountFactory) {
     this.jdbc = jdbc;
     this.readerAccountFactory = readerAccountFactory;
+  }
+
+  private ReaderAccount createReaderAccountFromResultSet(ResultSet rs) throws SQLException {
+    return readerAccountFactory.reconstitute(
+        ReaderAccountId.of(rs.getString("id")),
+        rs.getString("name"),
+        rs.getString("surname"),
+        rs.getString("email"),
+        rs.getString("telephone"),
+        rs.getString("password"),
+        ReaderAccountStatus.valueOf(rs.getString("status")));
   }
 
   @Override
@@ -36,17 +49,31 @@ public class JdbcReaderAccountRepository implements ReaderAccountPersistancePort
     var result =
         jdbc.query(
             "SELECT * FROM readers WHERE email = ?",
-            (rs, rowNum) -> {
-              return readerAccountFactory.reconstitute(
-                  ReaderAccountId.of(rs.getString("id")),
-                  rs.getString("name"),
-                  rs.getString("surname"),
-                  rs.getString("email"),
-                  rs.getString("telephone"),
-                  rs.getString("password"),
-                  ReaderAccountStatus.valueOf(rs.getString("status")));
-            },
+            (rs, rowNum) -> createReaderAccountFromResultSet(rs),
             email);
     return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+  }
+
+  @Override
+  public Optional<ReaderAccount> find(ReaderAccountId readerAccountId) {
+    var result =
+        jdbc.query(
+            "SELECT * FROM readers WHERE id = ?",
+            (rs, rowNum) -> createReaderAccountFromResultSet(rs),
+            readerAccountId.value().toString());
+    return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+  }
+
+  @Override
+  public void update(ReaderAccount readerAccount) {
+    jdbc.update(
+        "UPDATE readers SET name = ?, surname = ?, email = ?, telephone = ?, password = ?, status = ? WHERE id = ?",
+        readerAccount.name(),
+        readerAccount.surname(),
+        readerAccount.email(),
+        readerAccount.telephone(),
+        readerAccount.password(),
+        readerAccount.status().toString(),
+        readerAccount.id().value().toString());
   }
 }

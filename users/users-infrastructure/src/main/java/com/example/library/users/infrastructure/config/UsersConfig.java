@@ -2,9 +2,11 @@ package com.example.library.users.infrastructure.config;
 
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 import com.example.library.users.application.port.in.IRegisterReaderAccount;
+import com.example.library.users.application.port.in.IUnblockReaderAccount;
 import com.example.library.users.application.port.out.ReaderAccountPersistancePort;
-import com.example.library.users.application.repository.ReaderAcountRepository;
+import com.example.library.users.application.repository.ReaderAccountRepository;
 import com.example.library.users.application.service.RegisteringReaderAccount;
+import com.example.library.users.application.service.UnblockingUserAccount;
 import com.example.library.users.domain.reader.ReaderAccountFactory;
 import com.example.library.users.domain.reader.ReaderAccountFactoryImpl;
 import com.example.library.users.infrastructure.out.DomainEventPublisherImpl;
@@ -35,17 +37,24 @@ public class UsersConfig {
   }
 
   @Bean
-  ReaderAcountRepository usersReaderAccountRepository(
+  ReaderAccountRepository usersReaderAccountRepository(
       ReaderAccountPersistancePort usersReaderAccountPersistancePort) {
-    return new ReaderAcountRepository(usersReaderAccountPersistancePort);
+    return new ReaderAccountRepository(usersReaderAccountPersistancePort);
   }
 
   @Bean
   IRegisterReaderAccount registerReaderAccount(
       ReaderAccountFactory usersReaderAccountFactory,
-      ReaderAcountRepository usersReaderAccountRepository,
+      ReaderAccountRepository usersReaderAccountRepository,
       @Qualifier("usersDomainEventPublisher") DomainEventPublisher usersDomainEventPublisher) {
     return new RegisteringReaderAccount(
         usersReaderAccountRepository, usersReaderAccountFactory, usersDomainEventPublisher);
+  }
+
+  @Bean
+  IUnblockReaderAccount unblockReaderAccount(
+      ReaderAccountRepository usersReaderAccountRepository,
+      @Qualifier("usersDomainEventPublisher") DomainEventPublisher usersDomainEventPublisher) {
+    return new UnblockingUserAccount(usersReaderAccountRepository, usersDomainEventPublisher);
   }
 }

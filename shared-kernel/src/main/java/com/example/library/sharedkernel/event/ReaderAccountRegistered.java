@@ -2,7 +2,7 @@ package com.example.library.sharedkernel.event;
 
 import com.example.library.sharedkernel.identifier.ReaderAccountId;
 
-public class ReaderAccountRegisteredEvent extends DomainEvent {
+public class ReaderAccountRegistered extends DomainEvent {
 
   private final String readerAccountId;
   private final String email;
@@ -10,7 +10,7 @@ public class ReaderAccountRegisteredEvent extends DomainEvent {
   private final String surname;
   private final String telephone;
 
-  public ReaderAccountRegisteredEvent(
+  public ReaderAccountRegistered(
       ReaderAccountId id, String email, String name, String surname, String telephone) {
     super();
     this.readerAccountId = id.toString();

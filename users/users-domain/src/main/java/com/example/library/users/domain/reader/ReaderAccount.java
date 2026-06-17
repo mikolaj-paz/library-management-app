@@ -1,7 +1,8 @@
 package com.example.library.users.domain.reader;
 
 import com.example.library.sharedkernel.entity.AggregateRoot;
-import com.example.library.sharedkernel.event.ReaderAccountRegisteredEvent;
+import com.example.library.sharedkernel.event.ReaderAccountRegistered;
+import com.example.library.sharedkernel.event.ReaderAccountUnblocked;
 import com.example.library.sharedkernel.identifier.ReaderAccountId;
 
 public class ReaderAccount extends AggregateRoot<ReaderAccountId> {
@@ -11,7 +12,7 @@ public class ReaderAccount extends AggregateRoot<ReaderAccountId> {
   private final String surname;
   private final String telephone;
   private final String password;
-  private final ReaderAccountStatus status;
+  private ReaderAccountStatus status;
 
   private ReaderAccount(
       ReaderAccountId id,
@@ -28,7 +29,7 @@ public class ReaderAccount extends AggregateRoot<ReaderAccountId> {
     this.telephone = telephone;
     this.password = password;
     this.status = status;
-    registerEvent(new ReaderAccountRegisteredEvent(id, email, name, surname, telephone));
+    registerEvent(new ReaderAccountRegistered(id, email, name, surname, telephone));
   }
 
   static ReaderAccount of(
@@ -64,5 +65,10 @@ public class ReaderAccount extends AggregateRoot<ReaderAccountId> {
 
   public ReaderAccountStatus status() {
     return status;
+  }
+
+  public void changeStatusToActive() {
+    this.status = ReaderAccountStatus.ACTIVE;
+    this.registerEvent(new ReaderAccountUnblocked(this.id()));
   }
 }

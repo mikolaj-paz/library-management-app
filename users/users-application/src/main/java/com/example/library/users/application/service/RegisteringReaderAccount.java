@@ -3,18 +3,18 @@ package com.example.library.users.application.service;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 import com.example.library.users.application.command.RegisterReaderAccount;
 import com.example.library.users.application.port.in.IRegisterReaderAccount;
-import com.example.library.users.application.repository.ReaderAcountRepository;
+import com.example.library.users.application.repository.ReaderAccountRepository;
 import com.example.library.users.domain.reader.ReaderAccount;
 import com.example.library.users.domain.reader.ReaderAccountFactory;
 
 public class RegisteringReaderAccount implements IRegisterReaderAccount {
 
-  private final ReaderAcountRepository readerAccountRepository;
+  private final ReaderAccountRepository readerAccountRepository;
   private final ReaderAccountFactory readerAccountFactory;
   private final DomainEventPublisher eventPublisher;
 
   public RegisteringReaderAccount(
-      ReaderAcountRepository readerAccountRepository,
+      ReaderAccountRepository readerAccountRepository,
       ReaderAccountFactory readerAccountFactory,
       DomainEventPublisher eventPublisher) {
     this.readerAccountRepository = readerAccountRepository;
