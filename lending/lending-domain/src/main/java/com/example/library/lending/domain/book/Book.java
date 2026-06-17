@@ -1,8 +1,8 @@
 package com.example.library.lending.domain.book;
 
 import com.example.library.sharedkernel.entity.AggregateRoot;
-import com.example.library.sharedkernel.event.ReaderDequeuedEvent;
-import com.example.library.sharedkernel.event.ReaderQueuedEvent;
+import com.example.library.sharedkernel.event.ReaderDequeued;
+import com.example.library.sharedkernel.event.ReaderQueued;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import java.util.ArrayDeque;
@@ -34,12 +34,12 @@ public class Book extends AggregateRoot<BookId> {
 
   public void addToQueue(ReaderId readerId) {
     waitingQueue.addLast(readerId);
-    registerEvent(new ReaderQueuedEvent(this.id(), readerId));
+    registerEvent(new ReaderQueued(this.id(), readerId));
   }
 
   public Optional<ReaderId> removeNextReaderFromQueue() {
     Optional<ReaderId> nextReader = Optional.ofNullable(waitingQueue.pollFirst());
-    nextReader.ifPresent(readerId -> registerEvent(new ReaderDequeuedEvent(this.id(), readerId)));
+    nextReader.ifPresent(readerId -> registerEvent(new ReaderDequeued(this.id(), readerId)));
     return nextReader;
   }
 

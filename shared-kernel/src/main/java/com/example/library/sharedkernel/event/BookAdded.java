@@ -4,7 +4,7 @@ import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.valueobject.ISBN;
 import java.time.LocalDate;
 
-public class BookAddedEvent extends DomainEvent {
+public class BookAdded extends DomainEvent {
 
   private final BookId bookId;
   private final String title;
@@ -13,7 +13,7 @@ public class BookAddedEvent extends DomainEvent {
   private final String publisher;
   private final LocalDate publicationDate;
 
-  public BookAddedEvent(
+  public BookAdded(
       BookId bookId,
       String title,
       String author,

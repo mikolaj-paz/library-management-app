@@ -1,7 +1,7 @@
 package com.example.library.catalog.domain.book;
 
 import com.example.library.sharedkernel.entity.AggregateRoot;
-import com.example.library.sharedkernel.event.BookAddedEvent;
+import com.example.library.sharedkernel.event.BookAdded;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.valueobject.ISBN;
 import java.time.LocalDate;
@@ -26,7 +26,7 @@ public class Book extends AggregateRoot<BookId> {
     this.isbn = isbn;
     this.publisher = publisher;
     this.publicationDate = publicationDate;
-    registerEvent(new BookAddedEvent(id, title, author, isbn, publisher, publicationDate));
+    registerEvent(new BookAdded(id, title, author, isbn, publisher, publicationDate));
   }
 
   static Book of(
