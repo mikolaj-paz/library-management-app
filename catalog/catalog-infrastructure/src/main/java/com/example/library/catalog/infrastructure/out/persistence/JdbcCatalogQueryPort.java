@@ -5,6 +5,7 @@ import com.example.library.catalog.application.query.BookDetails;
 import com.example.library.catalog.application.query.BookSearchResult;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.valueobject.ISBN;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -57,12 +58,14 @@ public class JdbcCatalogQueryPort implements CatalogQueryPort {
                 b.title,
                 b.author,
                 b.isbn,
+                b.publisher,
+                b.publication_date,
                 COUNT(bc.id) AS total_copies,
                 COUNT(CASE WHEN bc.status = 'AVAILABLE' THEN 1 END) AS available_copies
             FROM books b
             LEFT JOIN book_copies bc ON bc.book_id = b.id
             WHERE b.id = ?
-            GROUP BY b.id, b.title, b.author, b.isbn
+            GROUP BY b.id, b.title, b.author, b.isbn, b.publisher, b.publication_date
             """,
             (rs, rowNum) ->
                 new BookDetails(
@@ -70,6 +73,8 @@ public class JdbcCatalogQueryPort implements CatalogQueryPort {
                     rs.getString("title"),
                     rs.getString("author"),
                     new ISBN(rs.getString("isbn")),
+                    rs.getString("publisher"),
+                    LocalDate.parse(rs.getString("publication_date")),
                     rs.getInt("total_copies"),
                     rs.getInt("available_copies")),
             bookId.value().toString());

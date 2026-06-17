@@ -61,7 +61,7 @@ public class LoanController {
     }
   }
 
-  record LendBookCopyRequest(String bookCopyId, String readerId, String dueDate) {}
+  record LendBookCopyRequest(String bookCopyId, String readerId) {}
 
   @PostMapping("/return/{bookCopyId}")
   public ResponseEntity<?> returnBookCopy(@PathVariable("bookCopyId") String bookCopyId) {

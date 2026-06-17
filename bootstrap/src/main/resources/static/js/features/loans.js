@@ -9,7 +9,6 @@ async function lendBookCopy(values) {
     body: {
       bookCopyId: values.bookCopyId,
       readerId: values.readerId,
-      dueDate: values.dueDate || ""
     }
   });
 

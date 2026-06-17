@@ -49,6 +49,34 @@ body {
   padding: 1.25rem;
 }
 
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+input {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.35rem 0.45rem;
+}
+
+pre {
+  margin: 0 0 1rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow-x: auto;
+  background: #fbfdff;
+}
+
 button {
   border: none;
   background: var(--primary);
@@ -62,11 +90,4 @@ button {
 
 button:hover {
   background: var(--primary-strong);
-}
-
-#lend-book-copy-form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
 }

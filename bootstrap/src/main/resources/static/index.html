@@ -41,6 +41,32 @@
       <section class="panel">
         <h2>Inventory</h2>
 
+        <h3>Create Book</h3>
+        <form id="create-book-form">
+          <label>
+            Title
+            <input name="title" type="text" required />
+          </label>
+          <label>
+            Author
+            <input name="author" type="text" required />
+          </label>
+          <label>
+            ISBN
+            <input name="isbn" type="text" required />
+          </label>
+          <label>
+            Publisher
+            <input name="publisher" type="text" required />
+          </label>
+          <label>
+            Publication Date
+            <input name="publicationDate" type="date" required />
+          </label>
+          <button type="submit">Create Book</button>
+        </form>
+        <pre id="create-book-output"></pre>
+
         <h3>Add Book Copy</h3>
         <form id="add-book-copy-form">
           <label>
@@ -74,10 +100,6 @@
           <label>
             Reader ID
             <input name="readerId" type="text" required />
-          </label>
-          <label>
-            Due Date (optional)
-            <input name="dueDate" type="text" />
           </label>
           <button type="submit">Lend</button>
         </form>
@@ -134,6 +156,56 @@
           <button type="submit">Reserve</button>
         </form>
         <pre id="reserve-book-output"></pre>
+
+        <h3>Join Waiting Queue</h3>
+        <form id="join-waiting-queue-form">
+          <label>
+            Reader ID
+            <input name="readerId" type="text" required />
+          </label>
+          <label>
+            Book ID
+            <input name="bookId" type="text" required />
+          </label>
+          <button type="submit">Join Queue</button>
+        </form>
+        <pre id="join-waiting-queue-output"></pre>
+      </section>
+
+      <section class="panel">
+        <h2>Readers</h2>
+
+        <h3>Register Reader Account</h3>
+        <form id="register-reader-form">
+          <label>
+            Name
+            <input name="name" type="text" required />
+          </label>
+          <label>
+            Surname
+            <input name="surname" type="text" required />
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" required />
+          </label>
+          <label>
+            Telephone
+            <input name="telephone" type="text" required />
+          </label>
+          <button type="submit">Register</button>
+        </form>
+        <pre id="register-reader-output"></pre>
+
+        <h3>Unblock Reader Account</h3>
+        <form id="unblock-reader-form">
+          <label>
+            Reader Account ID
+            <input name="readerAccountId" type="text" required />
+          </label>
+          <button type="submit">Unblock</button>
+        </form>
+        <pre id="unblock-reader-output"></pre>
       </section>
     </main>
 
