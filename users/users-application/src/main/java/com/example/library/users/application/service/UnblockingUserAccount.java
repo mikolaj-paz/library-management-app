@@ -32,8 +32,5 @@ public class UnblockingUserAccount implements IUnblockReaderAccount {
     readerAccountRepository.update(readerAccount);
 
     readerAccount.pullDomainEvents().forEach(eventPublisher::publish);
-
-    // 5. Bibliotekarz otrzymuje potwierdzenie pomyślnego odblokowania użytkownika.
-    return;
   }
 }

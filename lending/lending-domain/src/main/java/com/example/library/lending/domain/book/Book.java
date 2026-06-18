@@ -1,5 +1,7 @@
 package com.example.library.lending.domain.book;
 
+import com.example.library.lending.domain.exception.BookAlreadyInReaderWaitingQueueException;
+import com.example.library.lending.domain.exception.ExtensionNotAllowedException;
 import com.example.library.sharedkernel.entity.AggregateRoot;
 import com.example.library.sharedkernel.event.ReaderDequeued;
 import com.example.library.sharedkernel.event.ReaderQueued;
@@ -24,12 +26,19 @@ public class Book extends AggregateRoot<BookId> {
     return new Book(id, waitingQueue);
   }
 
-  public boolean hasQueuedReader() {
-    return !waitingQueue.isEmpty();
+  public void verifyIfCopyCanBeExtended() {
+    if (!waitingQueue.isEmpty()) {
+      throw new ExtensionNotAllowedException(
+          "Cannot extend the loan because there are readers in the queue for book: "
+              + this.id()
+              + ".");
+    }
   }
 
-  public boolean hasQueued(ReaderId readerId) {
-    return waitingQueue.contains(readerId);
+  public void checkIfCanBeQueued(ReaderId readerId) {
+    if (waitingQueue.contains(readerId)) {
+      throw new BookAlreadyInReaderWaitingQueueException(readerId, this.id());
+    }
   }
 
   public void addToQueue(ReaderId readerId) {

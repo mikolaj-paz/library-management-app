@@ -40,7 +40,6 @@ public class AddingBook implements IAddBook {
     // 4. Zapisanie danych nowej książki w bazie danych katalogu.
     bookRepository.create(book);
 
-    // 5. Bibliotekarz otrzymuje komunikat potwierdzający pomyślne dodanie  nowej książki.
     return book;
   }
 }

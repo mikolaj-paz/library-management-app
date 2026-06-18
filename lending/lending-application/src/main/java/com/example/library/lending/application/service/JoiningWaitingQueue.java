@@ -3,7 +3,6 @@ package com.example.library.lending.application.service;
 import com.example.library.lending.application.command.JoinWaitingQueue;
 import com.example.library.lending.application.port.in.IJoinWaitingQueue;
 import com.example.library.lending.application.repository.BookRepository;
-import com.example.library.lending.domain.exception.BookAlreadyInReaderWaitingQueueException;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 
 public class JoiningWaitingQueue implements IJoinWaitingQueue {
@@ -27,9 +26,7 @@ public class JoiningWaitingQueue implements IJoinWaitingQueue {
         bookRepository
             .find(bookId)
             .orElseThrow(() -> new IllegalArgumentException("Book not found: " + bookId));
-    if (book.hasQueued(readerId)) {
-      throw new BookAlreadyInReaderWaitingQueueException(readerId, bookId);
-    }
+    book.checkIfCanBeQueued(readerId);
 
     // 4. Dodanie nowego wpisu o rezerwacji kolejki dla czytelnika.
     book.addToQueue(readerId);

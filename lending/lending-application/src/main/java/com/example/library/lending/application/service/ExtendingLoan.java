@@ -5,7 +5,6 @@ import com.example.library.lending.application.port.in.IExtendLoan;
 import com.example.library.lending.application.repository.BookCopyRepository;
 import com.example.library.lending.application.repository.BookRepository;
 import com.example.library.lending.application.repository.LoanRepository;
-import com.example.library.lending.domain.exception.ExtensionNotAllowedException;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 
 public class ExtendingLoan implements IExtendLoan {
@@ -54,10 +53,7 @@ public class ExtendingLoan implements IExtendLoan {
 
     // 2. Sprawdzenie w bazie danych warunków pozwalających na przedłużenie (brak kolejki, nie
     // przekroczony limit przedłużeń).
-    if (book.hasQueuedReader()) {
-      throw new ExtensionNotAllowedException(
-          "Cannot extend loan " + loanId + " because there are readers in the queue.");
-    }
+    book.verifyIfCopyCanBeExtended();
 
     // 3. Obliczenie nowego terminu zwrotu książki.
     loan.extend();

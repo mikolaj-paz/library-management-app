@@ -33,7 +33,7 @@ public class ReservingBook implements IReserveBook {
 
   @Override
   public ReservationId reserveBook(ReserveBook command) {
-    // 2. Weryfikacja reguł Konta Czytelnika.
+    // 2. System sprawdza konto Czytelnika (brak blokad, nieprzekroczony limit).
     var readerId = command.readerId();
     var reader =
         readerRepository
@@ -41,13 +41,13 @@ public class ReservingBook implements IReserveBook {
             .orElseThrow(() -> new IllegalArgumentException("Reader not found: " + readerId));
     reader.verifyReservationEligibility();
 
-    // 3. System wyszukuje w bazie danych Egzemplarz tej książki o statusie „Dostępny”.
+    // 3. System wyszukuje egzemplarz tej książki o statusie „Dostępny”.
     var bookCopy =
         bookCopyRepository
             .findAvailableBookCopy(command.bookId())
             .orElseThrow(() -> new NoAvailableBookCopyException(command.bookId()));
 
-    // 4. Utworzenie nowej Rezerwacji przypisanej do konta użytkownika i zapisanie jej w bazie.
+    // 4. Utworzenie nowej Rezerwacji przypisanej do konta użytkownika..
     var bookCopyId = bookCopy.id();
     var reservation = reservationFactory.create(readerId, bookCopyId);
     var reservationId = reservation.id();
@@ -55,8 +55,6 @@ public class ReservingBook implements IReserveBook {
 
     // 5. Status wybranego Egzemplarza jest ustawiany na „Zarezerwowany”.
     bookCopy.reserve(reservationId, readerId);
-
-    // 6. Aktualizacja danych egzemplarza w bazie danych.
     bookCopyRepository.update(bookCopy);
 
     bookCopy.pullDomainEvents().forEach(eventPublisher::publish);
