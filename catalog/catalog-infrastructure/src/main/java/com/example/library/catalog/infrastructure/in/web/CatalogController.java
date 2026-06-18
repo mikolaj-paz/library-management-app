@@ -4,6 +4,7 @@ import com.example.library.catalog.application.port.in.IGetBookDetails;
 import com.example.library.catalog.application.port.in.ISearchCatalog;
 import com.example.library.catalog.application.query.GetBookDetails;
 import com.example.library.catalog.application.query.SearchCatalog;
+import com.example.library.catalog.domain.exception.BookNotFoundException;
 import com.example.library.sharedkernel.identifier.BookId;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,8 @@ public class CatalogController {
       return ResponseEntity.ok(details);
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (BookNotFoundException e) {
+      return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
       return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
     }

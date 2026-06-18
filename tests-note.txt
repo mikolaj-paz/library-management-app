@@ -1,0 +1,321 @@
+================================================================================
+1. SUMMARY
+================================================================================
+
+Current test suite covers shared-kernel, catalog, lending, notifications, users,
+bootstrap acceptance paths, and architecture rules.
+
+Layer / type             Classes   Tests run   Tooling
+--------------------------------------------------------------------------------
+Domain + shared unit     9         29 active   JUnit 5, AssertJ
+Application unit         17        36 active   JUnit 5, AssertJ, Mockito
+JDBC integration         9         24 active   JUnit 5, SQLite
+Controller slice         6         28 active   JUnit 5, MockMvc/direct calls
+Event adapter            1         2 active    JUnit 5, Mockito
+System / acceptance      1         9 active    SpringBootTest, Flyway
+Architecture             1         4 active    ArchUnit
+--------------------------------------------------------------------------------
+TOTAL                    44        132 active = 132 tests
+
+Last verification:
+  .\mvnw.cmd clean test
+  Result: BUILD SUCCESS (2026-06-18)
+
+================================================================================
+2. TEST-ONLY CONFIGURATION / INFRASTRUCTURE
+================================================================================
+
+architecture-tests/pom.xml
+  - Depends on shared-kernel plus catalog, lending, and users domain/application
+    modules so ArchUnit can inspect those production classes from tests.
+
+catalog-infrastructure/pom.xml and lending-infrastructure/pom.xml
+  - Provide test dependencies used by controller and JDBC tests.
+
+users-infrastructure/pom.xml
+  - Adds sqlite-jdbc with test scope for JdbcReaderAccountRepositoryTest.
+
+TEST HELPERS
+  - catalog/.../SqliteTestDatabase.java aligns in-memory SQLite schema with tests.
+  - lending/.../SqliteTestDatabase.java aligns in-memory SQLite schema with tests.
+
+BOOTSTRAP TEST CONFIG
+  - bootstrap/src/test/resources/application.properties
+  - Uses a random SQLite file per test context:
+      jdbc:sqlite:target/library-acceptance-test-${random.uuid}.db
+    This avoids stale Flyway schema history/checksum issues between repeated
+    test runs. It is test-only configuration.
+
+All previously disabled bug-documenting tests have been fixed and re-enabled.
+Production fixes: Book/BookCopy reconstitution (catalog-domain), BookCopyFactory
+(catalog-domain), CatalogController 404 mapping (catalog-infrastructure),
+LendingBookCopy availability guard (lending-application), JdbcReaderRepository
+loan count (lending-infrastructure), ReaderAccountRegistered ID serialization
+(shared-kernel), UsersController response mapping (users-infrastructure).
+
+================================================================================
+3. CURRENT TEST COVERAGE BY MODULE
+================================================================================
+
+SHARED-KERNEL
+  AggregateRootTest (1)
+    - registerEvent and pullDomainEvents returns and clears events.
+
+CATALOG-DOMAIN
+  BookTest (3)
+    - stores metadata on create.
+    - registers BookAdded on create.
+    - reconstituting Book should not register BookAdded.
+
+  BookCopyTest (5)
+    - creates AVAILABLE book copy.
+    - registers BookCopyAdded on create.
+    - withdraws AVAILABLE copy and emits BookCopyRemoved.
+    - rejects withdrawal of RESERVED copy.
+    - reconstituting BookCopy should not register BookCopyAdded.
+
+CATALOG-APPLICATION
+  AddingBookTest (2)
+    - creates and stores book for unique ISBN.
+    - rejects duplicate ISBN.
+
+  AddBookCopyServiceTest (2)
+    - creates copy for existing book and publishes event.
+    - rejects missing book.
+
+  RemoveBookCopyServiceTest (2)
+    - rejects missing copy.
+    - removes AVAILABLE copy and publishes only BookCopyRemoved.
+
+  GetBookDetailsServiceTest (2)
+    - returns details for existing book.
+    - propagates BookNotFoundException.
+
+  SearchCatalogServiceTest (1)
+    - delegates search query to CatalogQueryPort.
+
+CATALOG-INFRASTRUCTURE
+  BookControllerTest (2)
+    - POST /books returns bookId.
+    - POST /books maps invalid/duplicate input to 400.
+
+  BookCopyControllerTest (5)
+    - POST /book-copies success and bad request cases.
+    - POST /book-copies/remove success, bad request, and conflict cases.
+
+  CatalogControllerTest (2)
+    - returns book details for existing book.
+    - missing book should return 404.
+
+  JdbcBookRepositoryTest (4)
+    - insert, find by id, find by ISBN, empty result.
+
+  JdbcBookCopyRepositoryTest (2)
+    - insert linked copy.
+    - find copy by id.
+
+  JdbcCatalogQueryPortTest (3)
+    - search by title/author/ISBN.
+    - get details.
+    - not found details path.
+
+LENDING-DOMAIN
+  BookTest (2)
+    - adds reader to waiting queue and emits ReaderQueued.
+    - removes next queued reader and emits ReaderDequeued.
+
+  BookCopyTest (7)
+    - loan, reserve, return status transitions.
+    - rejects unavailable/invalid loan/reservation cases.
+    - emits BookCopyLoaned, BookCopyReserved, BookCopyReturned events.
+
+  LoanTest (5)
+    - creates ACTIVE loan with due date.
+    - closes loan.
+    - detects overdue loan.
+    - extends active loan once and emits LoanExtended.
+    - rejects closed or already-extended loan extension.
+
+  ReaderTest (2)
+    - ACTIVE reader can borrow.
+    - BLOCKED reader cannot borrow.
+
+  ReservationTest (1)
+    - creates reservation with reader and book copy identifiers.
+
+LENDING-APPLICATION
+  ExpiringReservationsTest (1)
+    - publishes ReservationExpired events for expired reservations.
+
+  ExtendLoanServiceTest (2)
+    - extends loan when book has no queued reader.
+    - rejects extension when book has queued reader.
+
+  HandlingOverdueBookReturnTest (1)
+    - blocks reader after overdue return.
+
+  HandlingReservationExpiredTest (1)
+    - marks reserved copy AVAILABLE when reservation expires.
+
+  JoiningWaitingQueueTest (2)
+    - adds reader to book waiting queue and publishes event.
+    - rejects duplicate waiting queue entry.
+
+  LendBookCopyServiceTest (7)
+    - happy path.
+    - reader not found, blocked reader, loan limit.
+    - copy not found, reserved-for-same-reader path.
+    - verifies copy loan event publication.
+    - unavailable copy should not create a loan before rejection.
+
+  ReserveBookServiceTest (5)
+    - happy path.
+    - blocked reader, loan limit, no available copy.
+    - marks selected copy as reserved and publishes event.
+
+  ReturnBookCopyServiceTest (2)
+    - closes active loan, marks copy available, publishes return event.
+    - rejects missing active loan.
+
+  ShowLoansServiceTest (1)
+    - delegates reader loan listing to repository.
+
+LENDING-INFRASTRUCTURE
+  LoanControllerTest (8)
+    - lend success, blocked reader, unavailable copy, bad request.
+    - return copy endpoint.
+    - extend loan endpoint.
+    - list loans endpoint.
+
+  ReservationControllerTest (7)
+    - reservation success.
+    - blocked reader, no-copy message, bad request.
+    - waiting queue success and duplicate-entry bad request.
+
+  JdbcBookCopyRepositoryTest (3)
+    - find, findAvailable, update status/reservation state.
+
+  JdbcBookRepositoryTest (2)
+    - finds book without queued reader.
+    - finds book with queued reader.
+
+  JdbcLoanRepositoryTest (2)
+    - inserts loan with ACTIVE status.
+    - finds loan summaries for a reader.
+
+  JdbcReaderRepositoryTest (3)
+    - find reader, empty result.
+    - closed loans should not count against reader active loan limit.
+
+  JdbcReservationRepositoryTest (2)
+    - inserts reservation.
+    - finds expired reservations.
+
+NOTIFICATIONS
+  InformServiceTest (1)
+    - builds Notification from InformCommand and sends it.
+
+  LendingEventListenerTest (2)
+    - informs reader when book copy is loaned.
+    - uses overdue notification type for overdue return.
+
+USERS
+  ReaderAccountTest (3)
+    - creates ACTIVE reader account with generated password.
+    - reconstitutes reader account.
+    - ReaderAccountRegistered should expose raw ReaderAccountId.
+
+  RegisteringReaderAccountTest (2)
+    - creates reader account for unique email.
+    - rejects duplicate email.
+
+  UnblockingUserAccountTest (2)
+    - unblocks reader account and publishes event.
+    - rejects missing reader account.
+
+  UsersControllerTest (4)
+    - maps duplicate email to 400.
+    - unblocks reader account success and bad request paths.
+    - success response should expose raw ReaderAccountId.
+
+  JdbcReaderAccountRepositoryTest (3)
+    - inserts reader account.
+    - finds reader account by email.
+    - empty result for unknown email.
+
+BOOTSTRAP ACCEPTANCE
+  LendingAcceptanceTest (9)
+    - POST /loans success.
+    - POST /loans blocked reader response.
+    - POST /reservations success.
+    - POST /reservations no-copy message.
+    - POST /book-copies/remove marks copy WITHDRAWN.
+    - POST /loans/return closes loan and marks copy AVAILABLE.
+    - POST /loans conflict must not persist unavailable-copy loan.
+    - POST /books persists metadata.
+    - POST /loans/extend plus POST /loans/list.
+
+ARCHITECTURE-TESTS
+  HexagonalArchitectureTest (4)
+    - domain layers are free of Spring/SQL/Jakarta.
+    - application layers do not depend on infrastructure.
+    - lending and catalog domain models stay isolated.
+    - aggregate roots include catalog, lending, and users aggregates.
+
+================================================================================
+4. TEMPORARILY DISABLED BUG-DOCUMENTING TESTS
+================================================================================
+
+None. All previously disabled tests have been fixed and re-enabled.
+
+================================================================================
+5. HOW TO RUN TESTS
+================================================================================
+
+ALL TESTS:
+  .\mvnw.cmd test
+
+CLEAN FULL VERIFICATION:
+  .\mvnw.cmd clean test
+
+TESTS + FORMAT + LINT (CI):
+  .\mvnw.cmd verify
+
+INSTALL (build + test + local .m2):
+  .\mvnw.cmd install
+
+Avoid "clean install" if OneDrive locks target\ folder.
+
+SINGLE TEST CLASS (nested modules need ":" prefix):
+  .\mvnw.cmd -pl :catalog-domain -Dtest=BookTest test
+  .\mvnw.cmd -pl :catalog-application -Dtest=AddBookCopyServiceTest test
+  .\mvnw.cmd -pl :catalog-infrastructure -Dtest=JdbcCatalogQueryPortTest test
+  .\mvnw.cmd -pl :lending-domain -Dtest=BookCopyTest test
+  .\mvnw.cmd -pl :lending-application -Dtest=LendBookCopyServiceTest test
+  .\mvnw.cmd -pl :lending-infrastructure -Dtest=LoanControllerTest test
+  .\mvnw.cmd -pl :notifications-application -Dtest=InformServiceTest test
+  .\mvnw.cmd -pl :users-application -Dtest=RegisteringReaderAccountTest test
+  .\mvnw.cmd -pl :architecture-tests -Dtest=HexagonalArchitectureTest test
+  .\mvnw.cmd -pl bootstrap -Dtest=LendingAcceptanceTest test
+
+CONFIRM TESTS RAN:
+  Output must contain:
+    [INFO]  T E S T S
+    [INFO] Running com.example.library....
+    [INFO] Tests run: X, Failures: 0, Errors: 0, Skipped: Y
+
+  BUILD SUCCESS in <1s without T E S T S = wrong module, no tests executed.
+
+================================================================================
+6. TEST PYRAMID
+================================================================================
+
+                    Architecture  (4)    ArchUnit
+                    Acceptance    (9)    bootstrap / SpringBootTest
+                    Event adapter (2)    Spring event listener adapter
+                    Controller   (28)    MockMvc / direct controller calls
+                    Integration  (24)    SQLite + JDBC
+                    Application  (36)    Mockito
+                    Domain/shared(29)    Pure JUnit
+
+================================================================================

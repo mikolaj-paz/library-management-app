@@ -4,7 +4,7 @@ import com.example.library.sharedkernel.identifier.ReaderAccountId;
 
 public class ReaderAccountRegistered extends DomainEvent {
 
-  private final String readerAccountId;
+  private final ReaderAccountId readerAccountId;
   private final String email;
   private final String name;
   private final String surname;
@@ -13,14 +13,14 @@ public class ReaderAccountRegistered extends DomainEvent {
   public ReaderAccountRegistered(
       ReaderAccountId id, String email, String name, String surname, String telephone) {
     super();
-    this.readerAccountId = id.toString();
+    this.readerAccountId = id;
     this.email = email;
     this.name = name;
     this.surname = surname;
     this.telephone = telephone;
   }
 
-  public String getReaderAccountId() {
+  public ReaderAccountId getReaderAccountId() {
     return readerAccountId;
   }
 

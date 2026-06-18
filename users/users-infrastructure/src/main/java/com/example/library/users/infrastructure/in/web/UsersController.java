@@ -30,7 +30,7 @@ public class UsersController {
   public ResponseEntity<?> registerReaderAccount(@RequestBody RegisterReaderAccount request) {
     try {
       var results = registerReaderAccountService.registerReaderAccount(request);
-      return ResponseEntity.ok(Map.of("readerAccountId", results.id().toString()));
+      return ResponseEntity.ok(Map.of("readerAccountId", results.id().value().toString()));
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {

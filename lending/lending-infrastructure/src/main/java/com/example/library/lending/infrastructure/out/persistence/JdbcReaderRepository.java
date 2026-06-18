@@ -26,7 +26,7 @@ public class JdbcReaderRepository implements ReaderPersistencePort {
             SELECT r.id, r.status, (
               SELECT COUNT(*)
               FROM loans l
-              WHERE l.reader_id = r.id
+              WHERE l.reader_id = r.id AND (l.status = 'ACTIVE' OR l.status = 'EXTENDED')
             ) AS active_loans_count
             FROM readers r
             WHERE r.id = ?

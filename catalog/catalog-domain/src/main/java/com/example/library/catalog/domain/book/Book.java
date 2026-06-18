@@ -26,10 +26,28 @@ public class Book extends AggregateRoot<BookId> {
     this.isbn = isbn;
     this.publisher = publisher;
     this.publicationDate = publicationDate;
-    registerEvent(new BookAdded(id, title, author, isbn, publisher, publicationDate));
   }
 
-  static Book of(
+  static Book create(
+      BookId id,
+      String title,
+      String author,
+      ISBN isbn,
+      String publisher,
+      LocalDate publicationDate) {
+    var book = new Book(id, title, author, isbn, publisher, publicationDate);
+    book.registerEvent(
+        new BookAdded(
+            book.id(),
+            book.title(),
+            book.author(),
+            book.isbn(),
+            book.publisher(),
+            book.publicationDate()));
+    return book;
+  }
+
+  static Book reconstitute(
       BookId id,
       String title,
       String author,
