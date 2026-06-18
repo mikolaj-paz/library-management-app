@@ -6,7 +6,7 @@ import com.example.library.lending.application.port.in.IHandleOverdueBookReturn;
 import com.example.library.lending.application.port.in.IHandleReservationExpired;
 import com.example.library.lending.application.port.in.IJoinWaitingQueue;
 import com.example.library.lending.application.port.in.ILendBookCopy;
-import com.example.library.lending.application.port.in.IReserveBook;
+import com.example.library.lending.application.port.in.IReserveBookCopy;
 import com.example.library.lending.application.port.in.IReturnBookCopy;
 import com.example.library.lending.application.port.in.IShowLoans;
 import com.example.library.lending.application.port.out.BookCopyPersistencePort;
@@ -25,7 +25,7 @@ import com.example.library.lending.application.service.HandlingOverdueBookReturn
 import com.example.library.lending.application.service.HandlingReservationExpired;
 import com.example.library.lending.application.service.JoiningWaitingQueue;
 import com.example.library.lending.application.service.LendingBookCopy;
-import com.example.library.lending.application.service.ReservingBook;
+import com.example.library.lending.application.service.ReservingBookCopy;
 import com.example.library.lending.application.service.ReturningBookCopy;
 import com.example.library.lending.application.service.ShowingLoans;
 import com.example.library.lending.domain.book.BookFactory;
@@ -182,13 +182,13 @@ public class LendingConfig {
   }
 
   @Bean
-  IReserveBook reservingBook(
+  IReserveBookCopy reservingBookCopy(
       ReaderRepository lendingReaderRepository,
       BookCopyRepository lendingBookCopyRepository,
       ReservationRepository lendingReservationRepository,
       ReservationFactory lendingReservationFactory,
       @Qualifier("lendingDomainEventPublisher") DomainEventPublisher lendingDomainEventPublisher) {
-    return new ReservingBook(
+    return new ReservingBookCopy(
         lendingReaderRepository,
         lendingBookCopyRepository,
         lendingReservationFactory,

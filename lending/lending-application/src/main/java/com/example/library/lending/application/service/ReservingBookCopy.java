@@ -1,7 +1,7 @@
 package com.example.library.lending.application.service;
 
-import com.example.library.lending.application.command.ReserveBook;
-import com.example.library.lending.application.port.in.IReserveBook;
+import com.example.library.lending.application.command.ReserveBookCopy;
+import com.example.library.lending.application.port.in.IReserveBookCopy;
 import com.example.library.lending.application.repository.BookCopyRepository;
 import com.example.library.lending.application.repository.ReaderRepository;
 import com.example.library.lending.application.repository.ReservationRepository;
@@ -10,7 +10,7 @@ import com.example.library.lending.domain.reservation.ReservationFactory;
 import com.example.library.sharedkernel.identifier.ReservationId;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 
-public class ReservingBook implements IReserveBook {
+public class ReservingBookCopy implements IReserveBookCopy {
 
   private final ReaderRepository readerRepository;
   private final BookCopyRepository bookCopyRepository;
@@ -18,7 +18,7 @@ public class ReservingBook implements IReserveBook {
   private final ReservationRepository reservationRepository;
   private final DomainEventPublisher eventPublisher;
 
-  public ReservingBook(
+  public ReservingBookCopy(
       ReaderRepository readerRepository,
       BookCopyRepository bookCopyRepository,
       ReservationFactory reservationFactory,
@@ -32,7 +32,7 @@ public class ReservingBook implements IReserveBook {
   }
 
   @Override
-  public ReservationId reserveBook(ReserveBook command) {
+  public ReservationId reserveBookCopy(ReserveBookCopy command) {
     // 2. System sprawdza konto Czytelnika (brak blokad, nieprzekroczony limit).
     var readerId = command.readerId();
     var reader =

@@ -1,9 +1,9 @@
 package com.example.library.lending.infrastructure.in.web;
 
 import com.example.library.lending.application.command.JoinWaitingQueue;
-import com.example.library.lending.application.command.ReserveBook;
+import com.example.library.lending.application.command.ReserveBookCopy;
 import com.example.library.lending.application.port.in.IJoinWaitingQueue;
-import com.example.library.lending.application.port.in.IReserveBook;
+import com.example.library.lending.application.port.in.IReserveBookCopy;
 import com.example.library.lending.domain.exception.BookAlreadyInReaderWaitingQueueException;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.NoAvailableBookCopyException;
@@ -21,21 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/reservations")
 public class ReservationController {
 
-  private final IReserveBook reserveBookService;
+  private final IReserveBookCopy reserveBookCopyService;
   private final IJoinWaitingQueue joinWaitingQueueService;
 
   public ReservationController(
-      IReserveBook reserveBookService, IJoinWaitingQueue joinWaitingQueueService) {
-    this.reserveBookService = reserveBookService;
+      IReserveBookCopy reserveBookCopyService, IJoinWaitingQueue joinWaitingQueueService) {
+    this.reserveBookCopyService = reserveBookCopyService;
     this.joinWaitingQueueService = joinWaitingQueueService;
   }
 
   @PostMapping
-  public ResponseEntity<?> reserveBook(@RequestBody ReserveBookRequest request) {
+  public ResponseEntity<?> reserveBookCopy(@RequestBody ReserveBookCopyRequest request) {
     try {
       var readerId = ReaderId.of(request.readerId());
       var bookId = BookId.of(request.bookId());
-      var result = reserveBookService.reserveBook(new ReserveBook(readerId, bookId));
+      var result = reserveBookCopyService.reserveBookCopy(new ReserveBookCopy(readerId, bookId));
 
       return ResponseEntity.ok(Map.of("reservationId", result.value().toString()));
     } catch (ReaderBlockedException | LoanLimitExceededException e) {
@@ -47,7 +47,7 @@ public class ReservationController {
     }
   }
 
-  record ReserveBookRequest(String readerId, String bookId) {}
+  record ReserveBookCopyRequest(String readerId, String bookId) {}
 
   @PostMapping("/queue")
   public ResponseEntity<?> joinWaitingQueue(@RequestBody JoinWaitingQueueRequest request) {
