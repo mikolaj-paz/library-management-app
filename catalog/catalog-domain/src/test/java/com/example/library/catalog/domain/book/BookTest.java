@@ -6,7 +6,6 @@ import com.example.library.sharedkernel.event.BookAdded;
 import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.valueobject.ISBN;
 import java.time.LocalDate;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class BookTest {
@@ -52,7 +51,6 @@ class BookTest {
   }
 
   @Test
-  @Disabled("TODO: Reconstituting a Book currently registers BookAdded")
   void should_not_register_book_added_event_when_book_is_reconstituted() {
     var isbn = new ISBN("978-0132350884");
     var publicationDate = LocalDate.of(2008, 8, 1);

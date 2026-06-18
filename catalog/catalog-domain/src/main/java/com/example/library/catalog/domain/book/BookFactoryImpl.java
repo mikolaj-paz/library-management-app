@@ -9,7 +9,7 @@ public class BookFactoryImpl implements BookFactory {
   @Override
   public Book create(
       String title, String author, ISBN isbn, String publisher, LocalDate publicationDate) {
-    return Book.of(BookId.create(), title, author, isbn, publisher, publicationDate);
+    return Book.create(BookId.create(), title, author, isbn, publisher, publicationDate);
   }
 
   @Override
@@ -20,6 +20,6 @@ public class BookFactoryImpl implements BookFactory {
       ISBN isbn,
       String publisher,
       LocalDate publicationDate) {
-    return Book.of(id, title, author, isbn, publisher, publicationDate);
+    return Book.reconstitute(id, title, author, isbn, publisher, publicationDate);
   }
 }

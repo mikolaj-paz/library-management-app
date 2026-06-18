@@ -9,12 +9,12 @@ public class BookCopyFactoryImpl implements BookCopyFactory {
 
   @Override
   public BookCopy create(BookId bookId) {
-    return BookCopy.of(BookCopyId.create(), BookCopyStatus.AVAILABLE, null, bookId);
+    return BookCopy.create(BookCopyId.create(), BookCopyStatus.AVAILABLE, null, bookId);
   }
 
   @Override
   public BookCopy reconstitute(
       BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
-    return BookCopy.of(id, status, reservedBy, bookId);
+    return BookCopy.reconstitute(id, status, reservedBy, bookId);
   }
 }

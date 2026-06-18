@@ -8,7 +8,6 @@ import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.identifier.ReaderId;
 import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 import java.util.UUID;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class BookCopyTest {
@@ -67,7 +66,6 @@ class BookCopyTest {
   }
 
   @Test
-  @Disabled("TODO: Reconstituting a BookCopy currently registers BookCopyAdded")
   void should_not_register_book_copy_added_event_when_copy_is_reconstituted() {
     var bookId = BookId.of(UUID.randomUUID().toString());
     var copy =

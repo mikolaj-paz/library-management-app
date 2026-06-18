@@ -30,7 +30,6 @@ import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -148,8 +147,6 @@ class LendBookCopyServiceTest {
   }
 
   @Test
-  @Disabled(
-      "TODO: LendingBookCopy currently creates the loan before validating book copy availability")
   void should_throw_when_copy_is_not_available_for_reader() {
     var copy = copy(BookCopyStatus.LOANED, null);
     givenActiveReader();

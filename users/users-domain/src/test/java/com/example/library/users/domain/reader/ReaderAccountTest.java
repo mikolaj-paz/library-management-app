@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.library.sharedkernel.event.ReaderAccountRegistered;
 import com.example.library.sharedkernel.identifier.ReaderAccountId;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class ReaderAccountTest {
@@ -25,8 +24,6 @@ class ReaderAccountTest {
   }
 
   @Test
-  @Disabled(
-      "TODO: ReaderAccountRegistered currently serializes ReaderAccountId via record toString")
   void should_register_reader_account_registered_event() {
     var account =
         new ReaderAccountFactoryImpl()
@@ -37,7 +34,7 @@ class ReaderAccountTest {
         .isInstanceOfSatisfying(
             ReaderAccountRegistered.class,
             event -> {
-              assertThat(event.getReaderAccountId()).isEqualTo(account.id().value().toString());
+              assertThat(event.getReaderAccountId()).isEqualTo(account.id());
               assertThat(event.getEmail()).isEqualTo("jane.doe@example.com");
               assertThat(event.getName()).isEqualTo("Jane");
               assertThat(event.getSurname()).isEqualTo("Doe");

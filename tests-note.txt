@@ -5,21 +5,21 @@
 Current test suite covers shared-kernel, catalog, lending, notifications, users,
 bootstrap acceptance paths, and architecture rules.
 
-Layer / type             Classes   Tests run             Tooling
+Layer / type             Classes   Tests run   Tooling
 --------------------------------------------------------------------------------
-Domain + shared unit     9         26 active + 3 skipped JUnit 5, AssertJ
-Application unit         17        34 active + 2 skipped JUnit 5, AssertJ, Mockito
-JDBC integration         9         23 active + 1 skipped JUnit 5, SQLite
-Controller slice         6         26 active + 2 skipped JUnit 5, MockMvc/direct calls
-Event adapter            1         2 active             JUnit 5, Mockito
-System / acceptance      1         6 active + 3 skipped SpringBootTest, Flyway
-Architecture             1         4 active             ArchUnit
+Domain + shared unit     9         29 active   JUnit 5, AssertJ
+Application unit         17        36 active   JUnit 5, AssertJ, Mockito
+JDBC integration         9         24 active   JUnit 5, SQLite
+Controller slice         6         28 active   JUnit 5, MockMvc/direct calls
+Event adapter            1         2 active    JUnit 5, Mockito
+System / acceptance      1         9 active    SpringBootTest, Flyway
+Architecture             1         4 active    ArchUnit
 --------------------------------------------------------------------------------
-TOTAL                    44        121 active + 11 skipped = 132 tests
+TOTAL                    44        132 active = 132 tests
 
 Last verification:
   .\mvnw.cmd clean test
-  Result: BUILD SUCCESS
+  Result: BUILD SUCCESS (2026-06-18)
 
 ================================================================================
 2. TEST-ONLY CONFIGURATION / INFRASTRUCTURE
@@ -46,9 +46,12 @@ BOOTSTRAP TEST CONFIG
     This avoids stale Flyway schema history/checksum issues between repeated
     test runs. It is test-only configuration.
 
-No production Java code or production migration changes are required for this
-test update. Existing production bugs are documented with temporarily disabled
-tests instead of being fixed here.
+All previously disabled bug-documenting tests have been fixed and re-enabled.
+Production fixes: Book/BookCopy reconstitution (catalog-domain), BookCopyFactory
+(catalog-domain), CatalogController 404 mapping (catalog-infrastructure),
+LendingBookCopy availability guard (lending-application), JdbcReaderRepository
+loan count (lending-infrastructure), ReaderAccountRegistered ID serialization
+(shared-kernel), UsersController response mapping (users-infrastructure).
 
 ================================================================================
 3. CURRENT TEST COVERAGE BY MODULE
@@ -59,17 +62,17 @@ SHARED-KERNEL
     - registerEvent and pullDomainEvents returns and clears events.
 
 CATALOG-DOMAIN
-  BookTest (3, 1 skipped)
+  BookTest (3)
     - stores metadata on create.
     - registers BookAdded on create.
-    - SKIPPED: reconstituting Book should not register BookAdded.
+    - reconstituting Book should not register BookAdded.
 
-  BookCopyTest (5, 1 skipped)
+  BookCopyTest (5)
     - creates AVAILABLE book copy.
     - registers BookCopyAdded on create.
     - withdraws AVAILABLE copy and emits BookCopyRemoved.
     - rejects withdrawal of RESERVED copy.
-    - SKIPPED: reconstituting BookCopy should not register BookCopyAdded.
+    - reconstituting BookCopy should not register BookCopyAdded.
 
 CATALOG-APPLICATION
   AddingBookTest (2)
@@ -80,9 +83,9 @@ CATALOG-APPLICATION
     - creates copy for existing book and publishes event.
     - rejects missing book.
 
-  RemoveBookCopyServiceTest (2, 1 skipped)
+  RemoveBookCopyServiceTest (2)
     - rejects missing copy.
-    - SKIPPED: removes AVAILABLE copy and publishes only BookCopyRemoved.
+    - removes AVAILABLE copy and publishes only BookCopyRemoved.
 
   GetBookDetailsServiceTest (2)
     - returns details for existing book.
@@ -100,9 +103,9 @@ CATALOG-INFRASTRUCTURE
     - POST /book-copies success and bad request cases.
     - POST /book-copies/remove success, bad request, and conflict cases.
 
-  CatalogControllerTest (2, 1 skipped)
+  CatalogControllerTest (2)
     - returns book details for existing book.
-    - SKIPPED: missing book should return 404.
+    - missing book should return 404.
 
   JdbcBookRepositoryTest (4)
     - insert, find by id, find by ISBN, empty result.
@@ -158,12 +161,12 @@ LENDING-APPLICATION
     - adds reader to book waiting queue and publishes event.
     - rejects duplicate waiting queue entry.
 
-  LendBookCopyServiceTest (7, 1 skipped)
+  LendBookCopyServiceTest (7)
     - happy path.
     - reader not found, blocked reader, loan limit.
     - copy not found, reserved-for-same-reader path.
     - verifies copy loan event publication.
-    - SKIPPED: unavailable copy should not create a loan before rejection.
+    - unavailable copy should not create a loan before rejection.
 
   ReserveBookServiceTest (5)
     - happy path.
@@ -200,9 +203,9 @@ LENDING-INFRASTRUCTURE
     - inserts loan with ACTIVE status.
     - finds loan summaries for a reader.
 
-  JdbcReaderRepositoryTest (3, 1 skipped)
+  JdbcReaderRepositoryTest (3)
     - find reader, empty result.
-    - SKIPPED: closed loans should not count against reader active loan limit.
+    - closed loans should not count against reader active loan limit.
 
   JdbcReservationRepositoryTest (2)
     - inserts reservation.
@@ -217,10 +220,10 @@ NOTIFICATIONS
     - uses overdue notification type for overdue return.
 
 USERS
-  ReaderAccountTest (3, 1 skipped)
+  ReaderAccountTest (3)
     - creates ACTIVE reader account with generated password.
     - reconstitutes reader account.
-    - SKIPPED: ReaderAccountRegistered should expose raw UUID id.
+    - ReaderAccountRegistered should expose raw ReaderAccountId.
 
   RegisteringReaderAccountTest (2)
     - creates reader account for unique email.
@@ -230,10 +233,10 @@ USERS
     - unblocks reader account and publishes event.
     - rejects missing reader account.
 
-  UsersControllerTest (4, 1 skipped)
+  UsersControllerTest (4)
     - maps duplicate email to 400.
     - unblocks reader account success and bad request paths.
-    - SKIPPED: success response should expose raw UUID id.
+    - success response should expose raw ReaderAccountId.
 
   JdbcReaderAccountRepositoryTest (3)
     - inserts reader account.
@@ -241,16 +244,16 @@ USERS
     - empty result for unknown email.
 
 BOOTSTRAP ACCEPTANCE
-  LendingAcceptanceTest (9, 3 skipped)
+  LendingAcceptanceTest (9)
     - POST /loans success.
     - POST /loans blocked reader response.
     - POST /reservations success.
     - POST /reservations no-copy message.
     - POST /book-copies/remove marks copy WITHDRAWN.
     - POST /loans/return closes loan and marks copy AVAILABLE.
-    - SKIPPED: POST /loans conflict must not persist unavailable-copy loan.
-    - SKIPPED: POST /books persists metadata.
-    - SKIPPED: POST /loans/extend plus POST /loans/list.
+    - POST /loans conflict must not persist unavailable-copy loan.
+    - POST /books persists metadata.
+    - POST /loans/extend plus POST /loans/list.
 
 ARCHITECTURE-TESTS
   HexagonalArchitectureTest (4)
@@ -263,49 +266,7 @@ ARCHITECTURE-TESTS
 4. TEMPORARILY DISABLED BUG-DOCUMENTING TESTS
 ================================================================================
 
-Catalog
-  - BookTest.should_not_register_book_added_event_when_book_is_reconstituted
-    TODO: Reconstituting a Book currently registers BookAdded.
-
-  - BookCopyTest.should_not_register_book_copy_added_event_when_copy_is_reconstituted
-    TODO: Reconstituting a BookCopy currently registers BookCopyAdded.
-
-  - RemoveBookCopyServiceTest.should_withdraw_available_copy_and_publish_event
-    TODO: Reconstituted BookCopy currently carries BookCopyAdded and publishes an
-    extra event.
-
-  - CatalogControllerTest.should_return_not_found_when_book_does_not_exist
-    TODO: CatalogController currently maps BookNotFoundException to 500 instead
-    of 404.
-
-Lending
-  - LendBookCopyServiceTest.should_throw_when_copy_is_not_available_for_reader
-    TODO: LendingBookCopy currently creates the loan before validating book
-    copy availability.
-
-  - JdbcReaderRepositoryTest.should_ignore_closed_loans_when_reconstituting_reader_loan_count
-    TODO: JdbcReaderRepository currently counts closed loans as active loans.
-
-Users
-  - ReaderAccountTest.should_register_reader_account_registered_event
-    TODO: ReaderAccountRegistered currently serializes ReaderAccountId via
-    record toString.
-
-  - UsersControllerTest.should_return_reader_account_id_when_registration_succeeds
-    TODO: UsersController currently returns ReaderAccountId via record toString.
-
-Bootstrap
-  - LendingAcceptanceTest.should_return_conflict_when_lending_unavailable_copy
-    TODO: LendingBookCopy currently creates the loan before validating book
-    copy availability.
-
-  - LendingAcceptanceTest.should_add_book_and_persist_metadata
-    TODO: Bootstrap Flyway schema does not yet include book
-    publisher/publication_date columns.
-
-  - LendingAcceptanceTest.should_extend_loan_and_show_it_on_reader_loan_list
-    TODO: JdbcBookRepository currently does not handle null queued_reader_id
-    during extension.
+None. All previously disabled tests have been fixed and re-enabled.
 
 ================================================================================
 5. HOW TO RUN TESTS
@@ -349,12 +310,12 @@ CONFIRM TESTS RAN:
 6. TEST PYRAMID
 ================================================================================
 
-                    Architecture (4)      ArchUnit
-                    Acceptance (9)        bootstrap / SpringBootTest
-                    Event adapter (2)     Spring event listener adapter
-                    Controller (28)       MockMvc / direct controller calls
-                    Integration (24)      SQLite + JDBC
-                    Application (36)      Mockito
-                    Domain/shared (29)    Pure JUnit
+                    Architecture  (4)    ArchUnit
+                    Acceptance    (9)    bootstrap / SpringBootTest
+                    Event adapter (2)    Spring event listener adapter
+                    Controller   (28)    MockMvc / direct controller calls
+                    Integration  (24)    SQLite + JDBC
+                    Application  (36)    Mockito
+                    Domain/shared(29)    Pure JUnit
 
 ================================================================================

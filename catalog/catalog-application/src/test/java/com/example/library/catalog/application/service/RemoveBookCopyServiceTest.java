@@ -17,7 +17,6 @@ import com.example.library.sharedkernel.identifier.BookId;
 import com.example.library.sharedkernel.publisher.DomainEventPublisher;
 import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 import java.util.Optional;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -32,8 +31,6 @@ class RemoveBookCopyServiceTest {
   @Mock private DomainEventPublisher eventPublisher;
 
   @Test
-  @Disabled(
-      "TODO: Reconstituted BookCopy currently carries BookCopyAdded and publishes an extra event")
   void should_withdraw_available_copy_and_publish_event() {
     var copyId = BookCopyId.create();
     var copy =

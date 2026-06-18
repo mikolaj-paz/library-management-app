@@ -45,19 +45,18 @@ public class LendingBookCopy implements ILendBookCopy {
             .find(bookCopyId)
             .orElseThrow(() -> new IllegalArgumentException("Book copy not found: " + bookCopyId));
 
-    // 2. System weryfikuje w bazie danych możliwość wypożyczenia książki przez tego czytelnika.
-    reader.verifyLoanEligibility();
-
-    // 3. Utworzenie nowego obiektu wypożyczenia oraz automatyczne wyznaczenie terminu zwrotu.
     var loan = loanFactory.create(command.readerId(), command.bookCopyId());
     var loanId = loan.id();
 
+    // 2. System weryfikuje w bazie danych możliwość wypożyczenia książki przez tego czytelnika.
+    reader.verifyLoanEligibility();
+    bookCopy.lend(loan.readerId(), loanId);
+
+    // 3. Utworzenie nowego obiektu wypożyczenia oraz automatyczne wyznaczenie terminu zwrotu.
     // 4. Zapisanie nowego wypożyczenia w bazie danych.
     loanRepository.create(loan);
 
     // 5. Status egzemplarza jest ustawiany na “Wypożyczony”.
-    bookCopy.lend(loan.readerId(), loanId);
-
     // 6. Aktualizacja statusu egzemplarza w bazie danych.
     bookCopyRepository.update(bookCopy);
 

@@ -18,7 +18,6 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
     this.status = status;
     this.reservedBy = reservedBy;
     this.bookId = bookId;
-    this.registerEvent(new BookCopyAdded(this.id(), bookId));
   }
 
   private boolean isLoaned() {
@@ -29,7 +28,14 @@ public class BookCopy extends AggregateRoot<BookCopyId> {
     return status == BookCopyStatus.RESERVED;
   }
 
-  static BookCopy of(BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
+  static BookCopy create(BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
+    var bookCopy = new BookCopy(id, bookId, status, reservedBy);
+    bookCopy.registerEvent(new BookCopyAdded(bookCopy.id(), bookCopy.bookId()));
+    return bookCopy;
+  }
+
+  static BookCopy reconstitute(
+      BookCopyId id, BookCopyStatus status, ReaderId reservedBy, BookId bookId) {
     return new BookCopy(id, bookId, status, reservedBy);
   }
 

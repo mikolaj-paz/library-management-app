@@ -10,7 +10,6 @@ import com.example.library.sharedkernel.identifier.ReaderId;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -44,7 +43,6 @@ class JdbcReaderRepositoryTest {
   }
 
   @Test
-  @Disabled("TODO: JdbcReaderRepository currently counts closed loans as active loans")
   void should_ignore_closed_loans_when_reconstituting_reader_loan_count() {
     var readerId = ReaderId.create();
     jdbc.update(

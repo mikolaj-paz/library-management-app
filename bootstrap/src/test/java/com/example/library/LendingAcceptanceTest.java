@@ -14,7 +14,6 @@ import com.example.library.sharedkernel.valueobject.BookCopyStatus;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -62,8 +61,6 @@ class LendingAcceptanceTest {
   }
 
   @Test
-  @Disabled(
-      "TODO: LendingBookCopy currently creates the loan before validating book copy availability")
   void should_return_conflict_when_lending_unavailable_copy() throws Exception {
     var readerId = ReaderId.create();
     var bookId = BookId.of(UUID.randomUUID().toString());
@@ -142,8 +139,6 @@ class LendingAcceptanceTest {
   }
 
   @Test
-  @Disabled(
-      "TODO: Bootstrap Flyway schema does not yet include book publisher/publication_date columns")
   void should_add_book_and_persist_metadata() throws Exception {
     mockMvc
         .perform(post("/books").contentType(MediaType.APPLICATION_JSON).content(addBookRequest()))
@@ -202,8 +197,6 @@ class LendingAcceptanceTest {
   }
 
   @Test
-  @Disabled(
-      "TODO: JdbcBookRepository currently does not handle null queued_reader_id during extension")
   void should_extend_loan_and_show_it_on_reader_loan_list() throws Exception {
     var readerId = ReaderId.create();
     var bookId = BookId.of(UUID.randomUUID().toString());

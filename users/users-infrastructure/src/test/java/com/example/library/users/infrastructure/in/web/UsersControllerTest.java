@@ -13,7 +13,6 @@ import com.example.library.users.application.port.in.IRegisterReaderAccount;
 import com.example.library.users.application.port.in.IUnblockReaderAccount;
 import com.example.library.users.domain.reader.ReaderAccountFactoryImpl;
 import java.util.Map;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -28,7 +27,6 @@ class UsersControllerTest {
   @Mock private IUnblockReaderAccount unblockReaderAccountService;
 
   @Test
-  @Disabled("TODO: UsersController currently returns ReaderAccountId via record toString")
   void should_return_reader_account_id_when_registration_succeeds() {
     var account =
         new ReaderAccountFactoryImpl()
