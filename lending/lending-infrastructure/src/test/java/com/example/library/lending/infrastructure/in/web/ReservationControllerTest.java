@@ -11,9 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.library.lending.application.command.JoinWaitingQueue;
-import com.example.library.lending.application.command.ReserveBook;
+import com.example.library.lending.application.command.ReserveBookCopy;
 import com.example.library.lending.application.port.in.IJoinWaitingQueue;
-import com.example.library.lending.application.port.in.IReserveBook;
+import com.example.library.lending.application.port.in.IReserveBookCopy;
 import com.example.library.lending.domain.exception.BookAlreadyInReaderWaitingQueueException;
 import com.example.library.lending.domain.exception.LoanLimitExceededException;
 import com.example.library.lending.domain.exception.NoAvailableBookCopyException;
@@ -36,7 +36,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @ExtendWith(MockitoExtension.class)
 class ReservationControllerTest {
 
-  @Mock private IReserveBook reserveBookService;
+  @Mock private IReserveBookCopy reserveBookCopyService;
 
   @Mock private IJoinWaitingQueue joinWaitingQueueService;
 
@@ -46,7 +46,7 @@ class ReservationControllerTest {
   void setUp() {
     mockMvc =
         MockMvcBuilders.standaloneSetup(
-                new ReservationController(reserveBookService, joinWaitingQueueService))
+                new ReservationController(reserveBookCopyService, joinWaitingQueueService))
             .setMessageConverters(new MappingJackson2HttpMessageConverter())
             .build();
   }
@@ -56,7 +56,7 @@ class ReservationControllerTest {
     var readerId = ReaderId.create();
     var bookId = BookId.of(UUID.randomUUID().toString());
     var reservationId = ReservationId.create();
-    when(reserveBookService.reserveBook(any())).thenReturn(reservationId);
+    when(reserveBookCopyService.reserveBookCopy(any())).thenReturn(reservationId);
 
     mockMvc
         .perform(
@@ -66,8 +66,8 @@ class ReservationControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.reservationId").value(reservationId.value().toString()));
 
-    var commandCaptor = ArgumentCaptor.forClass(ReserveBook.class);
-    verify(reserveBookService).reserveBook(commandCaptor.capture());
+    var commandCaptor = ArgumentCaptor.forClass(ReserveBookCopy.class);
+    verify(reserveBookCopyService).reserveBookCopy(commandCaptor.capture());
     assertThat(commandCaptor.getValue().readerId()).isEqualTo(readerId);
     assertThat(commandCaptor.getValue().bookId()).isEqualTo(bookId);
   }
@@ -76,7 +76,8 @@ class ReservationControllerTest {
   void should_return_unprocessable_entity_when_reader_is_blocked() throws Exception {
     var readerId = ReaderId.create();
     var bookId = BookId.of(UUID.randomUUID().toString());
-    when(reserveBookService.reserveBook(any())).thenThrow(new ReaderBlockedException(readerId));
+    when(reserveBookCopyService.reserveBookCopy(any()))
+        .thenThrow(new ReaderBlockedException(readerId));
 
     mockMvc
         .perform(
@@ -91,7 +92,8 @@ class ReservationControllerTest {
   void should_return_unprocessable_entity_when_loan_limit_is_exceeded() throws Exception {
     var readerId = ReaderId.create();
     var bookId = BookId.of(UUID.randomUUID().toString());
-    when(reserveBookService.reserveBook(any())).thenThrow(new LoanLimitExceededException(readerId));
+    when(reserveBookCopyService.reserveBookCopy(any()))
+        .thenThrow(new LoanLimitExceededException(readerId));
 
     mockMvc
         .perform(
@@ -106,7 +108,8 @@ class ReservationControllerTest {
   void should_return_message_when_no_available_copy_exists() throws Exception {
     var readerId = ReaderId.create();
     var bookId = BookId.of(UUID.randomUUID().toString());
-    when(reserveBookService.reserveBook(any())).thenThrow(new NoAvailableBookCopyException(bookId));
+    when(reserveBookCopyService.reserveBookCopy(any()))
+        .thenThrow(new NoAvailableBookCopyException(bookId));
 
     mockMvc
         .perform(

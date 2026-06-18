@@ -31,7 +31,6 @@ class JdbcBookRepositoryTest {
     assertThat(book).isPresent();
     assertThat(book.get().id()).isEqualTo(bookId);
     assertThat(book.get().waitingQueue()).isEmpty();
-    assertThat(book.get().hasQueuedReader()).isFalse();
   }
 
   @Test
@@ -45,7 +44,6 @@ class JdbcBookRepositoryTest {
 
     assertThat(book).isPresent();
     assertThat(book.get().waitingQueue()).containsExactly(queuedReaderId);
-    assertThat(book.get().hasQueuedReader()).isTrue();
   }
 
   private void insertBook(BookId bookId) {
