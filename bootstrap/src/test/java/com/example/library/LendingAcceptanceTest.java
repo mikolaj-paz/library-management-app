@@ -226,6 +226,21 @@ class LendingAcceptanceTest {
         .andExpect(jsonPath("$[0].status").value("EXTENDED"));
   }
 
+  @Test
+  void should_register_reader_account_and_persist_reader_data() throws Exception {
+    mockMvc
+        .perform(
+            post("/users/readers/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(readerRegistrationRequest()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.readerAccountId", notNullValue()));
+
+    assertThat(countRows("readers")).isEqualTo(1);
+    assertThat(readerStatus("jane.doe@example.com")).isEqualTo("ACTIVE");
+    assertThat(readerPassword("jane.doe@example.com")).isNotBlank();
+  }
+
   private void insertReader(ReaderId readerId, String status) {
     jdbc.update(
         "INSERT INTO readers (id, status) VALUES (?, ?)", readerId.value().toString(), status);
@@ -279,6 +294,14 @@ class LendingAcceptanceTest {
         "SELECT due_date FROM loans WHERE id = ?", String.class, loanId.value().toString());
   }
 
+  private String readerStatus(String email) {
+    return jdbc.queryForObject("SELECT status FROM readers WHERE email = ?", String.class, email);
+  }
+
+  private String readerPassword(String email) {
+    return jdbc.queryForObject("SELECT password FROM readers WHERE email = ?", String.class, email);
+  }
+
   private String loanRequest(BookCopyId copyId, ReaderId readerId) {
     return """
         {
@@ -328,5 +351,16 @@ class LendingAcceptanceTest {
         }
         """
         .formatted(readerId.value(), bookId.value());
+  }
+
+  private String readerRegistrationRequest() {
+    return """
+        {
+          "name": "Jane",
+          "surname": "Doe",
+          "email": "jane.doe@example.com",
+          "telephone": "+48123456789"
+        }
+        """;
   }
 }
